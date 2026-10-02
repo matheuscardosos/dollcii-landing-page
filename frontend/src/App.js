@@ -14,6 +14,7 @@ import { Stores } from "./components/Stores";
 import { Footer } from "./components/Footer";
 import { BagDrawer } from "./components/BagDrawer";
 import { Checkout } from "./components/Checkout";
+import { MascotQuiz } from "./components/MascotQuiz";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         <Footer />
         <BagDrawer />
         <Checkout />
+        <MascotQuiz />
         <Toaster position="bottom-center" richColors={false} toastOptions={{ className: "!rounded-full !bg-ink !text-white !border-none" }} />
       </div>
     </BagProvider>
