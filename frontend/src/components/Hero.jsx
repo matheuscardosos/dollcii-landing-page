@@ -86,7 +86,7 @@ export const Hero = () => {
 
   return (
     <section id="topo" data-testid="hero-section" className="relative overflow-hidden bg-white pt-[76px]">
-      <div className="mx-auto grid w-full max-w-[1440px] gap-6 px-5 pb-10 sm:px-8 lg:min-h-[calc(100svh-76px)] lg:grid-cols-12 lg:items-center lg:gap-10 lg:px-14 lg:pb-0">
+      <div className="mx-auto grid w-full max-w-[1440px] gap-6 px-5 pb-10 sm:px-8 lg:grid-cols-12 lg:items-center lg:gap-10 lg:px-14 lg:pb-6 xl:min-h-[calc(100svh-76px)] xl:pb-0">
         <div className="relative z-10 min-w-0 pt-10 lg:col-span-6 lg:pt-0">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2, duration: 1 }}>
             <Eyebrow>Picolés e gelatos artesanais · São Paulo</Eyebrow>
@@ -114,10 +114,10 @@ export const Hero = () => {
         </div>
 
         <div className="relative min-w-0 lg:col-span-6">
-          <FlavorStage flavor={flavor} className="mx-auto aspect-[4/5] w-full max-w-[520px] lg:aspect-auto lg:h-[min(78vh,760px)] lg:max-w-none" />
+          <FlavorStage flavor={flavor} className="mx-auto aspect-[4/5] w-full max-w-[520px] lg:aspect-auto lg:h-[min(64vh,600px)] xl:h-[min(78vh,760px)] lg:max-w-none" />
         </div>
 
-        <div className="min-w-0 lg:col-span-12 lg:-mt-10 lg:pb-10">
+        <div className="min-w-0 lg:col-span-12 lg:-mt-4 xl:-mt-10 lg:pb-6 xl:pb-10">
           <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
             <FlavorCard flavor={flavor} />
             <div className="hidden items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-ink-soft lg:flex">
