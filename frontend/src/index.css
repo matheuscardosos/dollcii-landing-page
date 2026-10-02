@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --background: 0 0% 100%;
+        --foreground: 0 0% 7%;
+        --card: 0 0% 100%;
+        --card-foreground: 0 0% 7%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 0 0% 7%;
+        --primary: 351 75% 54%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 60 8% 96%;
+        --secondary-foreground: 0 0% 7%;
+        --muted: 60 8% 96%;
+        --muted-foreground: 0 0% 44%;
+        --accent: 60 8% 96%;
+        --accent-foreground: 0 0% 7%;
+        --destructive: 351 75% 48%;
+        --destructive-foreground: 0 0% 100%;
+        --border: 0 0% 90%;
+        --input: 0 0% 86%;
+        --ring: 351 75% 54%;
+        --radius: 1rem;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+    html {
+        background: #ffffff;
+    }
+    body {
+        @apply bg-white text-ink font-sans antialiased;
+    }
+    ::selection {
+        background: #e2314b;
+        color: #ffffff;
+    }
+    .font-display {
+        letter-spacing: -0.03em;
+    }
+}
+
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+.hairline { border-color: rgba(17, 17, 17, 0.1); }
+
+.text-outline {
+    color: transparent;
+    -webkit-text-stroke: 1.5px #111111;
+}
+
+.pop-shadow { filter: drop-shadow(0 40px 50px rgba(17, 17, 17, 0.18)); }
+.fruit-shadow { filter: drop-shadow(0 18px 24px rgba(17, 17, 17, 0.16)); }
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-float, .animate-marquee, .animate-spin-slow { animation: none; }
+}
+
+@layer base {
+    [data-debug-wrapper="true"] {
+        display: contents !important;
+    }
+    [data-debug-wrapper="true"] > * {
+        margin: inherit;
+        padding: inherit;
+        gap: inherit;
+        border-width: inherit;
+        border-style: inherit;
+        border-color: inherit;
+    }
+}
