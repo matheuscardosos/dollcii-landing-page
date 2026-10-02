@@ -45,7 +45,7 @@ const FlavorSwitch = ({ active, onPick }) => (
           onClick={() => onPick(f)}
           className={`flex h-11 items-center gap-2.5 rounded-full border pl-3 pr-4 text-sm font-semibold transition-colors duration-300 ${on ? "border-ink bg-ink text-white" : "hairline bg-white text-ink hover:bg-paper"}`}
         >
-          <span className="h-3 w-3 rounded-full ring-2 ring-white/60" style={{ background: f.accent }} />
+          <img src={f.fruit} alt="" className="h-5 w-5 object-contain" />
           {f.name}
         </button>
       );
