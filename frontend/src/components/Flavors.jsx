@@ -17,23 +17,23 @@ const Block = ({ f, onActive }) => {
   }, [inView, f.id, onActive]);
 
   return (
-    <article ref={ref} data-testid={`flavor-block-${f.id}`} className="flex flex-col justify-center border-t hairline py-14 lg:min-h-[74vh] lg:py-0">
-      <div className="mb-8 lg:hidden">
-        <FlavorStage flavor={f} className="aspect-square w-full max-w-sm" />
+    <article ref={ref} data-testid={`flavor-block-${f.id}`} className="flex flex-col justify-center border-t hairline py-10 sm:py-14 lg:min-h-[74vh] lg:py-0">
+      <div className="mb-6 sm:mb-8 lg:hidden">
+        <FlavorStage flavor={f} className="aspect-[4/5] sm:aspect-square w-full max-w-[280px] sm:max-w-sm mx-auto" />
       </div>
       <Reveal>
         <div className="flex items-center gap-4">
           <span className="font-mono text-xs" style={{ color: f.accent }}>Nº {f.n}</span>
           <span className="h-px flex-1 bg-ink/10" />
         </div>
-        <h3 className="mt-6 font-display text-4xl font-bold leading-[0.98] tracking-[-0.03em] sm:text-5xl lg:text-6xl">{f.full}</h3>
-        <p className="mt-6 max-w-lg text-base leading-relaxed text-ink-soft sm:text-lg">{f.story}</p>
-        <ul className="mt-6 flex flex-wrap gap-2">
+        <h3 className="mt-4 sm:mt-6 font-display text-3xl font-bold leading-[0.98] tracking-[-0.03em] sm:text-5xl lg:text-6xl">{f.full}</h3>
+        <p className="mt-4 sm:mt-6 max-w-lg text-sm sm:text-base leading-relaxed text-ink-soft lg:text-lg">{f.story}</p>
+        <ul className="mt-4 sm:mt-6 flex flex-wrap gap-1.5 sm:gap-2">
           {f.notes.map((n) => (
             <li key={n} className="rounded-full bg-paper px-3.5 py-2 text-xs font-semibold">{n}</li>
           ))}
         </ul>
-        <div className="mt-8 flex items-center gap-5">
+        <div className="mt-6 sm:mt-8 flex items-center gap-4 sm:gap-5">
           <button data-testid={`flavor-add-${f.id}`} onClick={() => product && add(product)} className="flex h-12 items-center gap-2 rounded-full px-6 text-sm font-semibold text-white transition-transform duration-300 hover:-translate-y-0.5" style={{ background: f.accent }}>
             <Plus className="h-4 w-4" /> Adicionar à sacola
           </button>

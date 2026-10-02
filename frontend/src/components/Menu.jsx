@@ -43,7 +43,7 @@ export const Menu = () => {
           </div>
         </div>
 
-        <motion.div layout className="mt-10 grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <motion.div layout className="mt-8 sm:mt-10 grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 sm:gap-y-12 lg:grid-cols-3 xl:grid-cols-4">
           <AnimatePresence mode="popLayout">
             {list.map((p) => (
               <ProductCard key={p.id} p={p} onOpen={setOpen} />

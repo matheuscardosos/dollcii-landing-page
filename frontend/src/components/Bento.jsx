@@ -12,14 +12,14 @@ const Stat = ({ value, label, text, delay, className = "" }) => (
 
 export const Bento = () => (
   <Section data-testid="bento-section" className="pb-24 lg:pb-36">
-    <div className="mb-12 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+    <div className="mb-8 sm:mb-12 flex flex-col justify-between gap-4 sm:gap-6 lg:flex-row lg:items-end">
       <div>
         <Eyebrow>O que nos move</Eyebrow>
         <H2 className="mt-5" lines={["Menos ingredientes,", <span key="i" className="text-berry">mais verdade.</span>]} />
       </div>
       <p className="max-w-sm text-base leading-relaxed text-ink-soft">Cada gelado começa na feira e termina no palito em menos de dois dias. Sem pó, sem base pronta, sem pressa.</p>
     </div>
-    <div className="grid auto-rows-[240px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid auto-rows-[180px] sm:auto-rows-[240px] grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <Reveal className="group relative overflow-hidden rounded-[28px] bg-paper sm:col-span-2 sm:row-span-2" data-testid="bento-hero-card">
         <img src={process.env.PUBLIC_URL + "/img/splash.webp"} alt="Morangos caindo no leite fresco" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.6s] ease-out group-hover:scale-105" />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/5 to-transparent" />

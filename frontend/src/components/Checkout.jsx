@@ -50,7 +50,7 @@ const Tracker = ({ order }) => {
 };
 
 const Done = ({ order, onClose }) => (
-  <div className="p-7 sm:p-10" data-testid="order-confirmation">
+  <div className="p-5 sm:p-7 lg:p-10" data-testid="order-confirmation">
     <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 260, damping: 18 }} className="grid h-16 w-16 place-items-center rounded-full bg-berry text-white">
       <Check className="h-7 w-7" />
     </motion.div>
@@ -107,7 +107,7 @@ export const Checkout = () => {
 
   return (
     <Dialog open={checkout} onOpenChange={close}>
-      <DialogContent data-testid="checkout-modal" data-lenis-prevent className="max-h-[94svh] max-w-lg overflow-y-auto rounded-[28px] border-none bg-white p-0 sm:rounded-[28px]">
+      <DialogContent data-testid="checkout-modal" data-lenis-prevent className="max-h-[94svh] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-[20px] sm:rounded-[28px] border-none bg-white p-0">
         {order ? (
           <Done order={order} onClose={() => close(false)} />
         ) : items.length === 0 ? (
@@ -116,7 +116,7 @@ export const Checkout = () => {
             <DialogDescription className="mt-2 text-sm text-ink-soft">Adicione algum sabor para finalizar o pedido.</DialogDescription>
           </div>
         ) : (
-          <form onSubmit={submit} className="space-y-6 p-7 sm:p-10">
+          <form onSubmit={submit} className="space-y-5 sm:space-y-6 p-5 sm:p-7 lg:p-10">
             <div>
               <DialogTitle className="font-display text-4xl font-bold tracking-[-0.03em]">Finalizar pedido</DialogTitle>
               <DialogDescription className="mt-2 text-sm text-ink-soft">Leva menos de um minuto. Prometemos.</DialogDescription>

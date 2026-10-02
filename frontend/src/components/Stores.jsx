@@ -19,7 +19,7 @@ export const Stores = () => {
               <button key={x.id} data-testid={`store-locator-select-${x.id}`} onClick={() => setId(x.id)} className="group flex items-center justify-between border-t hairline py-6 text-left last:border-b">
                 <span className="flex items-baseline gap-5">
                   <span className="font-mono text-xs text-ink-soft">0{i + 1}</span>
-                  <span className={`font-display text-3xl font-bold tracking-[-0.03em] transition-colors duration-300 sm:text-4xl ${id === x.id ? "text-berry" : "text-ink group-hover:text-berry"}`}>{x.name}</span>
+                  <span className={`font-display text-2xl sm:text-3xl font-bold tracking-[-0.03em] transition-colors duration-300 lg:text-4xl ${id === x.id ? "text-berry" : "text-ink group-hover:text-berry"}`}>{x.name}</span>
                 </span>
                 <ArrowUpRight className={`h-5 w-5 transition-transform duration-500 ${id === x.id ? "rotate-45 text-berry" : ""}`} />
               </button>

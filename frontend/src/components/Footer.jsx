@@ -46,7 +46,7 @@ export const Footer = () => (
       <div className="grid gap-14 lg:grid-cols-12">
         <div className="lg:col-span-6">
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-white/60">Clube Dollcii</p>
-          <p className="mt-5 max-w-lg font-display text-4xl font-bold leading-[1.02] tracking-[-0.03em] sm:text-5xl">Sabores novos antes de todo mundo e 10% na primeira compra.</p>
+          <p className="mt-5 max-w-lg font-display text-2xl sm:text-4xl font-bold leading-[1.05] tracking-[-0.03em] lg:text-5xl">Sabores novos antes de todo mundo e 10% na primeira compra.</p>
           <div className="mt-8"><Club /></div>
         </div>
         {COLS.map(([title, links]) => (
@@ -65,9 +65,9 @@ export const Footer = () => (
           </div>
         ))}
       </div>
-      <div className="mt-20 flex items-end gap-3 border-t border-white/10 pt-8">
+      <div className="mt-14 sm:mt-20 flex items-end gap-2 sm:gap-3 border-t border-white/10 pt-6 sm:pt-8 overflow-hidden">
         <LogoMark className="h-[11vw] w-auto shrink-0" />
-        <p className="font-display text-[22vw] font-bold leading-[0.78] tracking-[-0.05em] text-white lg:text-[19vw]">dollcii</p>
+        <p className="font-display text-[18vw] sm:text-[22vw] font-bold leading-[0.78] tracking-[-0.05em] text-white lg:text-[19vw]">dollcii</p>
       </div>
       <div className="flex flex-col justify-between gap-2 py-8 font-mono text-[11px] uppercase tracking-[0.18em] text-white/55 sm:flex-row">
         <span>© 2026 Dollcii Gelateria Artesanal</span>
