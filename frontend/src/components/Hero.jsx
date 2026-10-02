@@ -87,11 +87,11 @@ export const Hero = () => {
   return (
     <section id="topo" data-testid="hero-section" className="relative overflow-hidden bg-white pt-[76px]">
       <div className="mx-auto grid w-full max-w-[1440px] gap-6 px-5 pb-10 sm:px-8 lg:grid-cols-12 lg:items-center lg:gap-10 lg:px-14 lg:pb-6 xl:min-h-[calc(100svh-76px)] xl:pb-0">
-        <div className="relative z-10 min-w-0 pt-10 lg:col-span-6 lg:pt-0">
+        <div className="relative z-10 min-w-0 pt-10 lg:col-span-6 lg:pt-4 xl:pt-0">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2, duration: 1 }}>
             <Eyebrow>Picolés e gelatos artesanais · São Paulo</Eyebrow>
           </motion.div>
-          <h1 data-testid="hero-title" className="mt-5 sm:mt-6 font-display text-[2.6rem] font-bold leading-[0.95] tracking-[-0.04em] sm:text-7xl lg:text-[5.4rem] xl:text-[6.2rem]">
+          <h1 data-testid="hero-title" className="mt-5 sm:mt-6 font-display text-[2.6rem] font-bold leading-[0.95] tracking-[-0.04em] sm:text-7xl lg:text-[4rem] xl:text-[5.4rem] 2xl:text-[6.2rem]">
             <Line i={0}>Feito de</Line>
             <Line i={1}><SwapWord flavor={flavor} /></Line>
             <Line i={2}>de verdade.</Line>
@@ -99,7 +99,7 @@ export const Hero = () => {
           <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 1, ease }} className="mt-5 sm:mt-7 max-w-md text-sm sm:text-base leading-relaxed text-ink-soft lg:text-lg">
             Fruta inteira, leite fresco e nenhum atalho. Gelados feitos à mão, em pequenos lotes, todos os dias.
           </motion.p>
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, duration: 1, ease }} className="mt-6 sm:mt-9 flex flex-col gap-4 sm:gap-6">
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, duration: 1, ease }} className="mt-6 sm:mt-8 flex flex-col gap-4 lg:gap-5">
             <FlavorSwitch active={flavor} onPick={pick} />
             <div className="flex flex-wrap items-center gap-3">
               <button data-testid="hero-primary-cta" onClick={() => scrollToId("cardapio")} className="group flex h-14 items-center gap-3 rounded-full bg-ink pl-7 pr-2 text-sm font-semibold text-white transition-colors hover:bg-berry">
