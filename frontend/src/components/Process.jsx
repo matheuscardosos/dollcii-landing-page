@@ -19,7 +19,7 @@ export const Process = () => {
       <div className="grid gap-14 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-5">
           <div className="relative aspect-[4/5] overflow-hidden rounded-[32px] bg-paper lg:sticky lg:top-28">
-            <motion.img style={{ y, scale: 1.2 }} src="/img/atelier.webp" alt="Ateliê Dollcii" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+            <motion.img style={{ y, scale: 1.2 }} src={process.env.PUBLIC_URL + "/img/atelier.webp"} alt="Ateliê Dollcii" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
             <div className="absolute bottom-5 left-5 h-28 w-28 animate-spin-slow">
               <svg viewBox="0 0 100 100" className="h-full w-full">
                 <defs><path id="circ" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0" /></defs>

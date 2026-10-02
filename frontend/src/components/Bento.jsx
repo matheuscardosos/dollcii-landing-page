@@ -21,7 +21,7 @@ export const Bento = () => (
     </div>
     <div className="grid auto-rows-[240px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <Reveal className="group relative overflow-hidden rounded-[28px] bg-paper sm:col-span-2 sm:row-span-2" data-testid="bento-hero-card">
-        <img src="/img/splash.webp" alt="Morangos caindo no leite fresco" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.6s] ease-out group-hover:scale-105" />
+        <img src={process.env.PUBLIC_URL + "/img/splash.webp"} alt="Morangos caindo no leite fresco" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.6s] ease-out group-hover:scale-105" />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/5 to-transparent" />
         <div className="absolute bottom-0 p-7 text-white lg:p-9">
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/80">Ingredientes</p>
@@ -31,7 +31,7 @@ export const Bento = () => (
       <Stat value="72h" label="Maturação" text="de descanso da base antes de bater, para uma textura mais sedosa." delay={0.05} />
       <Stat value="0" label="Conservantes" text="corantes ou aromas artificiais. Nunca usamos e nunca vamos usar." delay={0.1} className="!bg-berry-soft" />
       <Reveal delay={0.15} className="group relative overflow-hidden rounded-[28px] bg-paper sm:col-span-2">
-        <img src="/img/atelier.webp" alt="Ateliê Dollcii preparando a calda de morango" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.6s] ease-out group-hover:scale-105" />
+        <img src={process.env.PUBLIC_URL + "/img/atelier.webp"} alt="Ateliê Dollcii preparando a calda de morango" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.6s] ease-out group-hover:scale-105" />
         <div className="absolute inset-0 bg-gradient-to-r from-ink/75 via-ink/25 to-transparent" />
         <div className="relative flex h-full max-w-xs flex-col justify-end p-7 text-white">
           <p className="font-display text-5xl font-bold tracking-[-0.04em]">18</p>

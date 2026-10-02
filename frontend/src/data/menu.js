@@ -1,15 +1,17 @@
 export const brl = (v) =>
   (v ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+const P = process.env.PUBLIC_URL;
+
 const F = {
-  strawberry: "/img/fruit_strawberry.webp",
-  strawberryHalf: "/img/fruit_strawberry_half.webp",
-  strawberrySlice: "/img/fruit_strawberry_slice.webp",
-  pistachio: "/img/fruit_pistachio.webp",
-  cacau: "/img/fruit_cacau.webp",
-  maracuja: "/img/fruit_maracuja.webp",
-  mint: "/img/leaf_mint.webp",
-  milk: "/img/milk_splash.webp",
+  strawberry: P + "/img/fruit_strawberry.webp",
+  strawberryHalf: P + "/img/fruit_strawberry_half.webp",
+  strawberrySlice: P + "/img/fruit_strawberry_slice.webp",
+  pistachio: P + "/img/fruit_pistachio.webp",
+  cacau: P + "/img/fruit_cacau.webp",
+  maracuja: P + "/img/fruit_maracuja.webp",
+  mint: P + "/img/leaf_mint.webp",
+  milk: P + "/img/milk_splash.webp",
 };
 
 // Floating pieces around the hero popsicle. x/y in % of the stage, w in % of stage width.
@@ -22,7 +24,7 @@ export const FLAVORS = [
     word: "morango",
     accent: "#E2314B",
     tint: "#FDECEF",
-    pop: "/img/pop_morango.webp",
+    pop: P + "/img/pop_morango.webp",
     productId: "pic-morango",
     pieces: [
       { src: F.strawberry, x: 8, y: 14, w: 22, depth: 1.2, rot: -18, delay: 0 },
@@ -44,7 +46,7 @@ export const FLAVORS = [
     word: "pistache",
     accent: "#6F9A4F",
     tint: "#EEF4E6",
-    pop: "/img/pop_pistache.webp",
+    pop: P + "/img/pop_pistache.webp",
     productId: "pic-pistache",
     pieces: [
       { src: F.pistachio, x: 6, y: 16, w: 24, depth: 1.3, rot: -12, delay: 0 },
@@ -65,7 +67,7 @@ export const FLAVORS = [
     word: "cacau",
     accent: "#4A2A1E",
     tint: "#F1ECE8",
-    pop: "/img/pop_cacau.webp",
+    pop: P + "/img/pop_cacau.webp",
     productId: "pic-cacau",
     pieces: [
       { src: F.cacau, x: 4, y: 12, w: 28, depth: 1.3, rot: -8, delay: 0 },
@@ -85,7 +87,7 @@ export const FLAVORS = [
     word: "maracujá",
     accent: "#E9A30B",
     tint: "#FFF4D6",
-    pop: "/img/pop_maracuja.webp",
+    pop: P + "/img/pop_maracuja.webp",
     productId: "pic-maracuja",
     pieces: [
       { src: F.maracuja, x: 4, y: 14, w: 28, depth: 1.3, rot: -10, delay: 0 },
@@ -108,18 +110,18 @@ export const CATEGORIES = [
 ];
 
 export const PRODUCTS = [
-  { id: "pic-morango", cat: "picoles", name: "Morango & Leite", price: 14.9, img: "/img/pop_morango.webp", tint: "#FDECEF", desc: "Calda de morango silvestre entrelaçada em leite fresco.", tags: ["Mais pedido"], ingredients: "Leite fresco, morango, açúcar, creme de leite, baunilha em fava." },
-  { id: "pic-pistache", cat: "picoles", name: "Pistache Siciliano", price: 16.9, img: "/img/pop_pistache.webp", tint: "#EEF4E6", desc: "Pasta pura de pistache com topo de pistache picado.", tags: ["Sem glúten"], ingredients: "Leite, pasta de pistache, açúcar, creme de leite, flor de sal." },
-  { id: "pic-cacau", cat: "picoles", name: "Cacau 70%", price: 15.9, img: "/img/pop_cacau.webp", tint: "#F1ECE8", desc: "Casca de chocolate amargo e interior cremoso de cacau.", tags: ["Intenso"], ingredients: "Leite, chocolate 70%, cacau em pó, açúcar, nibs de cacau." },
-  { id: "pic-maracuja", cat: "picoles", name: "Maracujá da Serra", price: 12.9, img: "/img/pop_maracuja.webp", tint: "#FFF4D6", desc: "Polpa inteira com sementes, leve e refrescante.", tags: ["Vegano", "Zero lactose"], ingredients: "Polpa de maracujá, água, açúcar orgânico." },
-  { id: "pic-coco", cat: "picoles", name: "Coco Queimado", price: 13.9, img: "/img/pop_coco.webp", tint: "#F6F1E8", desc: "Leite de coco com lascas tostadas e um toque de rapadura.", tags: ["Vegano", "Zero lactose"], ingredients: "Leite de coco, coco ralado tostado, rapadura, água." },
-  { id: "pic-limao", cat: "picoles", name: "Limão Siciliano & Hortelã", price: 11.9, img: "/img/pop_limao.webp", tint: "#F3F7E4", desc: "Sorbet cítrico com folhas de hortelã fresca.", tags: ["Vegano"], ingredients: "Suco de limão siciliano, água, açúcar, hortelã." },
-  { id: "gel-doce-leite", cat: "gelatos", name: "Doce de Leite Mineiro", price: 18.9, img: "/img/cup_doce_leite.webp", tint: "#F7EEE2", desc: "Gelato de doce de leite artesanal com fio de caramelo.", tags: ["Copo 180 ml"], ingredients: "Leite, doce de leite, açúcar, creme de leite, sal." },
-  { id: "gel-frutas", cat: "gelatos", name: "Frutas Vermelhas", price: 19.9, img: "/img/cup_frutas_vermelhas.webp", tint: "#F8E8EC", desc: "Sorbet de framboesa e amora com frutas frescas.", tags: ["Vegano", "Copo 180 ml"], ingredients: "Framboesa, amora, mirtilo, água, açúcar." },
-  { id: "pote-baunilha", cat: "potes", name: "Pote Baunilha de Madagascar", price: 49.9, img: "/img/pote_baunilha.webp", tint: "#F4F1EA", desc: "Base clássica com fava de baunilha inteira. 500 ml.", tags: ["500 ml"], ingredients: "Leite, creme de leite, açúcar, gemas, baunilha de Madagascar." },
-  { id: "pote-morango", cat: "potes", name: "Pote Morango & Leite", price: 52.9, img: "/img/pote_morango.webp", tint: "#FDECEF", desc: "O nosso sabor assinatura para levar para casa. 500 ml.", tags: ["500 ml", "Assinatura"], ingredients: "Leite fresco, morango, açúcar, creme de leite, baunilha." },
-  { id: "esp-cone", cat: "especiais", name: "Cone Morango Silvestre", price: 21.9, img: "/img/especial_cone.webp", tint: "#FBEAE4", desc: "Casquinha crocante feita na casa, gelato e calda quente de morango.", tags: ["Edição limitada"], ingredients: "Casquinha artesanal, gelato de morango, calda de morango." },
-  { id: "esp-caixa", cat: "especiais", name: "Caixa Degustação", price: 79.9, img: "/img/caixa.webp", tint: "#F2F2EE", desc: "Seis picolés da casa em uma caixa para presentear.", tags: ["6 unidades", "Presente"], ingredients: "Seleção de seis sabores da estação." },
+  { id: "pic-morango", cat: "picoles", name: "Morango & Leite", price: 14.9, img: P + "/img/pop_morango.webp", tint: "#FDECEF", desc: "Calda de morango silvestre entrelaçada em leite fresco.", tags: ["Mais pedido"], ingredients: "Leite fresco, morango, açúcar, creme de leite, baunilha em fava." },
+  { id: "pic-pistache", cat: "picoles", name: "Pistache Siciliano", price: 16.9, img: P + "/img/pop_pistache.webp", tint: "#EEF4E6", desc: "Pasta pura de pistache com topo de pistache picado.", tags: ["Sem glúten"], ingredients: "Leite, pasta de pistache, açúcar, creme de leite, flor de sal." },
+  { id: "pic-cacau", cat: "picoles", name: "Cacau 70%", price: 15.9, img: P + "/img/pop_cacau.webp", tint: "#F1ECE8", desc: "Casca de chocolate amargo e interior cremoso de cacau.", tags: ["Intenso"], ingredients: "Leite, chocolate 70%, cacau em pó, açúcar, nibs de cacau." },
+  { id: "pic-maracuja", cat: "picoles", name: "Maracujá da Serra", price: 12.9, img: P + "/img/pop_maracuja.webp", tint: "#FFF4D6", desc: "Polpa inteira com sementes, leve e refrescante.", tags: ["Vegano", "Zero lactose"], ingredients: "Polpa de maracujá, água, açúcar orgânico." },
+  { id: "pic-coco", cat: "picoles", name: "Coco Queimado", price: 13.9, img: P + "/img/pop_coco.webp", tint: "#F6F1E8", desc: "Leite de coco com lascas tostadas e um toque de rapadura.", tags: ["Vegano", "Zero lactose"], ingredients: "Leite de coco, coco ralado tostado, rapadura, água." },
+  { id: "pic-limao", cat: "picoles", name: "Limão Siciliano & Hortelã", price: 11.9, img: P + "/img/pop_limao.webp", tint: "#F3F7E4", desc: "Sorbet cítrico com folhas de hortelã fresca.", tags: ["Vegano"], ingredients: "Suco de limão siciliano, água, açúcar, hortelã." },
+  { id: "gel-doce-leite", cat: "gelatos", name: "Doce de Leite Mineiro", price: 18.9, img: P + "/img/cup_doce_leite.webp", tint: "#F7EEE2", desc: "Gelato de doce de leite artesanal com fio de caramelo.", tags: ["Copo 180 ml"], ingredients: "Leite, doce de leite, açúcar, creme de leite, sal." },
+  { id: "gel-frutas", cat: "gelatos", name: "Frutas Vermelhas", price: 19.9, img: P + "/img/cup_frutas_vermelhas.webp", tint: "#F8E8EC", desc: "Sorbet de framboesa e amora com frutas frescas.", tags: ["Vegano", "Copo 180 ml"], ingredients: "Framboesa, amora, mirtilo, água, açúcar." },
+  { id: "pote-baunilha", cat: "potes", name: "Pote Baunilha de Madagascar", price: 49.9, img: P + "/img/pote_baunilha.webp", tint: "#F4F1EA", desc: "Base clássica com fava de baunilha inteira. 500 ml.", tags: ["500 ml"], ingredients: "Leite, creme de leite, açúcar, gemas, baunilha de Madagascar." },
+  { id: "pote-morango", cat: "potes", name: "Pote Morango & Leite", price: 52.9, img: P + "/img/pote_morango.webp", tint: "#FDECEF", desc: "O nosso sabor assinatura para levar para casa. 500 ml.", tags: ["500 ml", "Assinatura"], ingredients: "Leite fresco, morango, açúcar, creme de leite, baunilha." },
+  { id: "esp-cone", cat: "especiais", name: "Cone Morango Silvestre", price: 21.9, img: P + "/img/especial_cone.webp", tint: "#FBEAE4", desc: "Casquinha crocante feita na casa, gelato e calda quente de morango.", tags: ["Edição limitada"], ingredients: "Casquinha artesanal, gelato de morango, calda de morango." },
+  { id: "esp-caixa", cat: "especiais", name: "Caixa Degustação", price: 79.9, img: P + "/img/caixa.webp", tint: "#F2F2EE", desc: "Seis picolés da casa em uma caixa para presentear.", tags: ["6 unidades", "Presente"], ingredients: "Seleção de seis sabores da estação." },
 ];
 
 export const COUPONS = { DOLLCII10: 0.1 };
