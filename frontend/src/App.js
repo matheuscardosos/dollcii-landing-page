@@ -13,8 +13,9 @@ import { Testimonials } from "./components/Testimonials";
 import { Stores } from "./components/Stores";
 import { Footer } from "./components/Footer";
 import { BagDrawer } from "./components/BagDrawer";
-import { Checkout } from "./components/Checkout";
+import { CheckoutPage } from "./components/CheckoutPage";
 import { MascotQuiz } from "./components/MascotQuiz";
+import { CookieBanner } from "./components/CookieBanner";
 
 function App() {
   return (
@@ -34,8 +35,9 @@ function App() {
         </main>
         <Footer />
         <BagDrawer />
-        <Checkout />
+        <CheckoutPage />
         <MascotQuiz />
+        <CookieBanner />
         <Toaster position="bottom-center" richColors={false} toastOptions={{ className: "!rounded-full !bg-ink !text-white !border-none" }} />
       </div>
     </BagProvider>

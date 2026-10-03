@@ -4,6 +4,7 @@ import { ArrowRight, Instagram } from "lucide-react";
 import { toast } from "sonner";
 import { LogoMark } from "./Logo";
 import { scrollToId } from "./SmoothScroll";
+import { LegalModal } from "./LegalModal";
 
 const API = process.env.REACT_APP_BACKEND_URL ? `${process.env.REACT_APP_BACKEND_URL}/api` : null;
 
@@ -40,7 +41,9 @@ const COLS = [
   ["Atendimento", [["contato@dollcii.com.br"], ["(11) 4000-1020"], ["Seg a dom, 11h às 23h"]]],
 ];
 
-export const Footer = () => (
+export const Footer = () => {
+  const [legal, setLegal] = useState(null);
+  return (
   <footer data-testid="site-footer" className="overflow-hidden bg-ink text-white">
     <div className="mx-auto max-w-[1440px] px-5 pt-20 sm:px-8 lg:px-14 lg:pt-28">
       <div className="grid gap-14 lg:grid-cols-12">
@@ -69,10 +72,16 @@ export const Footer = () => (
         <LogoMark className="h-[11vw] w-auto shrink-0" />
         <p className="font-display text-[18vw] sm:text-[22vw] font-bold leading-[0.78] tracking-[-0.05em] text-white lg:text-[19vw]">dollcii</p>
       </div>
-      <div className="flex flex-col justify-between gap-2 py-8 font-mono text-[11px] uppercase tracking-[0.18em] text-white/55 sm:flex-row">
+      <div className="flex flex-col justify-between gap-4 py-8 font-mono text-[11px] uppercase tracking-[0.18em] text-white/55 sm:flex-row sm:items-center">
         <span>© 2026 Dollcii Gelateria Artesanal</span>
+        <div className="flex gap-4">
+          <button onClick={() => setLegal("termos")} className="transition-colors hover:text-white">Termos de Uso</button>
+          <button onClick={() => setLegal("privacidade")} className="transition-colors hover:text-white">Privacidade</button>
+        </div>
         <span>Feito com fruta de verdade em São Paulo</span>
       </div>
     </div>
+    <LegalModal type={legal} open={!!legal} onOpenChange={(o) => { if (!o) setLegal(null); }} />
   </footer>
-);
+  );
+};
