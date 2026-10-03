@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/dollcii-landing-page/static/css/main.93c8dc7b.css",
-    "main.js": "/dollcii-landing-page/static/js/main.bf0ba247.js",
+    "main.css": "/dollcii-landing-page/static/css/main.42256f74.css",
+    "main.js": "/dollcii-landing-page/static/js/main.504097f6.js",
     "index.html": "/dollcii-landing-page/index.html",
-    "main.93c8dc7b.css.map": "/dollcii-landing-page/static/css/main.93c8dc7b.css.map",
-    "main.bf0ba247.js.map": "/dollcii-landing-page/static/js/main.bf0ba247.js.map"
+    "main.42256f74.css.map": "/dollcii-landing-page/static/css/main.42256f74.css.map",
+    "main.504097f6.js.map": "/dollcii-landing-page/static/js/main.504097f6.js.map"
   },
   "entrypoints": [
-    "static/css/main.93c8dc7b.css",
-    "static/js/main.bf0ba247.js"
+    "static/css/main.42256f74.css",
+    "static/js/main.504097f6.js"
   ]
 }
