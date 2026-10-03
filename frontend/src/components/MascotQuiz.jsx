@@ -8,8 +8,8 @@ const P = process.env.PUBLIC_URL;
 
 const QUESTIONS = [
   {
-    msg: "E ai! Eu sou o Dollcii, seu guia de sabores. Bora descobrir o gelado perfeito pra voce?",
-    question: "Qual tipo de doce voce mais curte?",
+    msg: "E a\u00ed! Eu sou o Dollcii, seu guia de sabores. Bora descobrir o gelado perfeito pra voc\u00ea?",
+    question: "Qual tipo de doce voc\u00ea mais curte?",
     options: [
       { label: "Frutas frescas", value: "fruta" },
       { label: "Chocolate intenso", value: "chocolate" },
@@ -17,7 +17,7 @@ const QUESTIONS = [
     ],
   },
   {
-    question: "Como voce prefere a intensidade do sabor?",
+    question: "Como voc\u00ea prefere a intensidade do sabor?",
     options: [
       { label: "Leve e refrescante", value: "leve" },
       { label: "Equilibrado", value: "equilibrado" },
@@ -25,10 +25,10 @@ const QUESTIONS = [
     ],
   },
   {
-    question: "Pra qual ocasiao?",
+    question: "Pra qual ocasi\u00e3o?",
     options: [
       { label: "Pra mim, agora", value: "individual" },
-      { label: "Dividir com alguem", value: "dividir" },
+      { label: "Dividir com algu\u00e9m", value: "dividir" },
       { label: "Presentear", value: "presente" },
     ],
   },
@@ -95,7 +95,7 @@ const Reveal = ({ product }) => {
 
   return (
     <div className="flex flex-col items-center gap-3 pt-2">
-      <Bubble>Seu sabor ideal e...</Bubble>
+      <Bubble>Seu sabor ideal \u00e9...</Bubble>
       <motion.div
         className="relative mt-2 flex h-44 w-32 items-center justify-center rounded-2xl"
         style={{ background: revealed ? product.tint : "#111" }}
@@ -179,7 +179,7 @@ export const MascotQuiz = () => {
       {/* Botao flutuante */}
       <motion.button
         onClick={() => { setOpen(true); if (step === 0 && answers.length === 0) reset(); }}
-        className="fixed bottom-5 right-5 z-50 h-16 w-16 sm:h-18 sm:w-18 rounded-full bg-white shadow-xl border hairline overflow-hidden transition-transform hover:scale-110"
+        className="fixed bottom-6 right-1/2 translate-x-1/2 sm:right-8 sm:translate-x-0 z-50 h-20 w-20 sm:h-[88px] sm:w-[88px] rounded-full bg-white shadow-xl border hairline overflow-hidden transition-transform hover:scale-110"
         whileHover={{ rotate: [0, -5, 5, 0] }}
         transition={{ duration: 0.5 }}
         aria-label="Abrir quiz de sabores"
@@ -195,7 +195,7 @@ export const MascotQuiz = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="fixed bottom-24 right-5 z-50 flex w-[340px] max-w-[calc(100vw-2.5rem)] flex-col rounded-[24px] border hairline bg-white shadow-2xl"
+            className="fixed bottom-[7.5rem] left-1/2 -translate-x-1/2 sm:left-auto sm:right-8 sm:translate-x-0 z-50 flex w-[340px] max-w-[calc(100vw-2.5rem)] flex-col rounded-[24px] border hairline bg-white shadow-2xl"
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b hairline px-5 py-4">
@@ -212,7 +212,7 @@ export const MascotQuiz = () => {
             </div>
 
             {/* Body */}
-            <div className="flex flex-col gap-4 overflow-y-auto p-4" style={{ maxHeight: "60vh" }}>
+            <div className="flex flex-col gap-4 p-4" data-lenis-prevent style={{ maxHeight: "60vh", overflowY: "auto", overscrollBehavior: "contain", scrollbarWidth: "thin" }}>
               {/* Pergunta 1 sempre visivel */}
               {step >= 0 && (
                 <>
