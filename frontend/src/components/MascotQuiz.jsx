@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { PRODUCTS, brl } from "../data/menu";
@@ -161,6 +161,18 @@ export const MascotQuiz = () => {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState([]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("quiz")) setOpen(true);
+  }, []);
+
+  const openQuiz = () => {
+    setOpen(true);
+    if (step === 0 && answers.length === 0) reset();
+  };
+
+  const closeQuiz = () => setOpen(false);
+
   const reset = () => {
     setStep(0);
     setAnswers([]);
@@ -178,8 +190,8 @@ export const MascotQuiz = () => {
     <>
       {/* Botao flutuante */}
       <motion.button
-        onClick={() => { setOpen(true); if (step === 0 && answers.length === 0) reset(); }}
-        className="fixed bottom-6 right-1/2 translate-x-1/2 sm:right-8 sm:translate-x-0 z-50 h-20 w-20 sm:h-[88px] sm:w-[88px] rounded-full bg-white shadow-xl border hairline overflow-hidden transition-transform hover:scale-110"
+        onClick={openQuiz}
+        className="fixed bottom-5 right-5 sm:right-8 lg:bottom-auto lg:top-1/2 lg:-translate-y-1/2 z-50 h-16 w-16 sm:h-20 sm:w-20 lg:h-[88px] lg:w-[88px] rounded-full bg-white shadow-xl border hairline overflow-hidden transition-transform hover:scale-110"
         whileHover={{ rotate: [0, -5, 5, 0] }}
         transition={{ duration: 0.5 }}
         aria-label="Abrir quiz de sabores"
@@ -195,7 +207,7 @@ export const MascotQuiz = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="fixed bottom-[7.5rem] left-1/2 -translate-x-1/2 sm:left-auto sm:right-8 sm:translate-x-0 z-50 flex w-[340px] max-w-[calc(100vw-2.5rem)] flex-col rounded-[24px] border hairline bg-white shadow-2xl"
+            className="fixed bottom-[5.5rem] right-5 sm:right-8 sm:bottom-[6.5rem] lg:bottom-auto lg:top-1/2 lg:-translate-y-1/2 lg:right-[7.5rem] z-50 flex w-[min(340px,calc(100vw-2.5rem))] flex-col rounded-[24px] border hairline bg-white shadow-2xl max-h-[calc(100vh-7rem)] sm:max-h-[calc(100vh-8rem)]"
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b hairline px-5 py-4">
@@ -206,13 +218,13 @@ export const MascotQuiz = () => {
                   <p className="text-[11px] text-ink-soft">Descubra seu sabor</p>
                 </div>
               </div>
-              <button onClick={() => setOpen(false)} className="grid h-8 w-8 place-items-center rounded-full transition-colors hover:bg-paper" aria-label="Fechar">
+              <button onClick={closeQuiz} className="grid h-8 w-8 place-items-center rounded-full transition-colors hover:bg-paper" aria-label="Fechar">
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             {/* Body */}
-            <div className="flex flex-col gap-4 p-4" data-lenis-prevent style={{ maxHeight: "60vh", overflowY: "auto", overscrollBehavior: "contain", scrollbarWidth: "thin" }}>
+            <div className="flex flex-col gap-4 p-4" data-lenis-prevent style={{ maxHeight: "60vh", overflowY: "auto", overscrollBehavior: "contain", scrollbarWidth: "none" }}>
               {/* Pergunta 1 sempre visivel */}
               {step >= 0 && (
                 <>
