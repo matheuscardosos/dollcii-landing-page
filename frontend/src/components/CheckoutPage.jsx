@@ -186,10 +186,69 @@ const AddressSection = ({ address, setAddress, mode, setMode }) => {
 
 /* ── payment section ── */
 
-const CARD_BRANDS = ["visa", "mastercard", "elo", "amex"];
+const ALL_BRANDS = [
+  { id: "visa", name: "Visa" },
+  { id: "mastercard", name: "Mastercard" },
+  { id: "elo", name: "Elo" },
+  { id: "amex", name: "American Express" },
+  { id: "hipercard", name: "Hipercard" },
+  { id: "diners", name: "Diners Club" },
+  { id: "discover", name: "Discover" },
+  { id: "jcb", name: "JCB" },
+  { id: "maestro", name: "Maestro" },
+];
+
+function detectBrand(number) {
+  const n = number.replace(/\D/g, "");
+  if (!n) return null;
+  if (/^4/.test(n)) return "visa";
+  if (/^5[1-5]/.test(n)) return "mastercard";
+  if (/^3[47]/.test(n)) return "amex";
+  if (/^(636368|438935|504175|451416|509\d{3}|650\d{3}|651\d{3}|652[1-9]|6550)/.test(n)) return "elo";
+  if (/^(606282|3841)/.test(n)) return "hipercard";
+  if (/^3(?:0[0-5]|[68])/.test(n)) return "diners";
+  if (/^6(?:011|5)/.test(n)) return "discover";
+  if (/^35(?:2[89]|[3-8])/.test(n)) return "jcb";
+  if (/^(5018|5020|5038|6304|6759|676[1-3])/.test(n)) return "maestro";
+  return null;
+}
+
+const BrandsPopup = ({ open, onClose }) => (
+  <AnimatePresence>
+    {open && (
+      <>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          className="fixed inset-0 z-50"
+        />
+        <motion.div
+          initial={{ opacity: 0, y: 8, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 8, scale: 0.95 }}
+          className="absolute right-0 top-full z-50 mt-2 rounded-2xl border hairline bg-white p-4 shadow-xl"
+        >
+          <p className="mb-3 text-xs font-semibold text-ink">Bandeiras aceitas</p>
+          <div className="grid grid-cols-3 gap-3">
+            {ALL_BRANDS.map((b) => (
+              <div key={b.id} className="flex flex-col items-center gap-1.5 rounded-xl bg-paper p-2.5">
+                <img src={P + `/img/${b.id}.svg`} alt={b.name} className="h-6" />
+                <span className="text-[10px] text-ink-soft">{b.name}</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </>
+    )}
+  </AnimatePresence>
+);
 
 const PaymentSection = ({ method, setMethod, card, setCard }) => {
+  const [brandsOpen, setBrandsOpen] = useState(false);
   const setField = (key) => (e) => setCard((c) => ({ ...c, [key]: e.target.value }));
+  const detected = detectBrand(card.number);
 
   return (
     <div className="space-y-4">
@@ -221,9 +280,26 @@ const PaymentSection = ({ method, setMethod, card, setCard }) => {
               <p className="text-sm font-semibold">Dados do cartão</p>
               <div className="relative">
                 <Input label="Número do cartão" value={card.number} onChange={setField("number")} placeholder="0000 0000 0000 0000" inputMode="numeric" maxLength={19} />
-                <div className="absolute right-3 top-8 flex gap-1.5">
-                  {CARD_BRANDS.map((b) => <img key={b} src={P + `/img/${b}.svg`} alt={b} className="h-5" />)}
+                <div className="absolute right-3 top-8 flex items-center gap-1.5">
+                  {detected ? (
+                    <motion.img
+                      key={detected}
+                      initial={{ opacity: 0, scale: 0.7 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      src={P + `/img/${detected}.svg`}
+                      alt={detected}
+                      className="h-6"
+                    />
+                  ) : (
+                    <span className="text-[10px] text-ink-soft/50">Nenhuma</span>
+                  )}
                 </div>
+              </div>
+              <div className="relative inline-block">
+                <button type="button" onClick={() => setBrandsOpen(!brandsOpen)} className="text-xs font-medium text-berry hover:underline">
+                  Bandeiras aceitas
+                </button>
+                <BrandsPopup open={brandsOpen} onClose={() => setBrandsOpen(false)} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <Input label="Validade" value={card.expiry} onChange={setField("expiry")} placeholder="MM/AA" maxLength={5} />
