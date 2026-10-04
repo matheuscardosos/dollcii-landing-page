@@ -89,7 +89,7 @@ const Options = ({ options, onPick }) => (
   </motion.div>
 );
 
-const Reveal = ({ product }) => {
+const Reveal = ({ product, onScrollDown }) => {
   const [revealed, setRevealed] = useState(false);
   const { add } = useBag();
 
@@ -129,7 +129,7 @@ const Reveal = ({ product }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          onClick={() => setRevealed(true)}
+          onClick={() => { setRevealed(true); setTimeout(() => onScrollDown?.(), 400); }}
           className="mt-1 rounded-full bg-berry px-5 py-2.5 text-sm font-semibold text-white transition-transform hover:scale-105"
         >
           Revelar!
@@ -167,11 +167,15 @@ export const MascotQuiz = () => {
     if (params.has("quiz")) setOpen(true);
   }, []);
 
-  useEffect(() => {
-    if (!bodyRef.current) return;
+  const scrollDown = () => {
     setTimeout(() => {
       bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight, behavior: "smooth" });
     }, 350);
+  };
+
+  useEffect(() => {
+    if (!bodyRef.current) return;
+    scrollDown();
   }, [step]);
 
   const openQuiz = () => {
@@ -276,7 +280,7 @@ export const MascotQuiz = () => {
                       {QUESTIONS[2].options.find((o) => o.value === answers[2])?.label}
                     </span>
                   </div>
-                  <Reveal product={product} />
+                  <Reveal product={product} onScrollDown={scrollDown} />
                   <button
                     onClick={reset}
                     className="mx-auto mt-2 text-xs font-medium text-ink-soft underline transition-colors hover:text-ink"
