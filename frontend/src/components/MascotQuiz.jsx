@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { PRODUCTS, brl } from "../data/menu";
@@ -160,11 +160,19 @@ export const MascotQuiz = () => {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState([]);
+  const bodyRef = useRef(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.has("quiz")) setOpen(true);
   }, []);
+
+  useEffect(() => {
+    if (!bodyRef.current) return;
+    setTimeout(() => {
+      bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight, behavior: "smooth" });
+    }, 350);
+  }, [step]);
 
   const openQuiz = () => {
     setOpen(true);
@@ -224,7 +232,7 @@ export const MascotQuiz = () => {
             </div>
 
             {/* Body */}
-            <div className="flex flex-col gap-4 p-4" data-lenis-prevent style={{ maxHeight: "60vh", overflowY: "auto", overscrollBehavior: "contain", scrollbarWidth: "none" }}>
+            <div ref={bodyRef} className="flex flex-col gap-4 p-4" data-lenis-prevent style={{ maxHeight: "60vh", overflowY: "auto", overscrollBehavior: "contain", scrollbarWidth: "none" }}>
               {/* Pergunta 1 sempre visivel */}
               {step >= 0 && (
                 <>
