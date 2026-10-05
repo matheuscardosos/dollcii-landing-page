@@ -2,10 +2,10 @@ import { useState } from "react";
 import axios from "axios";
 import { ArrowRight, Instagram } from "lucide-react";
 import { toast } from "sonner";
-import { LogoMark } from "./Logo";
 import { scrollToId } from "./SmoothScroll";
 import { LegalModal } from "./LegalModal";
 
+const P = process.env.PUBLIC_URL;
 const API = process.env.REACT_APP_BACKEND_URL ? `${process.env.REACT_APP_BACKEND_URL}/api` : null;
 
 const Club = () => {
@@ -68,9 +68,8 @@ export const Footer = () => {
           </div>
         ))}
       </div>
-      <div className="mt-14 sm:mt-20 flex items-end gap-2 sm:gap-3 border-t border-white/10 pt-6 sm:pt-8 overflow-hidden">
-        <LogoMark className="h-[11vw] w-auto shrink-0" />
-        <p className="font-display text-[18vw] sm:text-[22vw] font-bold leading-[0.78] tracking-[-0.05em] text-white lg:text-[19vw]">geliz</p>
+      <div className="mt-14 border-t border-white/10 pt-10 sm:mt-20 sm:pt-14">
+        <img src={P + "/img/logo.webp"} alt="Geliz" className="mx-auto w-full max-w-[560px]" />
       </div>
       <div className="flex flex-col justify-between gap-4 py-8 font-mono text-[11px] uppercase tracking-[0.18em] text-white/55 sm:flex-row sm:items-center">
         <span>© 2026 Geliz</span>
