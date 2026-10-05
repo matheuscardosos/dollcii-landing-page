@@ -8,7 +8,7 @@ module.exports = {
       fontFamily: {
         display: ["Outfit", "system-ui", "sans-serif"],
         sans: ["Manrope", "system-ui", "sans-serif"],
-        mono: ["'JetBrains Mono'", "monospace"],
+        mono: ["'DM Mono'", "monospace"],
       },
       borderRadius: {
         lg: "var(--radius)",
