@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { ArrowRight, Instagram } from "lucide-react";
+import { WhatsAppIcon, WHATSAPP_LABEL, WHATSAPP_URL } from "./WhatsAppIcon";
 import { toast } from "sonner";
 import { scrollToId } from "./SmoothScroll";
 import { LegalModal } from "./LegalModal";
@@ -37,8 +38,8 @@ const Club = () => {
 };
 
 const COLS = [
-  ["Navegar", [["Sabores", "sabores"], ["Cardápio", "cardapio"], ["Processo", "processo"], ["Lojas", "lojas"]]],
-  ["Atendimento", [["contato@geliz.com.br"], ["(11) 4000-1020"], ["Seg a dom, 11h às 23h"]]],
+  ["Navegar", [["Sabores", "sabores"], ["Cardápio", "cardapio"], ["Nossa história", "historia"], ["Processo", "processo"], ["Lojas", "lojas"]]],
+  ["Atendimento", [["Seg a sex, 12h às 18h"], ["Sábado, 8h às 16h"], ["Domingo, 9h às 12h"]]],
 ];
 
 export const Footer = () => {
@@ -62,7 +63,10 @@ export const Footer = () => {
                 </li>
               ))}
               {title === "Atendimento" && (
-                <li><a data-testid="footer-instagram-link" href="https://www.instagram.com/gelizgeladinhos/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 transition-colors hover:text-berry"><Instagram className="h-4 w-4" /> @gelizgeladinhos</a></li>
+                <>
+                  <li className="pt-2"><a data-testid="footer-whatsapp-link" href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 transition-colors hover:text-berry"><WhatsAppIcon className="h-4 w-4" /> {WHATSAPP_LABEL}</a></li>
+                  <li><a data-testid="footer-instagram-link" href="https://www.instagram.com/gelizgeladinhos/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 transition-colors hover:text-berry"><Instagram className="h-4 w-4" /> @gelizgeladinhos</a></li>
+                </>
               )}
             </ul>
           </div>

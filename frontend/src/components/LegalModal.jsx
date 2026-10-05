@@ -54,7 +54,7 @@ const Terms = () => (
 
     <section>
       <h3 className="mb-2 text-base font-semibold text-ink">10. Contato</h3>
-      <p>Em caso de dúvidas sobre estes termos, entre em contato pelo e-mail contato@geliz.com.br ou pelo telefone (11) 4000-1020.</p>
+      <p>Em caso de dúvidas sobre estes termos, entre em contato pelo e-mail contato@geliz.com.br ou pelo WhatsApp (38) 9985-9473.</p>
     </section>
   </div>
 );
@@ -103,7 +103,7 @@ const Privacy = () => (
 
     <section>
       <h3 className="mb-2 text-base font-semibold text-ink">8. Contato do encarregado</h3>
-      <p>Para questões relacionadas à privacidade e proteção de dados, entre em contato com nosso encarregado (DPO) pelo e-mail privacidade@geliz.com.br ou pelo telefone (11) 4000-1020.</p>
+      <p>Para questões relacionadas à privacidade e proteção de dados, entre em contato com nosso encarregado (DPO) pelo e-mail privacidade@geliz.com.br ou pelo WhatsApp (38) 9985-9473.</p>
     </section>
   </div>
 );
