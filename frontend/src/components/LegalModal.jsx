@@ -9,12 +9,12 @@ const Terms = () => (
 
     <section>
       <h3 className="mb-2 text-base font-semibold text-ink">1. Aceitação dos termos</h3>
-      <p>Ao acessar e utilizar o site da Dollcii Gelateria Artesanal, você concorda com estes Termos de Uso. Caso não concorde com qualquer disposição, recomendamos que não utilize nossos serviços.</p>
+      <p>Ao acessar e utilizar o site da Geliz, você concorda com estes Termos de Uso. Caso não concorde com qualquer disposição, recomendamos que não utilize nossos serviços.</p>
     </section>
 
     <section>
       <h3 className="mb-2 text-base font-semibold text-ink">2. Sobre o serviço</h3>
-      <p>A Dollcii oferece picolés, gelatos e sobremesas artesanais para venda online com entrega na cidade de São Paulo. Os produtos disponíveis, preços e condições de entrega podem ser alterados a qualquer momento sem aviso prévio.</p>
+      <p>A Geliz oferece picolés, gelatos e sobremesas artesanais para venda online com entrega na cidade de São Paulo. Os produtos disponíveis, preços e condições de entrega podem ser alterados a qualquer momento sem aviso prévio.</p>
     </section>
 
     <section>
@@ -39,12 +39,12 @@ const Terms = () => (
 
     <section>
       <h3 className="mb-2 text-base font-semibold text-ink">7. Propriedade intelectual</h3>
-      <p>Todo o conteúdo do site, incluindo textos, imagens, logotipos, design e código-fonte, é de propriedade da Dollcii ou de seus licenciadores. É proibida a reprodução sem autorização prévia por escrito.</p>
+      <p>Todo o conteúdo do site, incluindo textos, imagens, logotipos, design e código-fonte, é de propriedade da Geliz ou de seus licenciadores. É proibida a reprodução sem autorização prévia por escrito.</p>
     </section>
 
     <section>
       <h3 className="mb-2 text-base font-semibold text-ink">8. Limitação de responsabilidade</h3>
-      <p>A Dollcii não se responsabiliza por danos indiretos decorrentes do uso do site. Nossos produtos devem ser armazenados conforme as instruções da embalagem. Não garantimos que o site estará disponível de forma ininterrupta.</p>
+      <p>A Geliz não se responsabiliza por danos indiretos decorrentes do uso do site. Nossos produtos devem ser armazenados conforme as instruções da embalagem. Não garantimos que o site estará disponível de forma ininterrupta.</p>
     </section>
 
     <section>
@@ -54,7 +54,7 @@ const Terms = () => (
 
     <section>
       <h3 className="mb-2 text-base font-semibold text-ink">10. Contato</h3>
-      <p>Em caso de dúvidas sobre estes termos, entre em contato pelo e-mail contato@dollcii.com.br ou pelo telefone (11) 4000-1020.</p>
+      <p>Em caso de dúvidas sobre estes termos, entre em contato pelo e-mail contato@geliz.com.br ou pelo telefone (11) 4000-1020.</p>
     </section>
   </div>
 );
@@ -93,7 +93,7 @@ const Privacy = () => (
 
     <section>
       <h3 className="mb-2 text-base font-semibold text-ink">6. Seus direitos (LGPD)</h3>
-      <p>Conforme a Lei Geral de Proteção de Dados (Lei 13.709/2018), você tem direito a acessar, corrigir, excluir e portar seus dados pessoais. Também pode revogar seu consentimento a qualquer momento. Para exercer seus direitos, entre em contato pelo e-mail contato@dollcii.com.br.</p>
+      <p>Conforme a Lei Geral de Proteção de Dados (Lei 13.709/2018), você tem direito a acessar, corrigir, excluir e portar seus dados pessoais. Também pode revogar seu consentimento a qualquer momento. Para exercer seus direitos, entre em contato pelo e-mail contato@geliz.com.br.</p>
     </section>
 
     <section>
@@ -103,7 +103,7 @@ const Privacy = () => (
 
     <section>
       <h3 className="mb-2 text-base font-semibold text-ink">8. Contato do encarregado</h3>
-      <p>Para questões relacionadas à privacidade e proteção de dados, entre em contato com nosso encarregado (DPO) pelo e-mail privacidade@dollcii.com.br ou pelo telefone (11) 4000-1020.</p>
+      <p>Para questões relacionadas à privacidade e proteção de dados, entre em contato com nosso encarregado (DPO) pelo e-mail privacidade@geliz.com.br ou pelo telefone (11) 4000-1020.</p>
     </section>
   </div>
 );

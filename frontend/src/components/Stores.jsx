@@ -37,8 +37,8 @@ export const Stores = () => {
           </AnimatePresence>
         </Reveal>
         <Reveal delay={0.1} className="relative overflow-hidden rounded-[32px] bg-paper lg:col-span-7">
-          <img src={process.env.PUBLIC_URL + "/img/loja.webp"} alt="Fachada da loja Dollcii" loading="lazy" className="aspect-[4/3] h-full w-full object-cover" />
-          <span className="absolute left-5 top-5 rounded-full bg-white px-4 py-2 font-mono text-[11px] uppercase tracking-[0.18em]">Dollcii {s.name}</span>
+          <img src={process.env.PUBLIC_URL + "/img/loja.webp"} alt="Fachada da loja Geliz" loading="lazy" className="aspect-[4/3] h-full w-full object-cover" />
+          <span className="absolute left-5 top-5 rounded-full bg-white px-4 py-2 font-mono text-[11px] uppercase tracking-[0.18em]">Geliz {s.name}</span>
         </Reveal>
       </div>
     </Section>

@@ -1,6 +1,6 @@
-# Dollcii
+# Geliz
 
-Landing page moderna e animada para a marca Dollcii, de picoles e sorvetes artesanais.
+Landing page moderna e animada para a marca Geliz, felicidade em forma de geladinho.
 
 Feita por **math.scs**
 
@@ -20,6 +20,8 @@ npm start
 ```
 
 O app abre em `http://localhost:3000`.
+
+No ar em [matheuscardosos.github.io/geliz-landing-page](https://matheuscardosos.github.io/geliz-landing-page).
 
 ## Licenca
 

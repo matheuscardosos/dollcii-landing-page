@@ -18,7 +18,7 @@ const Club = () => {
     setBusy(true);
     try {
       await axios.post(`${API}/newsletter`, { email });
-      toast.success("Bem-vindo ao Clube Dollcii! Seu cupom DOLLCII10 já está valendo.");
+      toast.success("Bem-vindo ao Clube Geliz! Seu cupom GELIZ10 já está valendo.");
       setEmail("");
     } catch {
       toast.error("Não conseguimos cadastrar agora. Tente novamente.");
@@ -38,7 +38,7 @@ const Club = () => {
 
 const COLS = [
   ["Navegar", [["Sabores", "sabores"], ["Cardápio", "cardapio"], ["Processo", "processo"], ["Lojas", "lojas"]]],
-  ["Atendimento", [["contato@dollcii.com.br"], ["(11) 4000-1020"], ["Seg a dom, 11h às 23h"]]],
+  ["Atendimento", [["contato@geliz.com.br"], ["(11) 4000-1020"], ["Seg a dom, 11h às 23h"]]],
 ];
 
 export const Footer = () => {
@@ -48,7 +48,7 @@ export const Footer = () => {
     <div className="mx-auto max-w-[1440px] px-5 pt-20 sm:px-8 lg:px-14 lg:pt-28">
       <div className="grid gap-14 lg:grid-cols-12">
         <div className="lg:col-span-6">
-          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-white/60">Clube Dollcii</p>
+          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-white/60">Clube Geliz</p>
           <p className="mt-5 max-w-lg font-display text-2xl sm:text-4xl font-bold leading-[1.05] tracking-[-0.03em] lg:text-5xl">Sabores novos antes de todo mundo e 10% na primeira compra.</p>
           <div className="mt-8"><Club /></div>
         </div>
@@ -62,7 +62,7 @@ export const Footer = () => {
                 </li>
               ))}
               {title === "Atendimento" && (
-                <li><a data-testid="footer-instagram-link" href="https://instagram.com" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 transition-colors hover:text-berry"><Instagram className="h-4 w-4" /> @dollcii</a></li>
+                <li><a data-testid="footer-instagram-link" href="https://instagram.com" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 transition-colors hover:text-berry"><Instagram className="h-4 w-4" /> @geliz</a></li>
               )}
             </ul>
           </div>
@@ -70,10 +70,10 @@ export const Footer = () => {
       </div>
       <div className="mt-14 sm:mt-20 flex items-end gap-2 sm:gap-3 border-t border-white/10 pt-6 sm:pt-8 overflow-hidden">
         <LogoMark className="h-[11vw] w-auto shrink-0" />
-        <p className="font-display text-[18vw] sm:text-[22vw] font-bold leading-[0.78] tracking-[-0.05em] text-white lg:text-[19vw]">dollcii</p>
+        <p className="font-display text-[18vw] sm:text-[22vw] font-bold leading-[0.78] tracking-[-0.05em] text-white lg:text-[19vw]">geliz</p>
       </div>
       <div className="flex flex-col justify-between gap-4 py-8 font-mono text-[11px] uppercase tracking-[0.18em] text-white/55 sm:flex-row sm:items-center">
-        <span>© 2026 Dollcii Gelateria Artesanal</span>
+        <span>© 2026 Geliz</span>
         <div className="flex gap-4">
           <button onClick={() => setLegal("termos")} className="transition-colors hover:text-white">Termos de Uso</button>
           <button onClick={() => setLegal("privacidade")} className="transition-colors hover:text-white">Privacidade</button>

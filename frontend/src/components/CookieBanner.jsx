@@ -5,7 +5,7 @@ import { Switch } from "./ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "./ui/dialog";
 
 const P = process.env.PUBLIC_URL;
-const STORAGE_KEY = "dollcii-cookies";
+const STORAGE_KEY = "geliz-cookies";
 
 const defaults = { essential: true, analytics: true, marketing: false };
 

@@ -23,8 +23,8 @@ export const FLAVORS = [
     fruit: P + "/img/morango.svg",
     full: "Morango & Leite",
     word: "morango",
-    accent: "#E2314B",
-    tint: "#FDECEF",
+    accent: "#FC030F",
+    tint: "#FFECED",
     pop: P + "/img/pop_morango.webp",
     productId: "pic-morango",
     pieces: [
@@ -114,7 +114,7 @@ export const CATEGORIES = [
 ];
 
 export const PRODUCTS = [
-  { id: "pic-morango", cat: "picoles", name: "Morango & Leite", price: 14.9, img: P + "/img/pop_morango.webp", tint: "#FDECEF", desc: "Calda de morango silvestre entrelaçada em leite fresco.", tags: ["Mais pedido"], ingredients: "Leite fresco, morango, açúcar, creme de leite, baunilha em fava." },
+  { id: "pic-morango", cat: "picoles", name: "Morango & Leite", price: 14.9, img: P + "/img/pop_morango.webp", tint: "#FFECED", desc: "Calda de morango silvestre entrelaçada em leite fresco.", tags: ["Mais pedido"], ingredients: "Leite fresco, morango, açúcar, creme de leite, baunilha em fava." },
   { id: "pic-pistache", cat: "picoles", name: "Pistache Siciliano", price: 16.9, img: P + "/img/pop_pistache.webp", tint: "#EEF4E6", desc: "Pasta pura de pistache com topo de pistache picado.", tags: ["Sem glúten"], ingredients: "Leite, pasta de pistache, açúcar, creme de leite, flor de sal." },
   { id: "pic-cacau", cat: "picoles", name: "Cacau 70%", price: 15.9, img: P + "/img/pop_cacau.webp", tint: "#F1ECE8", desc: "Casca de chocolate amargo e interior cremoso de cacau.", tags: ["Intenso"], ingredients: "Leite, chocolate 70%, cacau em pó, açúcar, nibs de cacau." },
   { id: "pic-maracuja", cat: "picoles", name: "Maracujá da Serra", price: 12.9, img: P + "/img/pop_maracuja.webp", tint: "#FFF4D6", desc: "Polpa inteira com sementes, leve e refrescante.", tags: ["Vegano", "Zero lactose"], ingredients: "Polpa de maracujá, água, açúcar orgânico." },
@@ -123,12 +123,12 @@ export const PRODUCTS = [
   { id: "gel-doce-leite", cat: "gelatos", name: "Doce de Leite Mineiro", price: 18.9, img: P + "/img/cup_doce_leite.webp", tint: "#F7EEE2", desc: "Gelato de doce de leite artesanal com fio de caramelo.", tags: ["Copo 180 ml"], ingredients: "Leite, doce de leite, açúcar, creme de leite, sal." },
   { id: "gel-frutas", cat: "gelatos", name: "Frutas Vermelhas", price: 19.9, img: P + "/img/cup_frutas_vermelhas.webp", tint: "#F8E8EC", desc: "Sorbet de framboesa e amora com frutas frescas.", tags: ["Vegano", "Copo 180 ml"], ingredients: "Framboesa, amora, mirtilo, água, açúcar." },
   { id: "pote-baunilha", cat: "potes", name: "Pote Baunilha de Madagascar", price: 49.9, img: P + "/img/pote_baunilha.webp", tint: "#F4F1EA", desc: "Base clássica com fava de baunilha inteira. 500 ml.", tags: ["500 ml"], ingredients: "Leite, creme de leite, açúcar, gemas, baunilha de Madagascar." },
-  { id: "pote-morango", cat: "potes", name: "Pote Morango & Leite", price: 52.9, img: P + "/img/pote_morango.webp", tint: "#FDECEF", desc: "O nosso sabor assinatura para levar para casa. 500 ml.", tags: ["500 ml", "Assinatura"], ingredients: "Leite fresco, morango, açúcar, creme de leite, baunilha." },
+  { id: "pote-morango", cat: "potes", name: "Pote Morango & Leite", price: 52.9, img: P + "/img/pote_morango.webp", tint: "#FFECED", desc: "O nosso sabor assinatura para levar para casa. 500 ml.", tags: ["500 ml", "Assinatura"], ingredients: "Leite fresco, morango, açúcar, creme de leite, baunilha." },
   { id: "esp-cone", cat: "especiais", name: "Cone Morango Silvestre", price: 21.9, img: P + "/img/especial_cone.webp", tint: "#FBEAE4", desc: "Casquinha crocante feita na casa, gelato e calda quente de morango.", tags: ["Edição limitada"], ingredients: "Casquinha artesanal, gelato de morango, calda de morango." },
   { id: "esp-caixa", cat: "especiais", name: "Caixa Degustação", price: 79.9, img: P + "/img/caixa.webp", tint: "#F2F2EE", desc: "Seis picolés da casa em uma caixa para presentear.", tags: ["6 unidades", "Presente"], ingredients: "Seleção de seis sabores da estação." },
 ];
 
-export const COUPONS = { DOLLCII10: 0.1 };
+export const COUPONS = { GELIZ10: 0.1 };
 export const FREE_DELIVERY_FROM = 80;
 export const DELIVERY_FEE = 7.9;
 

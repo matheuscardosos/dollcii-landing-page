@@ -52,7 +52,7 @@ export const Header = () => {
       className={`fixed inset-x-0 top-0 z-50 bg-white/85 backdrop-blur-xl transition-shadow duration-500 ${scrolled ? "shadow-[0_1px_0_rgba(17,17,17,0.08)]" : ""}`}
     >
       <div className="relative mx-auto flex h-[76px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-14">
-        <button data-testid="nav-brand-logo" onClick={() => go("topo")} aria-label="Dollcii, início">
+        <button data-testid="nav-brand-logo" onClick={() => go("topo")} aria-label="Geliz, início">
           <Logo />
         </button>
         <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 rounded-full border hairline bg-white p-1 lg:flex">

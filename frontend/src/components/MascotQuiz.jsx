@@ -8,7 +8,7 @@ const P = process.env.PUBLIC_URL;
 
 const QUESTIONS = [
   {
-    msg: "E aí! Eu sou o Dollcii, seu guia de sabores. Bora descobrir o gelado perfeito pra você?",
+    msg: "E aí! Eu sou o Geliz, seu guia de sabores. Bora descobrir o gelado perfeito pra você?",
     question: "Qual tipo de doce você mais curte?",
     options: [
       { label: "Frutas frescas", value: "fruta" },
@@ -208,7 +208,7 @@ export const MascotQuiz = () => {
         transition={{ duration: 0.5 }}
         aria-label="Abrir quiz de sabores"
       >
-        <img src={P + "/img/mascote.webp"} alt="Mascote Dollcii" className="h-full w-full object-contain p-1" />
+        <img src={P + "/img/mascote.webp"} alt="Mascote Geliz" className="h-full w-full object-contain p-1" />
       </motion.button>
 
       {/* Chat panel */}
@@ -226,7 +226,7 @@ export const MascotQuiz = () => {
               <div className="flex items-center gap-3">
                 <img src={P + "/img/mascote.webp"} alt="" className="h-9 w-9 object-contain" />
                 <div>
-                  <p className="font-display text-sm font-bold">Dollcii</p>
+                  <p className="font-display text-sm font-bold">Geliz</p>
                   <p className="text-[11px] text-ink-soft">Descubra seu sabor</p>
                 </div>
               </div>

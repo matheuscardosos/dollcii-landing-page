@@ -42,7 +42,7 @@ const Coupon = () => {
       </div>
       {coupon && (
         <p data-testid="cart-coupon-status" className={`mt-2 text-xs ${rate ? "text-[#6F9A4F]" : "text-berry"}`}>
-          {rate ? `Cupom ${coupon} aplicado: ${rate * 100}% de desconto` : "Cupom inválido. Experimente DOLLCII10"}
+          {rate ? `Cupom ${coupon} aplicado: ${rate * 100}% de desconto` : "Cupom inválido. Experimente GELIZ10"}
         </p>
       )}
     </div>

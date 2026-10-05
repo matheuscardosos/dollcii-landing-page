@@ -60,7 +60,7 @@ const LoginView = ({ goTo }) => {
     <form onSubmit={submit} className="space-y-4">
       <div>
         <DialogTitle className="font-display text-2xl font-bold tracking-[-0.03em]">Entrar</DialogTitle>
-        <DialogDescription className="mt-1 text-sm text-ink-soft">Acesse sua conta Dollcii</DialogDescription>
+        <DialogDescription className="mt-1 text-sm text-ink-soft">Acesse sua conta Geliz</DialogDescription>
       </div>
       <GoogleButton label="Entrar com Google" />
       <Divider />

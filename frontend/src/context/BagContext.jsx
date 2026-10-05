@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
-const KEY = "dollcii-bag";
+const KEY = "geliz-bag";
 const BagContext = createContext(null);
 
 const load = () => {
