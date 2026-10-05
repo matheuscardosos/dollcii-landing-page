@@ -62,7 +62,7 @@ export const Footer = () => {
                 </li>
               ))}
               {title === "Atendimento" && (
-                <li><a data-testid="footer-instagram-link" href="https://instagram.com" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 transition-colors hover:text-berry"><Instagram className="h-4 w-4" /> @geliz</a></li>
+                <li><a data-testid="footer-instagram-link" href="https://www.instagram.com/gelizgeladinhos/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 transition-colors hover:text-berry"><Instagram className="h-4 w-4" /> @gelizgeladinhos</a></li>
               )}
             </ul>
           </div>
