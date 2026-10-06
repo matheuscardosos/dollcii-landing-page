@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/geliz-landing-page/static/css/main.70b57795.css",
-    "main.js": "/geliz-landing-page/static/js/main.001fc748.js",
+    "main.css": "/geliz-landing-page/static/css/main.040dee7a.css",
+    "main.js": "/geliz-landing-page/static/js/main.16b3eae7.js",
     "index.html": "/geliz-landing-page/index.html",
-    "main.70b57795.css.map": "/geliz-landing-page/static/css/main.70b57795.css.map",
-    "main.001fc748.js.map": "/geliz-landing-page/static/js/main.001fc748.js.map"
+    "main.040dee7a.css.map": "/geliz-landing-page/static/css/main.040dee7a.css.map",
+    "main.16b3eae7.js.map": "/geliz-landing-page/static/js/main.16b3eae7.js.map"
   },
   "entrypoints": [
-    "static/css/main.70b57795.css",
-    "static/js/main.001fc748.js"
+    "static/css/main.040dee7a.css",
+    "static/js/main.16b3eae7.js"
   ]
 }
