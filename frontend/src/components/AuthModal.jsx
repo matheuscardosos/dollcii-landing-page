@@ -1,9 +1,16 @@
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "./ui/dialog";
+import { useAuth } from "../context/AuthContext";
 
 const P = process.env.PUBLIC_URL;
+
+// Contas de mentira pro seletor do Google. Clicar em qualquer uma loga de verdade.
+const GOOGLE_ACCOUNTS = [
+  { name: "Nicolas Geliz", email: "nicolas@gmail.com", color: "#FC030F" },
+  { name: "Allana Geliz", email: "allana.chef@gmail.com", color: "#FCC303" },
+];
 
 const Field = ({ label, type = "text", ...props }) => {
   const [show, setShow] = useState(false);
@@ -15,10 +22,10 @@ const Field = ({ label, type = "text", ...props }) => {
         <input
           {...props}
           type={isPassword && show ? "text" : type}
-          className="h-12 w-full rounded-2xl border hairline bg-white px-4 text-sm outline-none focus:border-ink pr-11"
+          className="h-12 w-full rounded-2xl border hairline bg-white px-4 pr-11 text-sm outline-none focus:border-ink"
         />
         {isPassword && (
-          <button type="button" onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-soft hover:text-ink" tabIndex={-1}>
+          <button type="button" tabIndex={-1} onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-soft hover:text-ink">
             {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         )}
@@ -27,10 +34,10 @@ const Field = ({ label, type = "text", ...props }) => {
   );
 };
 
-const GoogleButton = ({ label }) => (
+const GoogleButton = ({ label, onClick }) => (
   <button
     type="button"
-    onClick={() => toast("Funcionalidade disponível em breve!")}
+    onClick={onClick}
     className="flex h-12 w-full items-center justify-center gap-3 rounded-2xl border hairline bg-white text-sm font-medium transition-colors hover:bg-paper"
   >
     <img src={P + "/img/google.svg"} alt="" className="h-5 w-5" />
@@ -46,14 +53,60 @@ const Divider = () => (
   </div>
 );
 
-const LoginView = ({ goTo }) => {
+const Initial = ({ name, color }) => (
+  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-sm font-bold text-white" style={{ background: color }}>
+    {name.charAt(0)}
+  </span>
+);
+
+const GoogleView = ({ goTo, onDone }) => {
+  const { loginWithGoogle } = useAuth();
+  const pick = (acc) => {
+    loginWithGoogle(acc);
+    toast.success("Você entrou como " + acc.name.split(" ")[0]);
+    onDone();
+  };
+  return (
+    <div className="space-y-4">
+      <button onClick={() => goTo("login")} className="flex items-center gap-2 text-sm text-ink-soft hover:text-ink">
+        <ArrowLeft className="h-4 w-4" /> Voltar
+      </button>
+      <div className="flex items-center gap-3">
+        <img src={P + "/img/google.svg"} alt="" className="h-6 w-6" />
+        <div>
+          <DialogTitle className="font-display text-lg font-bold tracking-[-0.03em]">Escolha uma conta</DialogTitle>
+          <DialogDescription className="text-xs text-ink-soft">para continuar na Geliz</DialogDescription>
+        </div>
+      </div>
+      <div className="divide-y divide-ink/10 overflow-hidden rounded-2xl border hairline">
+        {GOOGLE_ACCOUNTS.map((acc) => (
+          <button key={acc.email} onClick={() => pick(acc)} className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-paper">
+            <Initial name={acc.name} color={acc.color} />
+            <span className="min-w-0">
+              <span className="block truncate text-sm font-semibold">{acc.name}</span>
+              <span className="block truncate text-xs text-ink-soft">{acc.email}</span>
+            </span>
+          </button>
+        ))}
+      </div>
+      <p className="text-center text-[11px] leading-relaxed text-ink-soft">
+        Demonstração. Nenhuma conta real do Google é acessada.
+      </p>
+    </div>
+  );
+};
+
+const LoginView = ({ goTo, onDone }) => {
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const submit = (e) => {
     e.preventDefault();
-    if (!email.trim() || !password.trim()) return toast.error("Preencha todos os campos");
-    toast("Funcionalidade disponível em breve!");
+    if (!email.trim() || !password.trim()) return toast.error("Preencha e-mail e senha");
+    const u = login(email, password);
+    toast.success("Bem-vindo, " + u.name.split(" ")[0] + "!");
+    onDone();
   };
 
   return (
@@ -62,7 +115,7 @@ const LoginView = ({ goTo }) => {
         <DialogTitle className="font-display text-2xl font-bold tracking-[-0.03em]">Entrar</DialogTitle>
         <DialogDescription className="mt-1 text-sm text-ink-soft">Acesse sua conta Geliz</DialogDescription>
       </div>
-      <GoogleButton label="Entrar com Google" />
+      <GoogleButton label="Entrar com Google" onClick={() => goTo("google")} />
       <Divider />
       <Field label="E-mail" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" />
       <Field label="Senha" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Sua senha" />
@@ -82,17 +135,19 @@ const LoginView = ({ goTo }) => {
   );
 };
 
-const RegisterView = ({ goTo }) => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
+const RegisterView = ({ goTo, onDone }) => {
+  const { login } = useAuth();
+  const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const submit = (e) => {
     e.preventDefault();
-    if (!name.trim() || !email.trim() || !password || !confirm) return toast.error("Preencha todos os campos");
-    if (password !== confirm) return toast.error("As senhas não coincidem");
-    toast("Funcionalidade disponível em breve!");
+    if (!form.name.trim() || !form.email.trim() || !form.password || !form.confirm)
+      return toast.error("Preencha todos os campos");
+    if (form.password !== form.confirm) return toast.error("As senhas não coincidem");
+    const u = login(form.email, form.password, form.name.trim());
+    toast.success("Conta criada. Bem-vindo, " + u.name.split(" ")[0] + "!");
+    onDone();
   };
 
   return (
@@ -101,12 +156,12 @@ const RegisterView = ({ goTo }) => {
         <DialogTitle className="font-display text-2xl font-bold tracking-[-0.03em]">Criar conta</DialogTitle>
         <DialogDescription className="mt-1 text-sm text-ink-soft">Cadastre-se para fazer pedidos</DialogDescription>
       </div>
-      <GoogleButton label="Cadastrar com Google" />
+      <GoogleButton label="Cadastrar com Google" onClick={() => goTo("google")} />
       <Divider />
-      <Field label="Nome completo" value={name} onChange={(e) => setName(e.target.value)} placeholder="Como podemos te chamar?" />
-      <Field label="E-mail" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" />
-      <Field label="Senha" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 8 caracteres" />
-      <Field label="Confirmar senha" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Repita a senha" />
+      <Field label="Nome completo" value={form.name} onChange={set("name")} placeholder="Como podemos te chamar?" />
+      <Field label="E-mail" type="email" value={form.email} onChange={set("email")} placeholder="seu@email.com" />
+      <Field label="Senha" type="password" value={form.password} onChange={set("password")} placeholder="Mínimo 8 caracteres" />
+      <Field label="Confirmar senha" type="password" value={form.confirm} onChange={set("confirm")} placeholder="Repita a senha" />
       <button type="submit" className="h-12 w-full rounded-full bg-berry text-sm font-semibold text-white transition-colors hover:bg-berry-dark">
         Criar conta
       </button>
@@ -122,13 +177,12 @@ const RegisterView = ({ goTo }) => {
 
 const ForgotView = ({ goTo }) => {
   const [email, setEmail] = useState("");
-
   const submit = (e) => {
     e.preventDefault();
     if (!email.trim()) return toast.error("Informe seu e-mail");
-    toast("Funcionalidade disponível em breve!");
+    toast.success("Se o e-mail existir, o link de recuperação chega em instantes.");
+    goTo("login");
   };
-
   return (
     <form onSubmit={submit} className="space-y-4">
       <div>
@@ -151,20 +205,26 @@ const ForgotView = ({ goTo }) => {
   );
 };
 
-export const AuthModal = ({ open, onOpenChange }) => {
+export const AuthModal = ({ open, onOpenChange, onSuccess }) => {
   const [view, setView] = useState("login");
 
-  const handleChange = (o) => {
+  const close = (o) => {
     onOpenChange(o);
     if (!o) setTimeout(() => setView("login"), 300);
   };
 
+  const done = () => {
+    close(false);
+    onSuccess?.();
+  };
+
   return (
-    <Dialog open={open} onOpenChange={handleChange}>
-      <DialogContent className="max-h-[94svh] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-[20px] sm:rounded-[28px] border-none bg-white p-6 sm:p-8">
-        {view === "login" && <LoginView goTo={setView} />}
-        {view === "register" && <RegisterView goTo={setView} />}
+    <Dialog open={open} onOpenChange={close}>
+      <DialogContent className="max-h-[94svh] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-[20px] border-none bg-white p-6 sm:rounded-[28px] sm:p-8">
+        {view === "login" && <LoginView goTo={setView} onDone={done} />}
+        {view === "register" && <RegisterView goTo={setView} onDone={done} />}
         {view === "forgot" && <ForgotView goTo={setView} />}
+        {view === "google" && <GoogleView goTo={setView} onDone={done} />}
       </DialogContent>
     </Dialog>
   );

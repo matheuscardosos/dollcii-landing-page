@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Menu as MenuIcon, ShoppingBag, User } from "lucide-react";
 import { Logo } from "./Logo";
 import { useBag } from "../context/BagContext";
+import { useAuth } from "../context/AuthContext";
 import { scrollToId } from "./SmoothScroll";
 import { Sheet, SheetContent, SheetTitle } from "./ui/sheet";
 import { AuthModal } from "./AuthModal";
@@ -30,6 +31,7 @@ export const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menu, setMenu] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
+  const { signed, user } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -65,10 +67,17 @@ export const Header = () => {
           <button data-testid="nav-order-now" onClick={() => go("cardapio")} className="hidden h-11 rounded-full border hairline px-5 text-sm font-semibold transition-colors hover:bg-paper md:block">
             Pedir agora
           </button>
-          <button onClick={() => setAuthOpen(true)} className="flex h-11 items-center gap-2 rounded-full border hairline px-4 text-sm font-semibold transition-colors hover:bg-paper">
-            <User className="h-4 w-4" />
-            <span className="hidden sm:inline">Entrar</span>
-          </button>
+          {signed ? (
+            <a href="#/conta" data-testid="nav-account" className="flex h-11 items-center gap-2 rounded-full border hairline px-4 text-sm font-semibold transition-colors hover:bg-paper">
+              <User className="h-4 w-4" />
+              <span className="hidden sm:inline">{user.name.split(" ")[0]}</span>
+            </a>
+          ) : (
+            <button onClick={() => setAuthOpen(true)} data-testid="nav-login" className="flex h-11 items-center gap-2 rounded-full border hairline px-4 text-sm font-semibold transition-colors hover:bg-paper">
+              <User className="h-4 w-4" />
+              <span className="hidden sm:inline">Entrar</span>
+            </button>
+          )}
           <BagButton />
           <button data-testid="nav-mobile-menu" onClick={() => setMenu(true)} className="grid h-11 w-11 place-items-center rounded-full border hairline lg:hidden" aria-label="Abrir menu">
             <MenuIcon className="h-4 w-4" />

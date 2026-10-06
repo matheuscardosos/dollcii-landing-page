@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, Check, Copy, Lock, Minus, Plus, Trash2, X } from "lucide-react";
+import { ArrowLeft, Check, Copy, CreditCard, Lock, Minus, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { useBag } from "../context/BagContext";
+import { useAuth } from "../context/AuthContext";
 import { brl, calcTotals, FREE_DELIVERY_FROM } from "../data/menu";
 
 const P = process.env.PUBLIC_URL;
+const EMPTY_ADDRESS = { cep: "", street: "", number: "", complement: "", neighborhood: "", city: "", state: "" };
 
 /* ── helpers ── */
 
@@ -186,158 +188,77 @@ const AddressSection = ({ address, setAddress, mode, setMode }) => {
 
 /* ── payment section ── */
 
-const ALL_BRANDS = [
-  { id: "visa", name: "Visa" },
-  { id: "mastercard", name: "Mastercard" },
-  { id: "elo", name: "Elo" },
-  { id: "amex", name: "American Express" },
-  { id: "hipercard", name: "Hipercard" },
-  { id: "diners", name: "Diners Club" },
-  { id: "discover", name: "Discover" },
-  { id: "jcb", name: "JCB" },
-  { id: "maestro", name: "Maestro" },
-];
+// Bandeiras que a maquininha aceita. Nao ha formulario: o cartao so e passado na entrega.
+const ACCEPTED = ["visa", "mastercard", "elo", "amex", "hipercard", "maestro"];
 
-function detectBrand(number) {
-  const n = number.replace(/\D/g, "");
-  if (!n) return null;
-  if (/^4/.test(n)) return "visa";
-  if (/^5[1-5]/.test(n)) return "mastercard";
-  if (/^3[47]/.test(n)) return "amex";
-  if (/^(636368|438935|504175|451416|509\d{3}|650\d{3}|651\d{3}|652[1-9]|6550)/.test(n)) return "elo";
-  if (/^(606282|3841)/.test(n)) return "hipercard";
-  if (/^3(?:0[0-5]|[68])/.test(n)) return "diners";
-  if (/^6(?:011|5)/.test(n)) return "discover";
-  if (/^35(?:2[89]|[3-8])/.test(n)) return "jcb";
-  if (/^(5018|5020|5038|6304|6759|676[1-3])/.test(n)) return "maestro";
-  return null;
-}
-
-const BrandsPopup = ({ open, onClose }) => (
-  <AnimatePresence>
-    {open && (
-      <>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="fixed inset-0 z-50"
-        />
-        <motion.div
-          initial={{ opacity: 0, y: 8, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 8, scale: 0.95 }}
-          className="absolute right-0 top-full z-50 mt-2 rounded-2xl border hairline bg-white p-4 shadow-xl"
-        >
-          <p className="mb-3 text-xs font-semibold text-ink">Bandeiras aceitas</p>
-          <div className="grid grid-cols-3 gap-3">
-            {ALL_BRANDS.map((b) => (
-              <div key={b.id} className="flex flex-col items-center gap-1.5 rounded-xl bg-paper p-2.5">
-                <img src={P + `/img/${b.id}.svg`} alt={b.name} className="h-6" />
-                <span className="text-[10px] text-ink-soft">{b.name}</span>
-              </div>
-            ))}
-          </div>
+const Option = ({ on, onClick, icon, title, children }) => (
+  <>
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex w-full items-center gap-3 rounded-2xl border p-4 text-left transition-colors ${on ? "border-berry bg-berry-soft" : "hairline"}`}
+    >
+      <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 ${on ? "border-berry" : "border-ink/20"}`}>
+        {on && <span className="h-2.5 w-2.5 rounded-full bg-berry" />}
+      </span>
+      {icon}
+      <span className="text-sm font-semibold">{title}</span>
+    </button>
+    <AnimatePresence>
+      {on && children && (
+        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+          {children}
         </motion.div>
-      </>
-    )}
-  </AnimatePresence>
+      )}
+    </AnimatePresence>
+  </>
 );
 
-const PaymentSection = ({ method, setMethod, card, setCard }) => {
-  const [brandsOpen, setBrandsOpen] = useState(false);
-  const setField = (key) => (e) => setCard((c) => ({ ...c, [key]: e.target.value }));
-  const detected = detectBrand(card.number);
+const PaymentSection = ({ method, setMethod }) => (
+  <div className="space-y-4">
+    <Label>Forma de pagamento</Label>
+    <p className="-mt-2 text-sm text-ink-soft">Escolha o método que prefere para finalizar sua compra.</p>
 
-  return (
-    <div className="space-y-4">
-      <Label>Forma de pagamento</Label>
-      <p className="text-sm text-ink-soft -mt-2">Escolha o método que prefere para finalizar sua compra.</p>
-
-      {/* Cartão option */}
-      <button
-        type="button"
-        onClick={() => setMethod("cartao")}
-        className={`flex w-full items-center gap-3 rounded-2xl border p-4 text-left transition-colors ${method === "cartao" ? "border-berry bg-berry-soft" : "hairline"}`}
-      >
-        <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 ${method === "cartao" ? "border-berry" : "border-ink/20"}`}>
-          {method === "cartao" && <span className="h-2.5 w-2.5 rounded-full bg-berry" />}
-        </span>
-        <img src={P + "/img/visa.svg"} alt="" className="h-5" />
-        <span className="text-sm font-semibold">Cartão de crédito e débito</span>
-      </button>
-
-      <AnimatePresence>
-        {method === "cartao" && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden"
-          >
-            <div className="space-y-3 rounded-2xl border hairline p-4">
-              <p className="text-sm font-semibold">Dados do cartão</p>
-              <div className="relative">
-                <Input label="Número do cartão" value={card.number} onChange={setField("number")} placeholder="0000 0000 0000 0000" inputMode="numeric" maxLength={19} />
-                <div className="absolute right-3 top-8 flex items-center gap-1.5">
-                  {detected ? (
-                    <motion.img
-                      key={detected}
-                      initial={{ opacity: 0, scale: 0.7 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      src={P + `/img/${detected}.svg`}
-                      alt={detected}
-                      className="h-6"
-                    />
-                  ) : (
-                    <span className="text-[10px] text-ink-soft/50">Nenhuma</span>
-                  )}
-                </div>
-              </div>
-              <div className="relative inline-block">
-                <button type="button" onClick={() => setBrandsOpen(!brandsOpen)} className="text-xs font-medium text-berry hover:underline">
-                  Bandeiras aceitas
-                </button>
-                <BrandsPopup open={brandsOpen} onClose={() => setBrandsOpen(false)} />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <Input label="Validade" value={card.expiry} onChange={setField("expiry")} placeholder="MM/AA" maxLength={5} />
-                <Input label="CVV" value={card.cvv} onChange={setField("cvv")} placeholder="000" inputMode="numeric" maxLength={4} />
-              </div>
-              <Input label="Nome do titular" value={card.name} onChange={setField("name")} placeholder="Como está no cartão" />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Pix option */}
-      <button
-        type="button"
-        onClick={() => setMethod("pix")}
-        className={`flex w-full items-center gap-3 rounded-2xl border p-4 text-left transition-colors ${method === "pix" ? "border-berry bg-berry-soft" : "hairline"}`}
-      >
-        <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 ${method === "pix" ? "border-berry" : "border-ink/20"}`}>
-          {method === "pix" && <span className="h-2.5 w-2.5 rounded-full bg-berry" />}
-        </span>
-        <img src={P + "/img/pix.svg"} alt="" className="h-5" />
-        <span className="text-sm font-semibold">Pagar com Pix</span>
-      </button>
-
-      {method === "pix" && (
-        <div className="flex items-center gap-3 rounded-2xl border hairline p-4">
-          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-paper">
-            <img src={P + "/img/pix.svg"} alt="" className="h-6" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold">Pagamento rápido e seguro</p>
-            <p className="text-xs text-ink-soft">Após a confirmação, você será redirecionado para pagar via Pix.</p>
-          </div>
+    <Option
+      on={method === "cartao"}
+      onClick={() => setMethod("cartao")}
+      icon={<CreditCard className="h-5 w-5 text-ink-soft" />}
+      title="Cartão na entrega"
+    >
+      <div className="rounded-2xl border hairline p-4">
+        <p className="text-sm font-semibold">Você paga na maquininha</p>
+        <p className="mt-1 text-xs leading-relaxed text-ink-soft">
+          Levamos a maquininha até você. O cartão só é passado na hora da entrega, crédito ou débito,
+          então não precisamos dos dados dele agora.
+        </p>
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          {ACCEPTED.map((b) => (
+            <span key={b} className="grid h-8 place-items-center rounded-lg bg-paper px-2">
+              <img src={P + `/img/${b}.svg`} alt={b} className="h-4" />
+            </span>
+          ))}
         </div>
-      )}
-    </div>
-  );
-};
+      </div>
+    </Option>
+
+    <Option
+      on={method === "pix"}
+      onClick={() => setMethod("pix")}
+      icon={<img src={P + "/img/pix.svg"} alt="" className="h-5" />}
+      title="Pagar com Pix"
+    >
+      <div className="flex items-center gap-3 rounded-2xl border hairline p-4">
+        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-paper">
+          <img src={P + "/img/pix.svg"} alt="" className="h-6" />
+        </div>
+        <div>
+          <p className="text-sm font-semibold">Pagamento rápido e seguro</p>
+          <p className="text-xs text-ink-soft">Geramos o QR Code na próxima etapa, com 15 minutos pra pagar.</p>
+        </div>
+      </div>
+    </Option>
+  </div>
+);
 
 /* ── pix waiting screen ── */
 
@@ -430,11 +351,16 @@ const Success = ({ onClose }) => (
 
 export const CheckoutPage = () => {
   const { items, coupon, checkout, setCheckout, clear, setCoupon, count } = useBag();
+  const { user, addOrder } = useAuth();
   const [mode, setMode] = useState("entrega");
   const [method, setMethod] = useState("cartao");
-  const [address, setAddress] = useState({ cep: "", street: "", number: "", complement: "", neighborhood: "", city: "", state: "" });
-  const [card, setCard] = useState({ number: "", expiry: "", cvv: "", name: "" });
+  const [address, setAddress] = useState(() => user?.address || EMPTY_ADDRESS);
   const [stage, setStage] = useState("form"); // form | pix | success
+
+  // Endereco padrao do perfil preenche o formulario quando o checkout abre.
+  useEffect(() => {
+    if (checkout && user?.address?.cep) setAddress(user.address);
+  }, [checkout, user]);
 
   const t = calcTotals(items, coupon, mode);
 
@@ -454,31 +380,30 @@ export const CheckoutPage = () => {
       if (!address.neighborhood.trim()) return toast.error("Informe o bairro");
       if (!address.city.trim()) return toast.error("Informe a cidade");
     }
-    if (method === "cartao") {
-      if (card.number.replace(/\D/g, "").length < 13) return toast.error("Número do cartão inválido");
-      if (!card.expiry.trim()) return toast.error("Informe a validade");
-      if (!card.cvv.trim()) return toast.error("Informe o CVV");
-      if (!card.name.trim()) return toast.error("Informe o nome do titular");
-    }
     return true;
   };
 
-  const handleFinalize = () => {
-    if (validate() !== true) return;
-    if (method === "pix") {
-      setStage("pix");
-    } else {
-      clear();
-      setCoupon("");
-      setStage("success");
-    }
-  };
-
-  const handlePixConfirm = useCallback(() => {
+  const concluir = useCallback(() => {
+    addOrder({
+      code: Math.random().toString(36).slice(2, 8).toUpperCase(),
+      date: new Date().toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }),
+      items: items.map(({ id, name, price, qty }) => ({ id, name, price, qty })),
+      total: t.total,
+      payment: method,
+      mode,
+      address: mode === "entrega" ? address : null,
+      step: 0,
+    });
     clear();
     setCoupon("");
     setStage("success");
-  }, [clear, setCoupon]);
+  }, [addOrder, items, t.total, method, mode, address, clear, setCoupon]);
+
+  const handleFinalize = () => {
+    if (validate() !== true) return;
+    if (method === "pix") setStage("pix");
+    else concluir();
+  };
 
   if (!checkout) return null;
 
@@ -505,7 +430,7 @@ export const CheckoutPage = () => {
         <Success onClose={close} />
       ) : stage === "pix" ? (
         <div className="mx-auto max-w-lg px-5 sm:px-8">
-          <PixWaiting total={t.total} onConfirm={handlePixConfirm} />
+          <PixWaiting total={t.total} onConfirm={concluir} />
         </div>
       ) : items.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
@@ -546,7 +471,7 @@ export const CheckoutPage = () => {
           {/* Right column: address + payment */}
           <div className="space-y-8 lg:col-span-7">
             <AddressSection address={address} setAddress={setAddress} mode={mode} setMode={setMode} />
-            <PaymentSection method={method} setMethod={setMethod} card={card} setCard={setCard} />
+            <PaymentSection method={method} setMethod={setMethod} />
 
             <button
               onClick={handleFinalize}

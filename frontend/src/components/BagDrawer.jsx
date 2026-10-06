@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "./ui/sheet";
 import { useBag } from "../context/BagContext";
+import { useAuth } from "../context/AuthContext";
+import { AuthModal } from "./AuthModal";
 import { brl, calcTotals, FREE_DELIVERY_FROM } from "../data/menu";
 import { scrollToId } from "./SmoothScroll";
 
@@ -51,6 +53,19 @@ const Coupon = () => {
 
 const Summary = () => {
   const { items, coupon, setOpen, setCheckout } = useBag();
+  const { signed } = useAuth();
+  const [authOpen, setAuthOpen] = useState(false);
+
+  const irParaCheckout = () => {
+    setOpen(false);
+    setCheckout(true);
+  };
+
+  // Sem conta nao da pra fechar pedido: abre o login e segue depois.
+  const finalizar = () => {
+    if (signed) return irParaCheckout();
+    setAuthOpen(true);
+  };
   const t = calcTotals(items, coupon);
   const left = Math.max(0, FREE_DELIVERY_FROM - (t.subtotal - t.discount));
   const pct = Math.min(100, ((t.subtotal - t.discount) / FREE_DELIVERY_FROM) * 100);
@@ -67,9 +82,11 @@ const Summary = () => {
         <div className="flex justify-between"><dt className="text-ink-soft">Entrega</dt><dd data-testid="cart-delivery" className="font-mono">{t.delivery ? brl(t.delivery) : "Grátis"}</dd></div>
         <div className="flex justify-between pt-2 font-display text-2xl font-bold"><dt>Total</dt><dd data-testid="cart-total">{brl(t.total)}</dd></div>
       </dl>
-      <button data-testid="checkout-button" onClick={() => { setOpen(false); setCheckout(true); }} className="mt-5 h-14 w-full rounded-full bg-berry text-sm font-semibold text-white transition-colors hover:bg-berry-dark">
+      <button data-testid="checkout-button" onClick={finalizar} className="mt-5 h-14 w-full rounded-full bg-berry text-sm font-semibold text-white transition-colors hover:bg-berry-dark">
         Finalizar pedido
       </button>
+      {!signed && <p className="mt-2 text-center text-xs text-ink-soft">Entre na sua conta para finalizar</p>}
+      <AuthModal open={authOpen} onOpenChange={setAuthOpen} onSuccess={irParaCheckout} />
     </div>
   );
 };
