@@ -353,7 +353,7 @@ const Success = ({ onClose }) => (
 
 export const CheckoutPage = () => {
   const { items, coupon, checkout, setCheckout, clear, setCoupon, count } = useBag();
-  const { user, addOrder } = useAuth();
+  const { user } = useAuth();
   const { addSale, couponRate, useCoupon } = useStore();
   const [mode, setMode] = useState("entrega");
   const [method, setMethod] = useState("cartao");
@@ -388,22 +388,21 @@ export const CheckoutPage = () => {
 
   const concluir = useCallback(() => {
     const pedido = items.map(({ id, name, price, qty }) => ({ id, name, price, qty }));
-    addSale({ items: pedido, total: t.total, payment: method, source: "site", step: 0 });
-    if (t.rate > 0) useCoupon(coupon);
-    addOrder({
-      code: Math.random().toString(36).slice(2, 8).toUpperCase(),
-      date: new Date().toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }),
-      items: items.map(({ id, name, price, qty }) => ({ id, name, price, qty })),
+    addSale({
+      items: pedido,
       total: t.total,
       payment: method,
+      source: "site",
+      step: 0,
+      customer: { name: user.name, email: user.email },
       mode,
       address: mode === "entrega" ? address : null,
-      step: 0,
     });
+    if (t.rate > 0) useCoupon(coupon);
     clear();
     setCoupon("");
     setStage("success");
-  }, [addOrder, addSale, useCoupon, coupon, items, t.total, t.rate, method, mode, address, clear, setCoupon]);
+  }, [addSale, useCoupon, coupon, user, items, t.total, t.rate, method, mode, address, clear, setCoupon]);
 
   const handleFinalize = () => {
     if (validate() !== true) return;

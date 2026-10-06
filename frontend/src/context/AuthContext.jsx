@@ -28,7 +28,6 @@ const blankProfile = (email, name, provider, role = "cliente") => ({
   phone: "",
   address: { cep: "", street: "", number: "", complement: "", neighborhood: "", city: "", state: "" },
   favorites: [],
-  orders: [],
 });
 
 const AuthContext = createContext(null);
@@ -68,10 +67,6 @@ export const AuthProvider = ({ children }) => {
     });
   }, []);
 
-  const addOrder = useCallback((order) => {
-    setUser((u) => (u ? { ...u, orders: [order, ...u.orders] } : u));
-  }, []);
-
   const value = useMemo(
     () => ({
       user,
@@ -84,10 +79,8 @@ export const AuthProvider = ({ children }) => {
       favorites: user?.favorites || [],
       isFavorite: (id) => !!user?.favorites.includes(id),
       toggleFavorite,
-      orders: user?.orders || [],
-      addOrder,
     }),
-    [user, login, loginWithGoogle, logout, updateProfile, toggleFavorite, addOrder]
+    [user, login, loginWithGoogle, logout, updateProfile, toggleFavorite]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -2,12 +2,13 @@ import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft, Check, ChevronRight, Clock, Heart, LogOut, MapPin, Package,
-  Plus, Receipt, ShieldCheck, ShoppingBag, Truck, User, UtensilsCrossed,
+  Plus, Receipt, ShieldCheck, ShoppingBag, Truck, User, UtensilsCrossed, X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "./Logo";
 import { useAuth } from "../context/AuthContext";
 import { useBag } from "../context/BagContext";
+import { useStore } from "../context/StoreContext";
 import { brl, CATEGORIES, PRODUCTS } from "../data/menu";
 
 const TABS = [
@@ -133,21 +134,28 @@ const Track = ({ step }) => (
 );
 
 const Pedidos = () => {
-  const { orders } = useAuth();
+  const { user } = useAuth();
+  const { salesOf } = useStore();
+  // Le direto das vendas da loja: assim um cancelamento no painel chega aqui.
+  const orders = salesOf(user.email);
+
   if (!orders.length) {
     return <Empty icon={Receipt} title="Nenhum pedido ainda" text="Quando você fizer o primeiro, ele aparece aqui com o status da entrega." />;
   }
+
   return (
     <div className="space-y-3">
       {orders.map((o) => (
-        <article key={o.code} className="rounded-[22px] border hairline bg-white p-4 sm:p-5">
+        <article key={o.code} className={`rounded-[22px] border bg-white p-4 sm:p-5 ${o.canceled ? "border-berry/30" : "hairline"}`}>
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft">#{o.code}</p>
-              <p className="mt-0.5 text-xs text-ink-soft">{o.date}</p>
+              <p className="mt-0.5 text-xs text-ink-soft">
+                {new Date(o.date).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+              </p>
             </div>
             <div className="shrink-0 text-right">
-              <p className="font-display text-lg font-bold">{brl(o.total)}</p>
+              <p className={`font-display text-lg font-bold ${o.canceled ? "text-ink-soft line-through" : ""}`}>{brl(o.total)}</p>
               <p className="text-[11px] text-ink-soft">{o.payment === "pix" ? "Pix" : "Maquininha"}</p>
             </div>
           </div>
@@ -159,7 +167,16 @@ const Pedidos = () => {
               </li>
             ))}
           </ul>
-          <Track step={o.step} />
+          {o.canceled ? (
+            <div className="mt-4 rounded-xl bg-berry-soft p-3">
+              <p className="flex items-center gap-1.5 text-sm font-semibold text-berry">
+                <X className="h-4 w-4" /> Pedido cancelado
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-ink-soft">{o.cancelReason}</p>
+            </div>
+          ) : (
+            <Track step={o.step} />
+          )}
         </article>
       ))}
     </div>

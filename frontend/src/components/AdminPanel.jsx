@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft, Boxes, Check, ChevronRight, Clock, LogOut, Minus, Package,
-  Plus, Receipt, Ticket, Trash2, TrendingUp, Truck, Wallet,
+  Plus, Receipt, Ticket, Trash2, TrendingUp, Truck, User, Wallet, X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "./Logo";
@@ -93,7 +93,7 @@ const Hoje = ({ onNovaVenda }) => {
               <li key={v.code} className="flex items-center justify-between gap-3 py-2.5">
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-medium">
-                    {v.items.reduce((s, i) => s + i.qty, 0)} un · {v.source === "balcao" ? "Balcão" : "Site"}
+                    {v.items.reduce((s, i) => s + i.qty, 0)} un · {v.customer ? v.customer.name : "Balcão"}
                   </span>
                   <span className="block text-xs text-ink-soft">{fmtHora(v.date)}</span>
                 </span>
@@ -109,55 +109,175 @@ const Hoje = ({ onNovaVenda }) => {
 
 /* ── aba pedidos ── */
 
+const MOTIVOS = ["Sem estoque", "Fora da área de entrega", "Cliente desistiu", "Pagamento não confirmado"];
+
+const CancelDialog = ({ sale, onClose, onConfirm }) => {
+  const [motivo, setMotivo] = useState("");
+
+  const confirmar = () => {
+    const texto = motivo.trim();
+    if (texto.length < 4) return toast.error("Escreva o motivo do cancelamento");
+    onConfirm(texto);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-5"
+    >
+      <motion.div
+        initial={{ y: 40 }}
+        animate={{ y: 0 }}
+        exit={{ y: 40 }}
+        className="w-full max-w-md rounded-t-[28px] bg-white p-6 sm:rounded-[28px]"
+        style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="font-display text-lg font-bold">Cancelar pedido</p>
+            <p className="mt-0.5 font-mono text-[11px] uppercase tracking-[0.18em] text-ink-soft">#{sale.code}</p>
+          </div>
+          <button onClick={onClose} aria-label="Fechar" className="grid h-8 w-8 place-items-center rounded-full transition-colors hover:bg-paper">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <p className="mt-4 text-sm text-ink-soft">
+          O cliente vai ver esse motivo no histórico dele. O estoque volta pra prateleira.
+        </p>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          {MOTIVOS.map((m) => (
+            <button
+              key={m}
+              onClick={() => setMotivo(m)}
+              className={`h-8 rounded-full border px-3 text-xs font-medium transition-colors ${motivo === m ? "border-ink bg-ink text-white" : "hairline hover:bg-paper"}`}
+            >
+              {m}
+            </button>
+          ))}
+        </div>
+
+        <textarea
+          value={motivo}
+          onChange={(e) => setMotivo(e.target.value)}
+          rows={3}
+          placeholder="Escreva o motivo"
+          className="mt-3 w-full resize-none rounded-2xl border hairline p-4 text-sm outline-none focus:border-ink"
+        />
+
+        <div className="mt-4 flex gap-2">
+          <button onClick={onClose} className="h-12 flex-1 rounded-full border hairline text-sm font-semibold transition-colors hover:bg-paper">
+            Voltar
+          </button>
+          <button onClick={confirmar} className="h-12 flex-1 rounded-full bg-berry text-sm font-semibold text-white transition-colors hover:bg-berry-dark">
+            Cancelar pedido
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
 const Pedidos = () => {
-  const { sales, advanceSale } = useStore();
+  const { sales, advanceSale, cancelSale } = useStore();
+  const [cancelando, setCancelando] = useState(null);
+
   if (!sales.length) {
     return <Empty icon={Receipt} title="Nenhum pedido ainda" text="Vendas do site e do balcão aparecem aqui." />;
   }
+
+  const confirmar = (motivo) => {
+    cancelSale(cancelando.code, motivo);
+    toast.success("Pedido #" + cancelando.code + " cancelado");
+    setCancelando(null);
+  };
+
   return (
-    <div className="space-y-3">
-      {sales.map((s) => (
-        <article key={s.code} className="rounded-[22px] border hairline bg-white p-4 sm:p-5">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft">
-                #{s.code} · {s.source === "balcao" ? "Balcão" : "Site"}
-              </p>
-              <p className="mt-0.5 text-xs text-ink-soft">{fmtHora(s.date)}</p>
+    <>
+      <div className="space-y-3">
+        {sales.map((s) => (
+          <article key={s.code} className={`rounded-[22px] border bg-white p-4 sm:p-5 ${s.canceled ? "border-berry/30 opacity-80" : "hairline"}`}>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft">#{s.code}</p>
+                <p className="mt-0.5 text-xs text-ink-soft">{fmtHora(s.date)}</p>
+              </div>
+              <div className="shrink-0 text-right">
+                <p className={`font-display text-lg font-bold ${s.canceled ? "text-ink-soft line-through" : ""}`}>{brl(s.total)}</p>
+                <p className="text-[11px] text-ink-soft">{s.payment === "pix" ? "Pix" : s.payment === "dinheiro" ? "Dinheiro" : "Maquininha"}</p>
+              </div>
             </div>
-            <div className="shrink-0 text-right">
-              <p className="font-display text-lg font-bold">{brl(s.total)}</p>
-              <p className="text-[11px] text-ink-soft">{s.payment === "pix" ? "Pix" : s.payment === "dinheiro" ? "Dinheiro" : "Maquininha"}</p>
+
+            <div className="mt-3 flex items-center gap-2 rounded-xl bg-paper px-3 py-2">
+              <User className="h-3.5 w-3.5 shrink-0 text-ink-soft" />
+              {s.customer ? (
+                <span className="min-w-0">
+                  <span className="block truncate text-xs font-semibold">{s.customer.name}</span>
+                  <span className="block truncate text-[11px] text-ink-soft">{s.customer.email}</span>
+                </span>
+              ) : (
+                <span className="text-xs font-medium text-ink-soft">Venda no balcão</span>
+              )}
             </div>
-          </div>
-          <ul className="mt-3 space-y-1 border-t hairline pt-3">
-            {s.items.map((i) => (
-              <li key={i.id} className="flex justify-between gap-3 text-sm">
-                <span className="min-w-0 truncate text-ink-soft">{i.qty}x {i.name}</span>
-                <span className="shrink-0 font-mono text-xs">{brl(i.price * i.qty)}</span>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-4 flex items-center justify-between gap-3">
-            <span className="flex items-center gap-2 text-sm font-medium">
-              {(() => {
-                const Icon = STEPS[s.step].icon;
-                return <Icon className="h-4 w-4 text-berry" />;
-              })()}
-              {STEPS[s.step].label}
-            </span>
-            {s.step < 3 && (
-              <button
-                onClick={() => advanceSale(s.code)}
-                className="flex h-9 items-center gap-1.5 rounded-full bg-ink px-4 text-xs font-semibold text-white transition-colors hover:bg-berry"
-              >
-                {STEPS[s.step + 1].label} <ChevronRight className="h-3.5 w-3.5" />
-              </button>
+
+            <ul className="mt-3 space-y-1 border-t hairline pt-3">
+              {s.items.map((i) => (
+                <li key={i.id} className="flex justify-between gap-3 text-sm">
+                  <span className="min-w-0 truncate text-ink-soft">{i.qty}x {i.name}</span>
+                  <span className="shrink-0 font-mono text-xs">{brl(i.price * i.qty)}</span>
+                </li>
+              ))}
+            </ul>
+
+            {s.canceled ? (
+              <div className="mt-4 rounded-xl bg-berry-soft p-3">
+                <p className="flex items-center gap-1.5 text-sm font-semibold text-berry">
+                  <X className="h-4 w-4" /> Cancelado
+                </p>
+                <p className="mt-1 text-xs leading-relaxed text-ink-soft">{s.cancelReason}</p>
+              </div>
+            ) : (
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                <span className="flex items-center gap-2 text-sm font-medium">
+                  {(() => {
+                    const Icon = STEPS[s.step].icon;
+                    return <Icon className="h-4 w-4 text-berry" />;
+                  })()}
+                  {STEPS[s.step].label}
+                </span>
+                <div className="flex items-center gap-2">
+                  {s.step < 3 && (
+                    <button
+                      onClick={() => setCancelando(s)}
+                      className="h-9 rounded-full border hairline px-4 text-xs font-semibold text-ink-soft transition-colors hover:border-berry hover:text-berry"
+                    >
+                      Cancelar
+                    </button>
+                  )}
+                  {s.step < 3 && (
+                    <button
+                      onClick={() => advanceSale(s.code)}
+                      className="flex h-9 items-center gap-1.5 rounded-full bg-ink px-4 text-xs font-semibold text-white transition-colors hover:bg-berry"
+                    >
+                      {STEPS[s.step + 1].label} <ChevronRight className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
             )}
-          </div>
-        </article>
-      ))}
-    </div>
+          </article>
+        ))}
+      </div>
+
+      <AnimatePresence>
+        {cancelando && (
+          <CancelDialog sale={cancelando} onClose={() => setCancelando(null)} onConfirm={confirmar} />
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 
@@ -473,10 +593,7 @@ export const AdminPanel = ({ onBack }) => {
     <div className="min-h-screen bg-paper lg:pl-[248px]">
       <aside className="fixed left-0 top-0 z-30 hidden h-screen w-[248px] flex-col border-r hairline bg-white px-5 py-6 lg:flex">
         <button onClick={onBack} aria-label="Voltar para o site" className="self-start"><Logo /></button>
-        <p className="mt-4 rounded-full bg-berry-soft px-3 py-1 text-center font-mono text-[10px] uppercase tracking-[0.18em] text-berry">
-          Painel da loja
-        </p>
-        <nav className="mt-6 space-y-1">
+        <nav className="mt-8 space-y-1">
           {TABS.map((t) => {
             const Icon = t.icon;
             const on = tab === t.id;
@@ -518,8 +635,7 @@ export const AdminPanel = ({ onBack }) => {
 
       <main className="mx-auto max-w-[1000px] px-5 pb-28 pt-6 sm:px-6 lg:pb-12">
         <div className="lg:hidden">
-          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-soft">Painel da loja</p>
-          <h1 className="mt-1 font-display text-2xl font-bold tracking-[-0.03em]">Oi, {user.name.split(" ")[0]}</h1>
+          <h1 className="font-display text-2xl font-bold tracking-[-0.03em]">Oi, {user.name.split(" ")[0]}</h1>
         </div>
 
         <AnimatePresence mode="wait">

@@ -36,7 +36,7 @@ const load = () => {
   }
 };
 
-const code = () => Math.random().toString(36).slice(2, 8).toUpperCase();
+const code = () => "GLZ" + Math.random().toString(36).slice(2, 7).toUpperCase();
 const hoje = () => new Date().toISOString().slice(0, 10);
 
 const StoreContext = createContext(null);
@@ -62,10 +62,29 @@ export const StoreProvider = ({ children }) => {
     });
   }, []);
 
+  const cancelSale = useCallback((saleCode, reason) => {
+    setData((d) => {
+      const venda = d.sales.find((s) => s.code === saleCode);
+      if (!venda || venda.canceled) return d;
+      // O que nao foi vendido volta pra prateleira.
+      const stock = { ...d.stock };
+      venda.items.forEach((i) => {
+        stock[i.id] = (stock[i.id] ?? 0) + i.qty;
+      });
+      return {
+        ...d,
+        stock,
+        sales: d.sales.map((s) =>
+          s.code === saleCode ? { ...s, canceled: true, cancelReason: reason, canceledAt: new Date().toISOString() } : s
+        ),
+      };
+    });
+  }, []);
+
   const advanceSale = useCallback((saleCode) => {
     setData((d) => ({
       ...d,
-      sales: d.sales.map((s) => (s.code === saleCode ? { ...s, step: Math.min(3, s.step + 1) } : s)),
+      sales: d.sales.map((s) => (s.code === saleCode && !s.canceled ? { ...s, step: Math.min(3, s.step + 1) } : s)),
     }));
   }, []);
 
@@ -114,7 +133,7 @@ export const StoreProvider = ({ children }) => {
 
   const value = useMemo(() => {
     const doDia = (arr) => arr.filter((x) => x.date.slice(0, 10) === hoje());
-    const vendasHoje = doDia(data.sales);
+    const vendasHoje = doDia(data.sales).filter((v) => !v.canceled);
     const despesasHoje = doDia(data.expenses);
     const faturamento = vendasHoje.reduce((s, v) => s + v.total, 0);
     const gastos = despesasHoje.reduce((s, e) => s + e.value, 0);
@@ -122,6 +141,8 @@ export const StoreProvider = ({ children }) => {
       ...data,
       addSale,
       advanceSale,
+      cancelSale,
+      salesOf: (email) => data.sales.filter((s) => s.customer && s.customer.email === email),
       adjustStock,
       setStock,
       addExpense,
@@ -144,7 +165,7 @@ export const StoreProvider = ({ children }) => {
         ticket: vendasHoje.length ? faturamento / vendasHoje.length : 0,
       },
     };
-  }, [data, addSale, advanceSale, adjustStock, setStock, addExpense, removeExpense, addCoupon, toggleCoupon, removeCoupon, useCoupon]);
+  }, [data, addSale, advanceSale, cancelSale, adjustStock, setStock, addExpense, removeExpense, addCoupon, toggleCoupon, removeCoupon, useCoupon]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 };
