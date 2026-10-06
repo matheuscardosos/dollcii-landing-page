@@ -3,6 +3,7 @@ import "@/App.css";
 import { Toaster } from "./components/ui/sonner";
 import { BagProvider } from "./context/BagContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { StoreProvider } from "./context/StoreContext";
 import { SmoothScroll } from "./components/SmoothScroll";
 import { Header } from "./components/Header";
 import { Hero } from "./components/Hero";
@@ -15,6 +16,7 @@ import { CheckoutPage } from "./components/CheckoutPage";
 import { MascotQuiz } from "./components/MascotQuiz";
 import { CookieBanner } from "./components/CookieBanner";
 import { Account } from "./components/Account";
+import { AdminPanel } from "./components/AdminPanel";
 
 // Rota por hash: o GitHub Pages nao reescreve URL, entao caminho real daria 404.
 const useHashRoute = () => {
@@ -43,19 +45,23 @@ const Landing = () => (
   </div>
 );
 
+const PROTEGIDAS = ["/conta", "/painel"];
+
 const Routes = () => {
   const [route, go] = useHashRoute();
-  const { signed } = useAuth();
+  const { signed, isAdmin } = useAuth();
 
-  // Sessao encerrada enquanto estava na area logada: volta pro site.
   useEffect(() => {
-    if (route === "/conta" && !signed) go("/");
-  }, [route, signed, go]);
+    // Sessao encerrada, ou cliente tentando o painel da loja: volta pro site.
+    if (PROTEGIDAS.includes(route) && !signed) go("/");
+    else if (route === "/painel" && !isAdmin) go("/conta");
+  }, [route, signed, isAdmin, go]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [route]);
 
+  if (route === "/painel" && signed && isAdmin) return <AdminPanel onBack={() => go("/")} />;
   if (route === "/conta" && signed) return <Account onBack={() => go("/")} />;
   return <Landing />;
 };
@@ -63,12 +69,14 @@ const Routes = () => {
 function App() {
   return (
     <AuthProvider>
-      <BagProvider>
-        <Routes />
-        <BagDrawer />
-        <CheckoutPage />
-        <Toaster position="bottom-center" richColors={false} toastOptions={{ className: "!rounded-full !bg-ink !text-white !border-none" }} />
-      </BagProvider>
+      <StoreProvider>
+        <BagProvider>
+          <Routes />
+          <BagDrawer />
+          <CheckoutPage />
+          <Toaster position="bottom-center" richColors={false} toastOptions={{ className: "!rounded-full !bg-ink !text-white !border-none" }} />
+        </BagProvider>
+      </StoreProvider>
     </AuthProvider>
   );
 }

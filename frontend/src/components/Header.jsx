@@ -31,7 +31,7 @@ export const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menu, setMenu] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
-  const { signed, user } = useAuth();
+  const { signed, user, isAdmin } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -68,9 +68,9 @@ export const Header = () => {
             Pedir agora
           </button>
           {signed ? (
-            <a href="#/conta" data-testid="nav-account" className="flex h-11 items-center gap-2 rounded-full border hairline px-4 text-sm font-semibold transition-colors hover:bg-paper">
+            <a href={isAdmin ? "#/painel" : "#/conta"} data-testid="nav-account" className="flex h-11 items-center gap-2 rounded-full border hairline px-4 text-sm font-semibold transition-colors hover:bg-paper">
               <User className="h-4 w-4" />
-              <span className="hidden sm:inline">{user.name.split(" ")[0]}</span>
+              <span className="hidden sm:inline">{isAdmin ? "Painel" : user.name.split(" ")[0]}</span>
             </a>
           ) : (
             <button onClick={() => setAuthOpen(true)} data-testid="nav-login" className="flex h-11 items-center gap-2 rounded-full border hairline px-4 text-sm font-semibold transition-colors hover:bg-paper">

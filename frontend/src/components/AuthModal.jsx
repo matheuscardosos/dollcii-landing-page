@@ -8,8 +8,8 @@ const P = process.env.PUBLIC_URL;
 
 // Contas de mentira pro seletor do Google. Clicar em qualquer uma loga de verdade.
 const GOOGLE_ACCOUNTS = [
-  { name: "Nicolas Geliz", email: "nicolas@gmail.com", color: "#FC030F" },
-  { name: "Allana Geliz", email: "allana.chef@gmail.com", color: "#FCC303" },
+  { name: "Nicolas Geliz", email: "nicolas@gmail.com", color: "#FC030F", role: "admin" },
+  { name: "Allana Geliz", email: "allana.chef@gmail.com", color: "#FCC303", role: "admin" },
 ];
 
 const Field = ({ label, type = "text", ...props }) => {
@@ -82,10 +82,13 @@ const GoogleView = ({ goTo, onDone }) => {
         {GOOGLE_ACCOUNTS.map((acc) => (
           <button key={acc.email} onClick={() => pick(acc)} className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-paper">
             <Initial name={acc.name} color={acc.color} />
-            <span className="min-w-0">
+            <span className="min-w-0 flex-1">
               <span className="block truncate text-sm font-semibold">{acc.name}</span>
               <span className="block truncate text-xs text-ink-soft">{acc.email}</span>
             </span>
+            {acc.role === "admin" && (
+              <span className="shrink-0 rounded-full bg-berry-soft px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-berry">Loja</span>
+            )}
           </button>
         ))}
       </div>

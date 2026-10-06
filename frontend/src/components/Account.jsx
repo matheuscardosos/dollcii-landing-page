@@ -360,7 +360,8 @@ export const Account = ({ onBack }) => {
             <Logo />
           </button>
           <p className="hidden font-display text-lg font-bold lg:block">{title}</p>
-          <BagFab className="h-11 w-11" />
+          {/* No celular a sacola fica so no centro da barra de baixo. */}
+          <BagFab className="hidden h-11 w-11 lg:grid" />
         </div>
       </header>
 

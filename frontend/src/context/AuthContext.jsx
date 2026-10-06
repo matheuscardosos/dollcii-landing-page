@@ -19,10 +19,11 @@ const nameFromEmail = (email) =>
     .replace(/\b\w/g, (c) => c.toUpperCase())
     .trim() || "Cliente";
 
-const blankProfile = (email, name, provider) => ({
+const blankProfile = (email, name, provider, role = "cliente") => ({
   name: name || nameFromEmail(email),
   email,
   provider,
+  role,
   cpf: "",
   phone: "",
   address: { cep: "", street: "", number: "", complement: "", neighborhood: "", city: "", state: "" },
@@ -47,7 +48,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const loginWithGoogle = useCallback((account) => {
-    const u = blankProfile(account.email, account.name, "google");
+    const u = blankProfile(account.email, account.name, "google", account.role || "cliente");
     u.avatar = account.avatar || null;
     setUser(u);
     return u;
@@ -75,6 +76,7 @@ export const AuthProvider = ({ children }) => {
     () => ({
       user,
       signed: !!user,
+      isAdmin: user?.role === "admin",
       login,
       loginWithGoogle,
       logout,

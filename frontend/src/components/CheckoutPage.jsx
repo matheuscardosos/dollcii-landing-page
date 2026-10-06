@@ -4,6 +4,7 @@ import { ArrowLeft, Check, Copy, CreditCard, Lock, Minus, Plus, Trash2, X } from
 import { toast } from "sonner";
 import { useBag } from "../context/BagContext";
 import { useAuth } from "../context/AuthContext";
+import { useStore } from "../context/StoreContext";
 import { brl, calcTotals, FREE_DELIVERY_FROM } from "../data/menu";
 
 const P = process.env.PUBLIC_URL;
@@ -352,6 +353,7 @@ const Success = ({ onClose }) => (
 export const CheckoutPage = () => {
   const { items, coupon, checkout, setCheckout, clear, setCoupon, count } = useBag();
   const { user, addOrder } = useAuth();
+  const { addSale } = useStore();
   const [mode, setMode] = useState("entrega");
   const [method, setMethod] = useState("cartao");
   const [address, setAddress] = useState(() => user?.address || EMPTY_ADDRESS);
@@ -384,6 +386,8 @@ export const CheckoutPage = () => {
   };
 
   const concluir = useCallback(() => {
+    const pedido = items.map(({ id, name, price, qty }) => ({ id, name, price, qty }));
+    addSale({ items: pedido, total: t.total, payment: method, source: "site", step: 0 });
     addOrder({
       code: Math.random().toString(36).slice(2, 8).toUpperCase(),
       date: new Date().toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }),
@@ -397,7 +401,7 @@ export const CheckoutPage = () => {
     clear();
     setCoupon("");
     setStage("success");
-  }, [addOrder, items, t.total, method, mode, address, clear, setCoupon]);
+  }, [addOrder, addSale, items, t.total, method, mode, address, clear, setCoupon]);
 
   const handleFinalize = () => {
     if (validate() !== true) return;
