@@ -57,12 +57,12 @@ const FlavorCard = ({ flavor }) => {
   const { add } = useBag();
   const product = PRODUCTS.find((p) => p.id === flavor.productId);
   return (
-    <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease, delay: 1 }} className="flex w-full min-w-0 items-center gap-3 sm:gap-4 rounded-[20px] sm:rounded-[24px] border hairline bg-white p-1.5 pl-4 sm:p-2 sm:pl-5 sm:w-fit" data-testid="hero-flavor-card">
-      <div className="min-w-0 flex-1">
-        <p className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-ink-soft">Nº {flavor.n} · {flavor.full}</p>
-        <p className="truncate text-xs sm:text-sm text-ink-soft">{flavor.line}</p>
+    <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease, delay: 1 }} className="flex w-full min-w-0 items-center gap-4 sm:gap-6 rounded-[22px] sm:rounded-[26px] border hairline bg-white p-2.5 pl-5 sm:p-3 sm:pl-6 sm:w-fit" data-testid="hero-flavor-card">
+      <div className="min-w-0 flex-1 py-0.5">
+        <p className="font-mono text-[9px] sm:text-[10px] uppercase leading-none tracking-[0.2em] text-ink-soft">Nº {flavor.n} · {flavor.full}</p>
+        <p className="mt-2 truncate text-xs leading-snug text-ink-soft sm:text-sm">{flavor.line}</p>
       </div>
-      <button data-testid="hero-add-flavor" onClick={() => product && add(product)} className="flex h-10 sm:h-12 shrink-0 items-center gap-1.5 sm:gap-2 rounded-full px-3.5 sm:px-5 text-xs sm:text-sm font-semibold text-white transition-transform duration-300 hover:scale-[1.03]" style={{ background: flavor.accent }}>
+      <button data-testid="hero-add-flavor" onClick={() => product && add(product)} className="flex h-11 sm:h-12 shrink-0 items-center gap-1.5 sm:gap-2 rounded-full px-4 sm:px-5 text-xs sm:text-sm font-semibold text-white transition-transform duration-300 hover:scale-[1.03]" style={{ background: flavor.accent }}>
         <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> {brl(product?.price)}
       </button>
     </motion.div>
@@ -99,7 +99,7 @@ export const Hero = () => {
           <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 1, ease }} className="mt-5 sm:mt-7 max-w-md text-sm sm:text-base leading-relaxed text-ink-soft lg:text-lg">
             Fruta inteira, leite fresco e nenhum atalho. Gelados feitos à mão, em pequenos lotes, todos os dias.
           </motion.p>
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, duration: 1, ease }} className="mt-6 sm:mt-8 flex flex-col gap-4 lg:gap-5">
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, duration: 1, ease }} className="mt-7 sm:mt-9 flex flex-col gap-5 lg:gap-6">
             <FlavorSwitch active={flavor} onPick={pick} />
             <div className="flex flex-wrap items-center gap-3">
               <button data-testid="hero-primary-cta" onClick={() => scrollToId("cardapio")} className="group flex h-14 items-center gap-3 rounded-full bg-ink pl-7 pr-2 text-sm font-semibold text-white transition-colors hover:bg-berry">
@@ -117,7 +117,7 @@ export const Hero = () => {
           <FlavorStage flavor={flavor} className="mx-auto aspect-[4/5] w-full max-w-[520px] lg:aspect-auto lg:h-[min(64vh,600px)] xl:h-[min(78vh,760px)] lg:max-w-none" />
         </div>
 
-        <div className="min-w-0 lg:col-span-12 lg:-mt-4 xl:-mt-10 lg:pb-6 xl:pb-10">
+        <div className="min-w-0 lg:col-span-12 lg:pb-8 xl:pb-12">
           <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
             <FlavorCard flavor={flavor} />
             <div className="hidden items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-ink-soft lg:flex">
