@@ -1,6 +1,9 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, Check, Clock, Heart, LogOut, Package, Plus, Truck, User } from "lucide-react";
+import {
+  ArrowLeft, Check, ChevronRight, Clock, Heart, LogOut, Package,
+  Plus, Receipt, ShoppingBag, Truck, User, UtensilsCrossed,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "./Logo";
 import { useAuth } from "../context/AuthContext";
@@ -8,88 +11,121 @@ import { useBag } from "../context/BagContext";
 import { brl, CATEGORIES, PRODUCTS } from "../data/menu";
 
 const TABS = [
-  { id: "cardapio", label: "Cardápio", icon: Package },
-  { id: "pedidos", label: "Pedidos", icon: Clock },
-  { id: "dados", label: "Dados", icon: User },
+  { id: "cardapio", label: "Cardápio", icon: UtensilsCrossed },
   { id: "favoritos", label: "Favoritos", icon: Heart },
+  { id: "pedidos", label: "Pedidos", icon: Receipt },
+  { id: "conta", label: "Conta", icon: User },
 ];
 
-export const ORDER_STEPS = ["Recebido", "Em preparo", "Saiu para entrega", "Entregue"];
+const ORDER_STEPS = [
+  { label: "Recebido", icon: Package },
+  { label: "Em preparo", icon: Clock },
+  { label: "A caminho", icon: Truck },
+  { label: "Entregue", icon: Check },
+];
 
-/* ── cartao de produto, versao compacta pra lista ── */
+/* ── card de produto, formato app ── */
 
-const Row = ({ p }) => {
+const ProductTile = ({ p }) => {
   const { add } = useBag();
   const { isFavorite, toggleFavorite } = useAuth();
   const fav = isFavorite(p.id);
   return (
-    <div className="flex items-center gap-4 rounded-[20px] border hairline bg-white p-3">
-      <div className="grid h-20 w-16 shrink-0 place-items-center overflow-hidden rounded-xl p-1.5" style={{ background: p.tint }}>
-        <img src={p.img} alt={p.name} loading="lazy" className="h-full w-auto object-contain" />
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold">{p.name}</p>
-        <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-ink-soft">{p.desc}</p>
-        <p className="mt-1.5 text-sm font-semibold">{brl(p.price)}</p>
-      </div>
-      <div className="flex shrink-0 flex-col items-center gap-2">
+    <motion.article layout className="overflow-hidden rounded-[22px] border hairline bg-white">
+      <div className="relative aspect-square" style={{ background: p.tint }}>
+        <img src={p.img} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-contain p-4" />
         <button
           onClick={() => toggleFavorite(p.id)}
-          aria-label={fav ? "Remover dos favoritos" : "Adicionar aos favoritos"}
-          className={`grid h-9 w-9 place-items-center rounded-full border transition-colors ${fav ? "border-berry bg-berry-soft text-berry" : "hairline text-ink-soft hover:text-berry"}`}
+          aria-label={fav ? "Remover dos favoritos" : "Salvar nos favoritos"}
+          className="absolute bottom-2 right-2 grid h-9 w-9 place-items-center rounded-full bg-white shadow-md transition-transform active:scale-90"
         >
-          <Heart className={`h-4 w-4 ${fav ? "fill-current" : ""}`} />
-        </button>
-        <button
-          onClick={() => add(p)}
-          aria-label={"Adicionar " + p.name + " à sacola"}
-          className="grid h-9 w-9 place-items-center rounded-full bg-ink text-white transition-colors hover:bg-berry"
-        >
-          <Plus className="h-4 w-4" />
+          <Heart className={`h-4 w-4 ${fav ? "fill-berry text-berry" : "text-ink-soft"}`} />
         </button>
       </div>
-    </div>
+      <div className="p-3">
+        <p className="truncate text-sm font-semibold">{p.name}</p>
+        <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-ink-soft">{p.desc}</p>
+        <div className="mt-3 flex items-center justify-between gap-2">
+          <span className="font-display text-lg font-bold">{brl(p.price)}</span>
+          <button
+            onClick={() => add(p)}
+            aria-label={"Adicionar " + p.name}
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ink text-white transition-colors hover:bg-berry active:scale-90"
+          >
+            <Plus className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </motion.article>
   );
 };
 
-/* ── aba: cardapio completo ── */
+const Empty = ({ icon: Icon, title, text }) => (
+  <div className="rounded-[22px] border hairline bg-white px-6 py-14 text-center">
+    <Icon className="mx-auto h-10 w-10 text-ink-soft" />
+    <p className="mt-4 font-display text-lg font-bold">{title}</p>
+    <p className="mx-auto mt-1 max-w-xs text-sm leading-relaxed text-ink-soft">{text}</p>
+  </div>
+);
 
-const Catalogo = () => {
+/* ── aba cardapio ── */
+
+const Cardapio = () => {
   const [cat, setCat] = useState("todos");
   const list = useMemo(() => (cat === "todos" ? PRODUCTS : PRODUCTS.filter((p) => p.cat === cat)), [cat]);
   return (
-    <div>
-      <div className="flex flex-wrap gap-2">
+    <>
+      <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 sm:mx-0 sm:px-0" style={{ scrollbarWidth: "none" }}>
         {CATEGORIES.map((c) => (
           <button
             key={c.id}
             onClick={() => setCat(c.id)}
-            className={`h-9 rounded-full border px-4 text-sm font-medium transition-colors ${cat === c.id ? "border-ink bg-ink text-white" : "hairline bg-white hover:bg-paper"}`}
+            className={`h-9 shrink-0 rounded-full border px-4 text-sm font-medium transition-colors ${cat === c.id ? "border-ink bg-ink text-white" : "hairline bg-white"}`}
           >
             {c.label}
           </button>
         ))}
       </div>
-      <div className="mt-5 grid gap-3 sm:grid-cols-2">
-        {list.map((p) => <Row key={p.id} p={p} />)}
+      <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
+        {list.map((p) => <ProductTile key={p.id} p={p} />)}
       </div>
+    </>
+  );
+};
+
+/* ── aba favoritos ── */
+
+const Favoritos = () => {
+  const { favorites } = useAuth();
+  const list = PRODUCTS.filter((p) => favorites.includes(p.id));
+  if (!list.length) {
+    return <Empty icon={Heart} title="Nenhum favorito ainda" text="Toque no coração de um sabor no cardápio para salvar aqui." />;
+  }
+  return (
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
+      {list.map((p) => <ProductTile key={p.id} p={p} />)}
     </div>
   );
 };
 
-/* ── aba: pedidos ── */
+/* ── aba pedidos ── */
 
-const StatusTrack = ({ step }) => (
-  <ol className="mt-4 grid grid-cols-4 gap-1">
+const Track = ({ step }) => (
+  <ol className="mt-4 flex items-start">
     {ORDER_STEPS.map((s, i) => {
       const done = i <= step;
-      const Icon = i === 3 ? Check : i === 2 ? Truck : i === 1 ? Clock : Package;
+      const Icon = s.icon;
       return (
-        <li key={s} className="flex flex-col items-center gap-1.5 text-center">
-          <span className={`grid h-8 w-8 place-items-center rounded-full ${done ? "bg-berry text-white" : "bg-ink/10 text-ink-soft"}`}>
+        <li key={s.label} className="relative flex flex-1 flex-col items-center gap-1.5">
+          {i > 0 && (
+            <span className={`absolute right-1/2 top-4 h-0.5 w-full ${i <= step ? "bg-berry" : "bg-ink/10"}`} />
+          )}
+          <span className={`relative grid h-8 w-8 place-items-center rounded-full ${done ? "bg-berry text-white" : "bg-ink/10 text-ink-soft"}`}>
             <Icon className="h-4 w-4" />
           </span>
-          <span className={`text-[10px] leading-tight ${done ? "font-semibold text-ink" : "text-ink-soft"}`}>{s}</span>
+          <span className={`text-center text-[10px] leading-tight ${done ? "font-semibold text-ink" : "text-ink-soft"}`}>
+            {s.label}
+          </span>
         </li>
       );
     })}
@@ -99,50 +135,54 @@ const StatusTrack = ({ step }) => (
 const Pedidos = () => {
   const { orders } = useAuth();
   if (!orders.length) {
-    return (
-      <div className="rounded-[24px] border hairline bg-white p-10 text-center">
-        <Package className="mx-auto h-10 w-10 text-ink-soft" />
-        <p className="mt-4 font-display text-xl font-bold">Nenhum pedido ainda</p>
-        <p className="mt-1 text-sm text-ink-soft">Quando você fizer o primeiro, ele aparece aqui com o status.</p>
-      </div>
-    );
+    return <Empty icon={Receipt} title="Nenhum pedido ainda" text="Quando você fizer o primeiro, ele aparece aqui com o status da entrega." />;
   }
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {orders.map((o) => (
-        <div key={o.code} className="rounded-[24px] border hairline bg-white p-5">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-soft">Pedido #{o.code}</p>
-              <p className="mt-1 text-sm text-ink-soft">{o.date}</p>
+        <article key={o.code} className="rounded-[22px] border hairline bg-white p-4 sm:p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft">#{o.code}</p>
+              <p className="mt-0.5 text-xs text-ink-soft">{o.date}</p>
             </div>
-            <div className="text-right">
-              <p className="font-display text-xl font-bold">{brl(o.total)}</p>
-              <p className="text-xs text-ink-soft">{o.payment === "pix" ? "Pix" : "Maquininha na entrega"}</p>
+            <div className="shrink-0 text-right">
+              <p className="font-display text-lg font-bold">{brl(o.total)}</p>
+              <p className="text-[11px] text-ink-soft">{o.payment === "pix" ? "Pix" : "Maquininha"}</p>
             </div>
           </div>
-          <ul className="mt-4 space-y-1.5 border-t hairline pt-4 text-sm">
+          <ul className="mt-3 space-y-1 border-t hairline pt-3">
             {o.items.map((i) => (
-              <li key={i.id} className="flex justify-between gap-3">
+              <li key={i.id} className="flex justify-between gap-3 text-sm">
                 <span className="min-w-0 truncate text-ink-soft">{i.qty}x {i.name}</span>
                 <span className="shrink-0 font-mono text-xs">{brl(i.price * i.qty)}</span>
               </li>
             ))}
           </ul>
-          <StatusTrack step={o.step} />
-        </div>
+          <Track step={o.step} />
+        </article>
       ))}
     </div>
   );
 };
 
-/* ── aba: dados da conta ── */
+/* ── aba conta ── */
 
 const Field = ({ label, ...props }) => (
   <label className="block">
-    <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-soft">{label}</span>
-    <input {...props} className="mt-1.5 h-12 w-full rounded-2xl border hairline bg-white px-4 text-sm outline-none focus:border-ink" />
+    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft">{label}</span>
+    <input {...props} className="mt-1.5 h-12 w-full rounded-2xl border hairline bg-white px-4 text-sm outline-none focus:border-ink disabled:bg-paper disabled:text-ink-soft" />
   </label>
+);
+
+const Card = ({ title, children, onSubmit, cta }) => (
+  <form onSubmit={onSubmit} className="space-y-3 rounded-[22px] border hairline bg-white p-5">
+    <p className="font-display text-base font-bold">{title}</p>
+    {children}
+    <button className="h-12 w-full rounded-full bg-ink text-sm font-semibold text-white transition-colors hover:bg-berry">
+      {cta}
+    </button>
+  </form>
 );
 
 const maskCpf = (v) =>
@@ -151,14 +191,15 @@ const maskCpf = (v) =>
     .replace(/(\d{3})(\d)/, "$1.$2")
     .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
 
-const Dados = () => {
-  const { user, updateProfile } = useAuth();
+const Conta = ({ onBack }) => {
+  const { user, updateProfile, logout } = useAuth();
   const [form, setForm] = useState({ name: user.name, cpf: user.cpf, phone: user.phone });
   const [addr, setAddr] = useState(user.address);
   const [pass, setPass] = useState({ atual: "", nova: "", confirma: "" });
   const [busyCep, setBusyCep] = useState(false);
 
-  const setF = (k) => (e) => setForm((f) => ({ ...f, [k]: k === "cpf" ? maskCpf(e.target.value) : e.target.value }));
+  const setF = (k) => (e) =>
+    setForm((f) => ({ ...f, [k]: k === "cpf" ? maskCpf(e.target.value) : e.target.value }));
 
   const setA = (k) => async (e) => {
     const v = e.target.value;
@@ -178,10 +219,16 @@ const Dados = () => {
     }
   };
 
-  const salvar = (e) => {
+  const salvarDados = (e) => {
     e.preventDefault();
-    updateProfile({ ...form, address: addr });
+    updateProfile(form);
     toast.success("Dados salvos");
+  };
+
+  const salvarEndereco = (e) => {
+    e.preventDefault();
+    updateProfile({ address: addr });
+    toast.success("Endereço salvo");
   };
 
   const trocarSenha = (e) => {
@@ -192,75 +239,6 @@ const Dados = () => {
     toast.success("Senha alterada");
   };
 
-  return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <form onSubmit={salvar} className="space-y-4 rounded-[24px] border hairline bg-white p-6">
-        <p className="font-display text-lg font-bold">Seus dados</p>
-        <Field label="Nome" value={form.name} onChange={setF("name")} />
-        <Field label="E-mail" value={user.email} disabled className="mt-1.5 h-12 w-full rounded-2xl border hairline bg-paper px-4 text-sm text-ink-soft outline-none" />
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="CPF" value={form.cpf} onChange={setF("cpf")} placeholder="000.000.000-00" inputMode="numeric" />
-          <Field label="Telefone" value={form.phone} onChange={setF("phone")} placeholder="(38) 90000-0000" inputMode="tel" />
-        </div>
-
-        <p className="pt-2 font-display text-lg font-bold">Endereço padrão</p>
-        <div className="relative">
-          <Field label="CEP" value={addr.cep} onChange={setA("cep")} placeholder="00000-000" inputMode="numeric" maxLength={9} />
-          {busyCep && <span className="absolute right-4 top-9 text-xs text-ink-soft">Buscando...</span>}
-        </div>
-        <Field label="Rua" value={addr.street} onChange={setA("street")} placeholder="Nome da rua" />
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Número" value={addr.number} onChange={setA("number")} placeholder="Nº" />
-          <Field label="Complemento" value={addr.complement} onChange={setA("complement")} placeholder="Apto, bloco..." />
-        </div>
-        <Field label="Bairro" value={addr.neighborhood} onChange={setA("neighborhood")} placeholder="Bairro" />
-        <div className="grid grid-cols-3 gap-3">
-          <div className="col-span-2"><Field label="Cidade" value={addr.city} onChange={setA("city")} placeholder="Cidade" /></div>
-          <Field label="Estado" value={addr.state} onChange={setA("state")} placeholder="UF" maxLength={2} />
-        </div>
-        <button className="h-12 w-full rounded-full bg-ink text-sm font-semibold text-white transition-colors hover:bg-berry">
-          Salvar alterações
-        </button>
-      </form>
-
-      <form onSubmit={trocarSenha} className="h-fit space-y-4 rounded-[24px] border hairline bg-white p-6">
-        <p className="font-display text-lg font-bold">Trocar senha</p>
-        <Field label="Senha atual" type="password" value={pass.atual} onChange={(e) => setPass((p) => ({ ...p, atual: e.target.value }))} />
-        <Field label="Nova senha" type="password" value={pass.nova} onChange={(e) => setPass((p) => ({ ...p, nova: e.target.value }))} />
-        <Field label="Confirmar nova senha" type="password" value={pass.confirma} onChange={(e) => setPass((p) => ({ ...p, confirma: e.target.value }))} />
-        <button className="h-12 w-full rounded-full border border-ink text-sm font-semibold transition-colors hover:bg-ink hover:text-white">
-          Alterar senha
-        </button>
-      </form>
-    </div>
-  );
-};
-
-/* ── aba: favoritos ── */
-
-const Favoritos = () => {
-  const { favorites } = useAuth();
-  const list = PRODUCTS.filter((p) => favorites.includes(p.id));
-  if (!list.length) {
-    return (
-      <div className="rounded-[24px] border hairline bg-white p-10 text-center">
-        <Heart className="mx-auto h-10 w-10 text-ink-soft" />
-        <p className="mt-4 font-display text-xl font-bold">Nenhum favorito ainda</p>
-        <p className="mt-1 text-sm text-ink-soft">Toque no coração de um sabor no cardápio para salvar aqui.</p>
-      </div>
-    );
-  }
-  return <div className="grid gap-3 sm:grid-cols-2">{list.map((p) => <Row key={p.id} p={p} />)}</div>;
-};
-
-/* ── casca ── */
-
-export const Account = ({ onBack }) => {
-  const { user, logout } = useAuth();
-  const [tab, setTab] = useState("cardapio");
-
-  if (!user) return null;
-
   const sair = () => {
     logout();
     toast.success("Você saiu da conta");
@@ -268,29 +246,90 @@ export const Account = ({ onBack }) => {
   };
 
   return (
-    <div className="min-h-screen bg-paper">
-      <header className="sticky top-0 z-30 border-b hairline bg-white/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-[76px] max-w-[1100px] items-center justify-between px-5 sm:px-8">
-          <button onClick={onBack} aria-label="Voltar para o site"><Logo /></button>
-          <div className="flex items-center gap-2">
-            <button onClick={onBack} className="hidden h-10 items-center gap-2 rounded-full border hairline px-4 text-sm font-medium transition-colors hover:bg-paper sm:flex">
-              <ArrowLeft className="h-4 w-4" /> Voltar ao site
-            </button>
-            <button onClick={sair} className="flex h-10 items-center gap-2 rounded-full bg-ink px-4 text-sm font-semibold text-white transition-colors hover:bg-berry">
-              <LogOut className="h-4 w-4" /> Sair
-            </button>
-          </div>
+    <div className="space-y-3 lg:grid lg:grid-cols-2 lg:items-start lg:gap-4 lg:space-y-0">
+      <Card title="Dados pessoais" onSubmit={salvarDados} cta="Salvar dados">
+        <Field label="Nome" value={form.name} onChange={setF("name")} />
+        <Field label="E-mail" value={user.email} disabled />
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="CPF" value={form.cpf} onChange={setF("cpf")} placeholder="000.000.000-00" inputMode="numeric" />
+          <Field label="Telefone" value={form.phone} onChange={setF("phone")} placeholder="(38) 90000-0000" inputMode="tel" />
         </div>
-      </header>
+      </Card>
 
-      <main className="mx-auto max-w-[1100px] px-5 py-8 sm:px-8 sm:py-12">
-        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">Minha conta</p>
-        <h1 className="mt-2 font-display text-3xl font-bold tracking-[-0.03em] sm:text-4xl">
-          Oi, {user.name.split(" ")[0]}
-        </h1>
-        <p className="mt-1 text-sm text-ink-soft">{user.email}</p>
+      <Card title="Endereço padrão" onSubmit={salvarEndereco} cta="Salvar endereço">
+        <div className="relative">
+          <Field label="CEP" value={addr.cep} onChange={setA("cep")} placeholder="00000-000" inputMode="numeric" maxLength={9} />
+          {busyCep && <span className="absolute right-4 top-9 text-xs text-ink-soft">Buscando...</span>}
+        </div>
+        <Field label="Rua" value={addr.street} onChange={setA("street")} placeholder="Nome da rua" />
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Número" value={addr.number} onChange={setA("number")} placeholder="Nº" />
+          <Field label="Complemento" value={addr.complement} onChange={setA("complement")} placeholder="Apto, bloco" />
+        </div>
+        <Field label="Bairro" value={addr.neighborhood} onChange={setA("neighborhood")} placeholder="Bairro" />
+        <div className="grid grid-cols-3 gap-3">
+          <div className="col-span-2">
+            <Field label="Cidade" value={addr.city} onChange={setA("city")} placeholder="Cidade" />
+          </div>
+          <Field label="UF" value={addr.state} onChange={setA("state")} placeholder="MG" maxLength={2} />
+        </div>
+      </Card>
 
-        <nav className="mt-8 flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+      <Card title="Segurança" onSubmit={trocarSenha} cta="Alterar senha">
+        <Field label="Senha atual" type="password" value={pass.atual} onChange={(e) => setPass((p) => ({ ...p, atual: e.target.value }))} />
+        <Field label="Nova senha" type="password" value={pass.nova} onChange={(e) => setPass((p) => ({ ...p, nova: e.target.value }))} />
+        <Field label="Confirmar nova senha" type="password" value={pass.confirma} onChange={(e) => setPass((p) => ({ ...p, confirma: e.target.value }))} />
+      </Card>
+
+      <div className="space-y-2 rounded-[22px] border hairline bg-white p-5">
+        <p className="font-display text-base font-bold">Sessão</p>
+        <button onClick={onBack} className="flex w-full items-center justify-between rounded-xl px-1 py-3 text-sm transition-colors hover:bg-paper">
+          <span className="flex items-center gap-3"><ArrowLeft className="h-4 w-4 text-ink-soft" /> Voltar para o site</span>
+          <ChevronRight className="h-4 w-4 text-ink-soft" />
+        </button>
+        <button onClick={sair} className="flex w-full items-center justify-between rounded-xl px-1 py-3 text-sm text-berry transition-colors hover:bg-berry-soft">
+          <span className="flex items-center gap-3"><LogOut className="h-4 w-4" /> Sair da conta</span>
+          <ChevronRight className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+/* ── casca do app ── */
+
+const BagFab = ({ className = "" }) => {
+  const { count, setOpen } = useBag();
+  return (
+    <button
+      onClick={() => setOpen(true)}
+      aria-label="Abrir sacola"
+      className={`relative grid place-items-center rounded-full bg-berry text-white shadow-lg transition-transform active:scale-90 ${className}`}
+    >
+      <ShoppingBag className="h-5 w-5" />
+      {count > 0 && (
+        <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-ink px-1 font-mono text-[10px] text-white">
+          {count}
+        </span>
+      )}
+    </button>
+  );
+};
+
+export const Account = ({ onBack }) => {
+  const { user } = useAuth();
+  const [tab, setTab] = useState("cardapio");
+
+  if (!user) return null;
+
+  const title = TABS.find((t) => t.id === tab)?.label;
+
+  return (
+    <div className="min-h-screen bg-paper lg:pl-[248px]">
+      {/* Navegacao lateral no desktop */}
+      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-[248px] flex-col border-r hairline bg-white px-5 py-6 lg:flex">
+        <button onClick={onBack} aria-label="Voltar para o site" className="self-start"><Logo /></button>
+        <nav className="mt-8 space-y-1">
           {TABS.map((t) => {
             const Icon = t.icon;
             const on = tab === t.id;
@@ -298,30 +337,78 @@ export const Account = ({ onBack }) => {
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
-                className={`flex h-10 shrink-0 items-center gap-2 rounded-full border px-4 text-sm font-medium transition-colors ${on ? "border-ink bg-ink text-white" : "hairline bg-white hover:bg-white/60"}`}
+                className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${on ? "bg-ink text-white" : "text-ink-soft hover:bg-paper hover:text-ink"}`}
               >
                 <Icon className="h-4 w-4" /> {t.label}
               </button>
             );
           })}
         </nav>
+        <div className="mt-auto rounded-2xl bg-paper p-4">
+          <p className="truncate text-sm font-semibold">{user.name}</p>
+          <p className="truncate text-xs text-ink-soft">{user.email}</p>
+          <button onClick={onBack} className="mt-3 text-xs font-medium text-berry hover:underline">
+            Voltar para o site
+          </button>
+        </div>
+      </aside>
+
+      {/* Barra do topo */}
+      <header className="sticky top-0 z-20 border-b hairline bg-white/90 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 max-w-[1000px] items-center justify-between gap-3 px-5 sm:px-6">
+          <button onClick={onBack} className="lg:hidden" aria-label="Voltar para o site">
+            <Logo />
+          </button>
+          <p className="hidden font-display text-lg font-bold lg:block">{title}</p>
+          <BagFab className="h-11 w-11" />
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-[1000px] px-5 pb-28 pt-6 sm:px-6 lg:pb-12">
+        <div className="lg:hidden">
+          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-soft">Minha conta</p>
+          <h1 className="mt-1 font-display text-2xl font-bold tracking-[-0.03em]">
+            Oi, {user.name.split(" ")[0]}
+          </h1>
+        </div>
 
         <AnimatePresence mode="wait">
           <motion.div
             key={tab}
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.25 }}
-            className="mt-6"
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.22 }}
+            className="mt-5 lg:mt-0"
           >
-            {tab === "cardapio" && <Catalogo />}
-            {tab === "pedidos" && <Pedidos />}
-            {tab === "dados" && <Dados />}
+            {tab === "cardapio" && <Cardapio />}
             {tab === "favoritos" && <Favoritos />}
+            {tab === "pedidos" && <Pedidos />}
+            {tab === "conta" && <Conta onBack={onBack} />}
           </motion.div>
         </AnimatePresence>
       </main>
+
+      {/* Navegacao inferior no celular, com a sacola no centro */}
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t hairline bg-white/95 backdrop-blur-xl lg:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+        <div className="mx-auto grid h-16 max-w-md grid-cols-5 items-center px-2">
+          {TABS.slice(0, 2).map((t) => <TabButton key={t.id} t={t} on={tab === t.id} onClick={() => setTab(t.id)} />)}
+          <div className="relative flex justify-center">
+            <BagFab className="absolute -top-7 h-14 w-14 ring-4 ring-paper" />
+          </div>
+          {TABS.slice(2).map((t) => <TabButton key={t.id} t={t} on={tab === t.id} onClick={() => setTab(t.id)} />)}
+        </div>
+      </nav>
     </div>
+  );
+};
+
+const TabButton = ({ t, on, onClick }) => {
+  const Icon = t.icon;
+  return (
+    <button onClick={onClick} className="flex flex-col items-center gap-0.5 py-1" aria-current={on ? "page" : undefined}>
+      <Icon className={`h-5 w-5 ${on ? "text-berry" : "text-ink-soft"}`} />
+      <span className={`text-[10px] leading-none ${on ? "font-semibold text-berry" : "text-ink-soft"}`}>{t.label}</span>
+    </button>
   );
 };
