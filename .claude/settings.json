@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm start:*)",
+      "Bash(npm run:*)",
+      "Bash(gh api:*)",
+      "Bash(gh issue create --title 'imagens quebradas no github pages' --body ':*)",
+      "Bash(grep -o \"PUBLIC_URL\\\\|/dollcii-landing-page/img/\\\\|/img/\" build/static/js/main.*.js)",
+      "Bash(grep -o 'dollcii-landing-page/img/[^\"]*' build/static/js/main.*.js)",
+      "Bash(gh issue create --title 'layout espremido e bugado no mobile' --body ':*)",
+      "Bash(python3 -c ':*)",
+      "Bash(gh issue create --title 'imagem do carrinho vazando e hero espremido em notebooks' --body ':*)",
+      "Bash(gh issue create --title 'hero espremido em notebooks: sabores, botoes e card colados' --body ':*)"
+    ]
+  }
+}

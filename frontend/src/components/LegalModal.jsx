@@ -14,7 +14,7 @@ const Terms = () => (
 
     <section>
       <h3 className="mb-2 text-base font-semibold text-ink">2. Sobre o serviço</h3>
-      <p>A Geliz oferece picolés, gelatos e sobremesas artesanais para venda online com entrega na cidade de São Paulo. Os produtos disponíveis, preços e condições de entrega podem ser alterados a qualquer momento sem aviso prévio.</p>
+      <p>A Geliz oferece geladinhos gourmet para venda online com entrega em Montes Claros, MG. Os produtos disponíveis, preços e condições de entrega podem ser alterados a qualquer momento sem aviso prévio.</p>
     </section>
 
     <section>

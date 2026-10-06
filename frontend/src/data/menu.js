@@ -172,9 +172,3 @@ export const calcTotals = (items, coupon, mode = "entrega") => {
   const delivery = mode === "entrega" && after > 0 && after < FREE_DELIVERY_FROM ? DELIVERY_FEE : 0;
   return { subtotal, discount, delivery, total: after + delivery, rate };
 };
-
-export const STORES = [
-  { id: "jardins", name: "Jardins", address: "Rua Oscar Freire, 1120, Jardins, São Paulo", hours: "Todos os dias, 11h às 23h", phone: "(11) 4000-1020" },
-  { id: "pinheiros", name: "Pinheiros", address: "Rua dos Pinheiros, 870, Pinheiros, São Paulo", hours: "Ter a dom, 12h às 22h", phone: "(11) 4000-1030" },
-  { id: "vila-madalena", name: "Vila Madalena", address: "Rua Aspicuelta, 410, Vila Madalena, São Paulo", hours: "Todos os dias, 12h às 00h", phone: "(11) 4000-1040" },
-];

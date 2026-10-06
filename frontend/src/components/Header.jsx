@@ -12,7 +12,6 @@ const LINKS = [
   { id: "cardapio", label: "Cardápio" },
   { id: "historia", label: "História" },
   { id: "processo", label: "Processo" },
-  { id: "lojas", label: "Lojas" },
 ];
 
 const BagButton = () => {

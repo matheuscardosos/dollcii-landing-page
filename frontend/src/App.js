@@ -10,8 +10,6 @@ import { Bento } from "./components/Bento";
 import { Menu } from "./components/Menu";
 import { Historia } from "./components/Historia";
 import { Process } from "./components/Process";
-import { Testimonials } from "./components/Testimonials";
-import { Stores } from "./components/Stores";
 import { Footer } from "./components/Footer";
 import { BagDrawer } from "./components/BagDrawer";
 import { CheckoutPage } from "./components/CheckoutPage";
@@ -32,8 +30,6 @@ function App() {
           <Menu />
           <Historia />
           <Process />
-          <Testimonials />
-          <Stores />
         </main>
         <Footer />
         <BagDrawer />

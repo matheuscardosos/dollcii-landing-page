@@ -38,7 +38,7 @@ const Club = () => {
 };
 
 const COLS = [
-  ["Navegar", [["Sabores", "sabores"], ["Cardápio", "cardapio"], ["Nossa história", "historia"], ["Processo", "processo"], ["Lojas", "lojas"]]],
+  ["Navegar", [["Sabores", "sabores"], ["Cardápio", "cardapio"], ["Nossa história", "historia"], ["Processo", "processo"]]],
   ["Atendimento", [["Seg a sex, 12h às 18h"], ["Sábado, 8h às 16h"], ["Domingo, 9h às 12h"]]],
 ];
 
@@ -81,7 +81,7 @@ export const Footer = () => {
           <button onClick={() => setLegal("termos")} className="transition-colors hover:text-white">Termos de Uso</button>
           <button onClick={() => setLegal("privacidade")} className="transition-colors hover:text-white">Privacidade</button>
         </div>
-        <span>Feito com fruta de verdade em São Paulo</span>
+        <span>Feito à mão em Montes Claros, MG</span>
       </div>
     </div>
     <LegalModal type={legal} open={!!legal} onOpenChange={(o) => { if (!o) setLegal(null); }} />
