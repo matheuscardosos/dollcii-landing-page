@@ -96,7 +96,14 @@ export const Header = () => {
           </div>
         </SheetContent>
       </Sheet>
-      <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
+      <AuthModal
+        open={authOpen}
+        onOpenChange={setAuthOpen}
+        onSuccess={(u) => {
+          // Entrou pelo header: vai direto pra area dele, sem ter que clicar de novo.
+          window.location.hash = u && u.role === "admin" ? "/painel" : "/conta";
+        }}
+      />
     </motion.header>
   );
 };

@@ -404,9 +404,11 @@ const Despesas = () => {
 
 /* ── aba cupons ── */
 
+const fmtData = (iso) => iso.split("-").reverse().join("/");
+
 const Cupons = () => {
-  const { coupons, addCoupon, toggleCoupon, removeCoupon } = useStore();
-  const [form, setForm] = useState({ code: "", discount: "10" });
+  const { coupons, addCoupon, toggleCoupon, removeCoupon, isExpired } = useStore();
+  const [form, setForm] = useState({ code: "", discount: "10", expiresAt: "" });
 
   const criar = (e) => {
     e.preventDefault();
@@ -414,8 +416,10 @@ const Cupons = () => {
     const pct = parseInt(form.discount, 10);
     if (code.length < 3) return toast.error("O código precisa de pelo menos 3 letras");
     if (!pct || pct < 1 || pct > 90) return toast.error("Desconto deve ficar entre 1% e 90%");
-    if (!addCoupon(code, pct)) return toast.error("Já existe um cupom " + code);
-    setForm({ code: "", discount: "10" });
+    if (form.expiresAt && form.expiresAt < new Date().toISOString().slice(0, 10))
+      return toast.error("A validade não pode ser no passado");
+    if (!addCoupon(code, pct, form.expiresAt)) return toast.error("Já existe um cupom " + code);
+    setForm({ code: "", discount: "10", expiresAt: "" });
     toast.success("Cupom " + code + " criado");
   };
 
@@ -425,25 +429,41 @@ const Cupons = () => {
         <p className="font-display text-base font-bold">Criar cupom</p>
         <div className="grid grid-cols-3 gap-3">
           <div className="col-span-2">
-            <input
-              value={form.code}
-              onChange={(e) => setForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))}
-              placeholder="GELIZ10"
-              maxLength={16}
-              className="h-12 w-full rounded-2xl border hairline px-4 text-sm uppercase outline-none focus:border-ink"
-            />
+            <label className="block">
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft">Código</span>
+              <input
+                value={form.code}
+                onChange={(e) => setForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))}
+                placeholder="GELIZ10"
+                maxLength={16}
+                className="mt-1.5 h-12 w-full rounded-2xl border hairline px-4 text-sm uppercase outline-none focus:border-ink"
+              />
+            </label>
           </div>
-          <div className="relative">
-            <input
-              value={form.discount}
-              onChange={(e) => setForm((f) => ({ ...f, discount: e.target.value.replace(/\D/g, "").slice(0, 2) }))}
-              inputMode="numeric"
-              aria-label="Desconto em porcentagem"
-              className="h-12 w-full rounded-2xl border hairline px-4 pr-8 text-sm outline-none focus:border-ink"
-            />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-ink-soft">%</span>
-          </div>
+          <label className="block">
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft">Desconto</span>
+            <span className="relative mt-1.5 block">
+              <input
+                value={form.discount}
+                onChange={(e) => setForm((f) => ({ ...f, discount: e.target.value.replace(/\D/g, "").slice(0, 2) }))}
+                inputMode="numeric"
+                className="h-12 w-full rounded-2xl border hairline px-4 pr-8 text-sm outline-none focus:border-ink"
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-ink-soft">%</span>
+            </span>
+          </label>
         </div>
+        <label className="block">
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft">Validade (opcional)</span>
+          <input
+            type="date"
+            value={form.expiresAt}
+            min={new Date().toISOString().slice(0, 10)}
+            onChange={(e) => setForm((f) => ({ ...f, expiresAt: e.target.value }))}
+            className="mt-1.5 h-12 w-full rounded-2xl border hairline px-4 text-sm outline-none focus:border-ink"
+          />
+          <span className="mt-1.5 block text-xs text-ink-soft">Deixe vazio para o cupom não expirar.</span>
+        </label>
         <button className="h-12 w-full rounded-full bg-ink text-sm font-semibold text-white transition-colors hover:bg-berry">
           Criar cupom
         </button>
@@ -453,28 +473,39 @@ const Cupons = () => {
         <Empty icon={Ticket} title="Nenhum cupom" text="Crie um código de desconto pra divulgar nas redes." />
       ) : (
         <div className="space-y-3">
-          {coupons.map((c) => (
-            <div key={c.code} className="flex items-center gap-3 rounded-[22px] border hairline bg-white p-4">
-              <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${c.active ? "bg-berry-soft text-berry" : "bg-paper text-ink-soft"}`}>
-                <Ticket className="h-5 w-5" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-mono text-sm font-bold tracking-wider">{c.code}</p>
-                <p className="text-xs text-ink-soft">
-                  {c.discount}% de desconto · {c.uses} {c.uses === 1 ? "uso" : "usos"}
-                </p>
+          {coupons.map((c) => {
+            const vencido = isExpired(c);
+            const valendo = c.active && !vencido;
+            return (
+              <div key={c.code} className={`flex items-center gap-3 rounded-[22px] border bg-white p-4 ${vencido ? "border-berry/30" : "hairline"}`}>
+                <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${valendo ? "bg-berry-soft text-berry" : "bg-paper text-ink-soft"}`}>
+                  <Ticket className="h-5 w-5" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className={`truncate font-mono text-sm font-bold tracking-wider ${vencido ? "text-ink-soft line-through" : ""}`}>
+                    {c.code}
+                  </p>
+                  <p className="text-xs text-ink-soft">
+                    {c.discount}% · {c.uses} {c.uses === 1 ? "uso" : "usos"}
+                    {c.expiresAt ? (vencido ? " · venceu em " : " · vale até ") + fmtData(c.expiresAt) : " · sem prazo"}
+                  </p>
+                </div>
+                {vencido ? (
+                  <span className="shrink-0 rounded-full bg-berry-soft px-3 py-1 text-xs font-semibold text-berry">Vencido</span>
+                ) : (
+                  <button
+                    onClick={() => toggleCoupon(c.code)}
+                    className={`h-8 shrink-0 rounded-full border px-3 text-xs font-semibold transition-colors ${c.active ? "border-[#6F9A4F] text-[#6F9A4F]" : "hairline text-ink-soft"}`}
+                  >
+                    {c.active ? "Ativo" : "Pausado"}
+                  </button>
+                )}
+                <button onClick={() => removeCoupon(c.code)} aria-label={"Apagar cupom " + c.code} className="shrink-0 text-ink-soft transition-colors hover:text-berry">
+                  <Trash2 className="h-4 w-4" />
+                </button>
               </div>
-              <button
-                onClick={() => toggleCoupon(c.code)}
-                className={`h-8 shrink-0 rounded-full border px-3 text-xs font-semibold transition-colors ${c.active ? "border-[#6F9A4F] text-[#6F9A4F]" : "hairline text-ink-soft"}`}
-              >
-                {c.active ? "Ativo" : "Pausado"}
-              </button>
-              <button onClick={() => removeCoupon(c.code)} aria-label={"Apagar cupom " + c.code} className="shrink-0 text-ink-soft transition-colors hover:text-berry">
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

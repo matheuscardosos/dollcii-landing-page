@@ -62,9 +62,9 @@ const Initial = ({ name, color }) => (
 const GoogleView = ({ goTo, onDone }) => {
   const { loginWithGoogle } = useAuth();
   const pick = (acc) => {
-    loginWithGoogle(acc);
+    const u = loginWithGoogle(acc);
     toast.success("Você entrou como " + acc.name.split(" ")[0]);
-    onDone();
+    onDone(u);
   };
   return (
     <div className="space-y-4">
@@ -109,7 +109,7 @@ const LoginView = ({ goTo, onDone }) => {
     if (!email.trim() || !password.trim()) return toast.error("Preencha e-mail e senha");
     const u = login(email, password);
     toast.success("Bem-vindo, " + u.name.split(" ")[0] + "!");
-    onDone();
+    onDone(u);
   };
 
   return (
@@ -150,7 +150,7 @@ const RegisterView = ({ goTo, onDone }) => {
     if (form.password !== form.confirm) return toast.error("As senhas não coincidem");
     const u = login(form.email, form.password, form.name.trim());
     toast.success("Conta criada. Bem-vindo, " + u.name.split(" ")[0] + "!");
-    onDone();
+    onDone(u);
   };
 
   return (
@@ -216,9 +216,9 @@ export const AuthModal = ({ open, onOpenChange, onSuccess }) => {
     if (!o) setTimeout(() => setView("login"), 300);
   };
 
-  const done = () => {
+  const done = (user) => {
     close(false);
-    onSuccess?.();
+    onSuccess?.(user);
   };
 
   return (

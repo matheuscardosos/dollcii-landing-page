@@ -16,6 +16,7 @@ const vazio = () => ({
     discount: Math.round(rate * 100),
     active: true,
     uses: 0,
+    expiresAt: "",
   })),
 });
 
@@ -96,7 +97,7 @@ export const StoreProvider = ({ children }) => {
     setData((d) => ({ ...d, stock: { ...d.stock, [id]: Math.max(0, qty) } }));
   }, []);
 
-  const addCoupon = useCallback((code, discount) => {
+  const addCoupon = useCallback((code, discount, expiresAt = "") => {
     const norm = code.trim().toUpperCase();
     let ok = true;
     setData((d) => {
@@ -104,7 +105,7 @@ export const StoreProvider = ({ children }) => {
         ok = false;
         return d;
       }
-      return { ...d, coupons: [{ code: norm, discount, active: true, uses: 0 }, ...d.coupons] };
+      return { ...d, coupons: [{ code: norm, discount, active: true, uses: 0, expiresAt }, ...d.coupons] };
     });
     return ok;
   }, []);
@@ -151,11 +152,14 @@ export const StoreProvider = ({ children }) => {
       toggleCoupon,
       removeCoupon,
       useCoupon,
-      // Cupom inativo ou inexistente nao da desconto.
+      // Cupom inexistente, pausado ou vencido nao da desconto.
       couponRate: (code) => {
         const c = data.coupons.find((x) => x.code === (code || "").trim().toUpperCase());
-        return c && c.active ? c.discount / 100 : 0;
+        if (!c || !c.active) return 0;
+        if (c.expiresAt && c.expiresAt < hoje()) return 0;
+        return c.discount / 100;
       },
+      isExpired: (c) => !!c.expiresAt && c.expiresAt < hoje(),
       hoje: {
         vendas: vendasHoje,
         pedidos: vendasHoje.length,
