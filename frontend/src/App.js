@@ -4,9 +4,7 @@ import { BagProvider } from "./context/BagContext";
 import { SmoothScroll } from "./components/SmoothScroll";
 import { Header } from "./components/Header";
 import { Hero } from "./components/Hero";
-import { Marquee } from "./components/Marquee";
 import { Flavors } from "./components/Flavors";
-import { Bento } from "./components/Bento";
 import { Menu } from "./components/Menu";
 import { Historia } from "./components/Historia";
 import { Footer } from "./components/Footer";
@@ -23,9 +21,7 @@ function App() {
         <Header />
         <main>
           <Hero />
-          <Marquee />
           <Flavors />
-          <Bento />
           <Menu />
           <Historia />
         </main>
