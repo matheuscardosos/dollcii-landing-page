@@ -38,7 +38,7 @@ const Club = () => {
 };
 
 const COLS = [
-  ["Navegar", [["Sabores", "sabores"], ["Cardápio", "cardapio"], ["Nossa história", "historia"], ["Processo", "processo"]]],
+  ["Navegar", [["Sabores", "sabores"], ["Cardápio", "cardapio"], ["Nossa história", "historia"]]],
   ["Atendimento", [["Seg a sex, 12h às 18h"], ["Sábado, 8h às 16h"], ["Domingo, 9h às 12h"]]],
 ];
 
