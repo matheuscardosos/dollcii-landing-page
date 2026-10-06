@@ -36,24 +36,19 @@ const QUESTIONS = [
 
 function pickProduct(answers) {
   const [taste, intensity, occasion] = answers;
+  const byId = (id) => PRODUCTS.find((p) => p.id === id);
 
-  if (occasion === "presente") return PRODUCTS.find((p) => p.id === "esp-caixa");
-
-  if (taste === "chocolate") {
-    if (intensity === "forte") return PRODUCTS.find((p) => p.id === "pic-cacau");
-    return PRODUCTS.find((p) => p.id === "gel-doce-leite");
-  }
+  if (taste === "chocolate") return byId("geliz-nutella");
 
   if (taste === "fruta") {
-    if (intensity === "leve") return PRODUCTS.find((p) => p.id === "pic-maracuja");
-    if (occasion === "dividir") return PRODUCTS.find((p) => p.id === "pote-morango");
-    return PRODUCTS.find((p) => p.id === "pic-morango");
+    if (intensity === "leve") return byId("geliz-limao");
+    return byId("geliz-amor-cravejado");
   }
 
   // cremoso
-  if (intensity === "forte") return PRODUCTS.find((p) => p.id === "pic-pistache");
-  if (occasion === "dividir") return PRODUCTS.find((p) => p.id === "pote-baunilha");
-  return PRODUCTS.find((p) => p.id === "gel-doce-leite");
+  if (intensity === "forte") return byId("geliz-nutella");
+  if (occasion === "presente") return byId("geliz-amor-cravejado");
+  return byId("geliz-pudim");
 }
 
 const Bubble = ({ children, delay = 0 }) => (
