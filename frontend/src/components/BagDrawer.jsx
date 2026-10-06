@@ -4,6 +4,7 @@ import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "./ui/sheet";
 import { useBag } from "../context/BagContext";
 import { useAuth } from "../context/AuthContext";
+import { useStore } from "../context/StoreContext";
 import { AuthModal } from "./AuthModal";
 import { brl, calcTotals, FREE_DELIVERY_FROM } from "../data/menu";
 import { scrollToId } from "./SmoothScroll";
@@ -34,8 +35,9 @@ const Item = ({ i }) => {
 
 const Coupon = () => {
   const { coupon, setCoupon } = useBag();
+  const { couponRate } = useStore();
   const [val, setVal] = useState(coupon);
-  const { rate } = calcTotals([], coupon);
+  const rate = couponRate(coupon);
   return (
     <div className="mt-5">
       <div className="flex gap-2">
@@ -44,7 +46,7 @@ const Coupon = () => {
       </div>
       {coupon && (
         <p data-testid="cart-coupon-status" className={`mt-2 text-xs ${rate ? "text-[#6F9A4F]" : "text-berry"}`}>
-          {rate ? `Cupom ${coupon} aplicado: ${rate * 100}% de desconto` : "Cupom inválido. Experimente GELIZ10"}
+          {rate ? `Cupom ${coupon} aplicado: ${Math.round(rate * 100)}% de desconto` : "Cupom inválido ou expirado"}
         </p>
       )}
     </div>
@@ -54,6 +56,7 @@ const Coupon = () => {
 const Summary = () => {
   const { items, coupon, setOpen, setCheckout } = useBag();
   const { signed } = useAuth();
+  const { couponRate } = useStore();
   const [authOpen, setAuthOpen] = useState(false);
 
   const irParaCheckout = () => {
@@ -66,7 +69,7 @@ const Summary = () => {
     if (signed) return irParaCheckout();
     setAuthOpen(true);
   };
-  const t = calcTotals(items, coupon);
+  const t = calcTotals(items, coupon, "entrega", couponRate(coupon));
   const left = Math.max(0, FREE_DELIVERY_FROM - (t.subtotal - t.discount));
   const pct = Math.min(100, ((t.subtotal - t.discount) / FREE_DELIVERY_FROM) * 100);
   return (

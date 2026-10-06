@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { PRODUCTS } from "../data/menu";
+import { COUPONS, PRODUCTS } from "../data/menu";
 
 const KEY = "geliz-loja";
 const STOCK_INICIAL = 40;
@@ -10,6 +10,13 @@ const vazio = () => ({
   sales: [],
   expenses: [],
   stock: Object.fromEntries(PRODUCTS.map((p) => [p.id, STOCK_INICIAL])),
+  // O cupom antigo vira o primeiro da lista, agora editavel pelo painel.
+  coupons: Object.entries(COUPONS).map(([code, rate]) => ({
+    code,
+    discount: Math.round(rate * 100),
+    active: true,
+    uses: 0,
+  })),
 });
 
 const load = () => {
@@ -20,6 +27,7 @@ const load = () => {
     return {
       sales: Array.isArray(v.sales) ? v.sales : [],
       expenses: Array.isArray(v.expenses) ? v.expenses : [],
+      coupons: Array.isArray(v.coupons) ? v.coupons : base.coupons,
       // Produto novo no cardapio entra com estoque cheio em vez de indefinido.
       stock: { ...base.stock, ...(v.stock || {}) },
     };
@@ -69,6 +77,33 @@ export const StoreProvider = ({ children }) => {
     setData((d) => ({ ...d, stock: { ...d.stock, [id]: Math.max(0, qty) } }));
   }, []);
 
+  const addCoupon = useCallback((code, discount) => {
+    const norm = code.trim().toUpperCase();
+    let ok = true;
+    setData((d) => {
+      if (d.coupons.some((c) => c.code === norm)) {
+        ok = false;
+        return d;
+      }
+      return { ...d, coupons: [{ code: norm, discount, active: true, uses: 0 }, ...d.coupons] };
+    });
+    return ok;
+  }, []);
+
+  const toggleCoupon = useCallback((code) => {
+    setData((d) => ({ ...d, coupons: d.coupons.map((c) => (c.code === code ? { ...c, active: !c.active } : c)) }));
+  }, []);
+
+  const removeCoupon = useCallback((code) => {
+    setData((d) => ({ ...d, coupons: d.coupons.filter((c) => c.code !== code) }));
+  }, []);
+
+  const useCoupon = useCallback((code) => {
+    const norm = (code || "").trim().toUpperCase();
+    if (!norm) return;
+    setData((d) => ({ ...d, coupons: d.coupons.map((c) => (c.code === norm ? { ...c, uses: c.uses + 1 } : c)) }));
+  }, []);
+
   const addExpense = useCallback((exp) => {
     setData((d) => ({ ...d, expenses: [{ id: code(), date: new Date().toISOString(), ...exp }, ...d.expenses] }));
   }, []);
@@ -91,6 +126,15 @@ export const StoreProvider = ({ children }) => {
       setStock,
       addExpense,
       removeExpense,
+      addCoupon,
+      toggleCoupon,
+      removeCoupon,
+      useCoupon,
+      // Cupom inativo ou inexistente nao da desconto.
+      couponRate: (code) => {
+        const c = data.coupons.find((x) => x.code === (code || "").trim().toUpperCase());
+        return c && c.active ? c.discount / 100 : 0;
+      },
       hoje: {
         vendas: vendasHoje,
         pedidos: vendasHoje.length,
@@ -100,7 +144,7 @@ export const StoreProvider = ({ children }) => {
         ticket: vendasHoje.length ? faturamento / vendasHoje.length : 0,
       },
     };
-  }, [data, addSale, advanceSale, adjustStock, setStock, addExpense, removeExpense]);
+  }, [data, addSale, advanceSale, adjustStock, setStock, addExpense, removeExpense, addCoupon, toggleCoupon, removeCoupon, useCoupon]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 };

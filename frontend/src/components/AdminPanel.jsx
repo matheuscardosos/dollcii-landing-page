@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft, Boxes, Check, ChevronRight, Clock, LogOut, Minus, Package,
-  Plus, Receipt, Trash2, TrendingUp, Truck, Wallet,
+  Plus, Receipt, Ticket, Trash2, TrendingUp, Truck, Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "./Logo";
@@ -15,6 +15,7 @@ const TABS = [
   { id: "pedidos", label: "Pedidos", icon: Receipt },
   { id: "estoque", label: "Estoque", icon: Boxes },
   { id: "despesas", label: "Despesas", icon: Wallet },
+  { id: "cupons", label: "Cupons", icon: Ticket },
 ];
 
 const STEPS = [
@@ -281,6 +282,85 @@ const Despesas = () => {
   );
 };
 
+/* ── aba cupons ── */
+
+const Cupons = () => {
+  const { coupons, addCoupon, toggleCoupon, removeCoupon } = useStore();
+  const [form, setForm] = useState({ code: "", discount: "10" });
+
+  const criar = (e) => {
+    e.preventDefault();
+    const code = form.code.trim().toUpperCase();
+    const pct = parseInt(form.discount, 10);
+    if (code.length < 3) return toast.error("O código precisa de pelo menos 3 letras");
+    if (!pct || pct < 1 || pct > 90) return toast.error("Desconto deve ficar entre 1% e 90%");
+    if (!addCoupon(code, pct)) return toast.error("Já existe um cupom " + code);
+    setForm({ code: "", discount: "10" });
+    toast.success("Cupom " + code + " criado");
+  };
+
+  return (
+    <div className="space-y-4">
+      <form onSubmit={criar} className="space-y-3 rounded-[22px] border hairline bg-white p-5">
+        <p className="font-display text-base font-bold">Criar cupom</p>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="col-span-2">
+            <input
+              value={form.code}
+              onChange={(e) => setForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))}
+              placeholder="GELIZ10"
+              maxLength={16}
+              className="h-12 w-full rounded-2xl border hairline px-4 text-sm uppercase outline-none focus:border-ink"
+            />
+          </div>
+          <div className="relative">
+            <input
+              value={form.discount}
+              onChange={(e) => setForm((f) => ({ ...f, discount: e.target.value.replace(/\D/g, "").slice(0, 2) }))}
+              inputMode="numeric"
+              aria-label="Desconto em porcentagem"
+              className="h-12 w-full rounded-2xl border hairline px-4 pr-8 text-sm outline-none focus:border-ink"
+            />
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-ink-soft">%</span>
+          </div>
+        </div>
+        <button className="h-12 w-full rounded-full bg-ink text-sm font-semibold text-white transition-colors hover:bg-berry">
+          Criar cupom
+        </button>
+      </form>
+
+      {coupons.length === 0 ? (
+        <Empty icon={Ticket} title="Nenhum cupom" text="Crie um código de desconto pra divulgar nas redes." />
+      ) : (
+        <div className="space-y-3">
+          {coupons.map((c) => (
+            <div key={c.code} className="flex items-center gap-3 rounded-[22px] border hairline bg-white p-4">
+              <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${c.active ? "bg-berry-soft text-berry" : "bg-paper text-ink-soft"}`}>
+                <Ticket className="h-5 w-5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-mono text-sm font-bold tracking-wider">{c.code}</p>
+                <p className="text-xs text-ink-soft">
+                  {c.discount}% de desconto · {c.uses} {c.uses === 1 ? "uso" : "usos"}
+                </p>
+              </div>
+              <button
+                onClick={() => toggleCoupon(c.code)}
+                className={`h-8 shrink-0 rounded-full border px-3 text-xs font-semibold transition-colors ${c.active ? "border-[#6F9A4F] text-[#6F9A4F]" : "hairline text-ink-soft"}`}
+              >
+                {c.active ? "Ativo" : "Pausado"}
+              </button>
+              <button onClick={() => removeCoupon(c.code)} aria-label={"Apagar cupom " + c.code} className="shrink-0 text-ink-soft transition-colors hover:text-berry">
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 /* ── nova venda ── */
 
 const NovaVenda = ({ onClose }) => {
@@ -455,23 +535,24 @@ export const AdminPanel = ({ onBack }) => {
             {tab === "pedidos" && <Pedidos />}
             {tab === "estoque" && <Estoque />}
             {tab === "despesas" && <Despesas />}
+            {tab === "cupons" && <Cupons />}
           </motion.div>
         </AnimatePresence>
       </main>
 
+      {/* Com cinco abas a venda sai do centro e vira botao flutuante. */}
+      <button
+        onClick={() => setVenda(true)}
+        aria-label="Nova venda"
+        className="fixed bottom-20 right-5 z-40 flex h-14 items-center gap-2 rounded-full bg-berry px-5 text-sm font-semibold text-white shadow-lg transition-transform active:scale-90 lg:hidden"
+        style={{ marginBottom: "env(safe-area-inset-bottom)" }}
+      >
+        <Plus className="h-5 w-5" /> Venda
+      </button>
+
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t hairline bg-white/95 backdrop-blur-xl lg:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
         <div className="mx-auto grid h-16 max-w-md grid-cols-5 items-center px-2">
-          {TABS.slice(0, 2).map((t) => <TabButton key={t.id} t={t} on={tab === t.id} onClick={() => setTab(t.id)} />)}
-          <div className="relative flex justify-center">
-            <button
-              onClick={() => setVenda(true)}
-              aria-label="Nova venda"
-              className="absolute -top-7 grid h-14 w-14 place-items-center rounded-full bg-berry text-white shadow-lg ring-4 ring-paper transition-transform active:scale-90"
-            >
-              <Plus className="h-6 w-6" />
-            </button>
-          </div>
-          {TABS.slice(2).map((t) => <TabButton key={t.id} t={t} on={tab === t.id} onClick={() => setTab(t.id)} />)}
+          {TABS.map((t) => <TabButton key={t.id} t={t} on={tab === t.id} onClick={() => setTab(t.id)} />)}
         </div>
       </nav>
 

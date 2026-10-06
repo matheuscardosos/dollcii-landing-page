@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  ArrowLeft, Check, ChevronRight, Clock, Heart, LogOut, Package,
-  Plus, Receipt, ShoppingBag, Truck, User, UtensilsCrossed,
+  ArrowLeft, Check, ChevronRight, Clock, Heart, LogOut, MapPin, Package,
+  Plus, Receipt, ShieldCheck, ShoppingBag, Truck, User, UtensilsCrossed,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "./Logo";
@@ -175,9 +175,8 @@ const Field = ({ label, ...props }) => (
   </label>
 );
 
-const Card = ({ title, children, onSubmit, cta }) => (
+const Card = ({ children, onSubmit, cta }) => (
   <form onSubmit={onSubmit} className="space-y-3 rounded-[22px] border hairline bg-white p-5">
-    <p className="font-display text-base font-bold">{title}</p>
     {children}
     <button className="h-12 w-full rounded-full bg-ink text-sm font-semibold text-white transition-colors hover:bg-berry">
       {cta}
@@ -191,8 +190,25 @@ const maskCpf = (v) =>
     .replace(/(\d{3})(\d)/, "$1.$2")
     .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
 
+const SECOES = [
+  { id: "pessoais", label: "Dados pessoais", hint: "Nome, CPF e telefone", icon: User },
+  { id: "endereco", label: "Endereço padrão", hint: "Usado pra preencher o checkout", icon: MapPin },
+  { id: "seguranca", label: "Segurança", hint: "Trocar a senha", icon: ShieldCheck },
+  { id: "sessao", label: "Sessão", hint: "Voltar ao site ou sair", icon: LogOut },
+];
+
+const SectionHeader = ({ title, onBack }) => (
+  <div className="mb-4 flex items-center gap-3">
+    <button onClick={onBack} aria-label="Voltar" className="grid h-9 w-9 shrink-0 place-items-center rounded-full border hairline bg-white transition-colors hover:bg-paper">
+      <ArrowLeft className="h-4 w-4" />
+    </button>
+    <p className="font-display text-lg font-bold">{title}</p>
+  </div>
+);
+
 const Conta = ({ onBack }) => {
   const { user, updateProfile, logout } = useAuth();
+  const [secao, setSecao] = useState(null);
   const [form, setForm] = useState({ name: user.name, cpf: user.cpf, phone: user.phone });
   const [addr, setAddr] = useState(user.address);
   const [pass, setPass] = useState({ atual: "", nova: "", confirma: "" });
@@ -245,52 +261,113 @@ const Conta = ({ onBack }) => {
     onBack();
   };
 
-  return (
-    <div className="space-y-3 lg:grid lg:grid-cols-2 lg:items-start lg:gap-4 lg:space-y-0">
-      <Card title="Dados pessoais" onSubmit={salvarDados} cta="Salvar dados">
-        <Field label="Nome" value={form.name} onChange={setF("name")} />
-        <Field label="E-mail" value={user.email} disabled />
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="CPF" value={form.cpf} onChange={setF("cpf")} placeholder="000.000.000-00" inputMode="numeric" />
-          <Field label="Telefone" value={form.phone} onChange={setF("phone")} placeholder="(38) 90000-0000" inputMode="tel" />
-        </div>
-      </Card>
+  const voltar = () => setSecao(null);
 
-      <Card title="Endereço padrão" onSubmit={salvarEndereco} cta="Salvar endereço">
-        <div className="relative">
-          <Field label="CEP" value={addr.cep} onChange={setA("cep")} placeholder="00000-000" inputMode="numeric" maxLength={9} />
-          {busyCep && <span className="absolute right-4 top-9 text-xs text-ink-soft">Buscando...</span>}
-        </div>
-        <Field label="Rua" value={addr.street} onChange={setA("street")} placeholder="Nome da rua" />
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Número" value={addr.number} onChange={setA("number")} placeholder="Nº" />
-          <Field label="Complemento" value={addr.complement} onChange={setA("complement")} placeholder="Apto, bloco" />
-        </div>
-        <Field label="Bairro" value={addr.neighborhood} onChange={setA("neighborhood")} placeholder="Bairro" />
-        <div className="grid grid-cols-3 gap-3">
-          <div className="col-span-2">
-            <Field label="Cidade" value={addr.city} onChange={setA("city")} placeholder="Cidade" />
+  if (secao === "pessoais") {
+    return (
+      <div className="mx-auto max-w-lg">
+        <SectionHeader title="Dados pessoais" onBack={voltar} />
+        <Card onSubmit={salvarDados} cta="Salvar dados">
+          <Field label="Nome" value={form.name} onChange={setF("name")} />
+          <Field label="E-mail" value={user.email} disabled />
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="CPF" value={form.cpf} onChange={setF("cpf")} placeholder="000.000.000-00" inputMode="numeric" />
+            <Field label="Telefone" value={form.phone} onChange={setF("phone")} placeholder="(38) 90000-0000" inputMode="tel" />
           </div>
-          <Field label="UF" value={addr.state} onChange={setA("state")} placeholder="MG" maxLength={2} />
+        </Card>
+      </div>
+    );
+  }
+
+  if (secao === "endereco") {
+    return (
+      <div className="mx-auto max-w-lg">
+        <SectionHeader title="Endereço padrão" onBack={voltar} />
+        <Card onSubmit={salvarEndereco} cta="Salvar endereço">
+          <div className="relative">
+            <Field label="CEP" value={addr.cep} onChange={setA("cep")} placeholder="00000-000" inputMode="numeric" maxLength={9} />
+            {busyCep && <span className="absolute right-4 top-9 text-xs text-ink-soft">Buscando...</span>}
+          </div>
+          <Field label="Rua" value={addr.street} onChange={setA("street")} placeholder="Nome da rua" />
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Número" value={addr.number} onChange={setA("number")} placeholder="Nº" />
+            <Field label="Complemento" value={addr.complement} onChange={setA("complement")} placeholder="Apto, bloco" />
+          </div>
+          <Field label="Bairro" value={addr.neighborhood} onChange={setA("neighborhood")} placeholder="Bairro" />
+          <div className="grid grid-cols-3 gap-3">
+            <div className="col-span-2">
+              <Field label="Cidade" value={addr.city} onChange={setA("city")} placeholder="Cidade" />
+            </div>
+            <Field label="UF" value={addr.state} onChange={setA("state")} placeholder="MG" maxLength={2} />
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  if (secao === "seguranca") {
+    return (
+      <div className="mx-auto max-w-lg">
+        <SectionHeader title="Segurança" onBack={voltar} />
+        <Card onSubmit={trocarSenha} cta="Alterar senha">
+          <Field label="Senha atual" type="password" value={pass.atual} onChange={(e) => setPass((p) => ({ ...p, atual: e.target.value }))} />
+          <Field label="Nova senha" type="password" value={pass.nova} onChange={(e) => setPass((p) => ({ ...p, nova: e.target.value }))} />
+          <Field label="Confirmar nova senha" type="password" value={pass.confirma} onChange={(e) => setPass((p) => ({ ...p, confirma: e.target.value }))} />
+        </Card>
+      </div>
+    );
+  }
+
+  if (secao === "sessao") {
+    return (
+      <div className="mx-auto max-w-lg">
+        <SectionHeader title="Sessão" onBack={voltar} />
+        <div className="space-y-1 rounded-[22px] border hairline bg-white p-3">
+          <button onClick={onBack} className="flex w-full items-center justify-between rounded-xl px-2 py-3.5 text-sm transition-colors hover:bg-paper">
+            <span className="flex items-center gap-3"><ArrowLeft className="h-4 w-4 text-ink-soft" /> Voltar para o site</span>
+            <ChevronRight className="h-4 w-4 text-ink-soft" />
+          </button>
+          <button onClick={sair} className="flex w-full items-center justify-between rounded-xl px-2 py-3.5 text-sm text-berry transition-colors hover:bg-berry-soft">
+            <span className="flex items-center gap-3"><LogOut className="h-4 w-4" /> Sair da conta</span>
+            <ChevronRight className="h-4 w-4" />
+          </button>
         </div>
-      </Card>
+      </div>
+    );
+  }
 
-      <Card title="Segurança" onSubmit={trocarSenha} cta="Alterar senha">
-        <Field label="Senha atual" type="password" value={pass.atual} onChange={(e) => setPass((p) => ({ ...p, atual: e.target.value }))} />
-        <Field label="Nova senha" type="password" value={pass.nova} onChange={(e) => setPass((p) => ({ ...p, nova: e.target.value }))} />
-        <Field label="Confirmar nova senha" type="password" value={pass.confirma} onChange={(e) => setPass((p) => ({ ...p, confirma: e.target.value }))} />
-      </Card>
+  return (
+    <div className="mx-auto max-w-lg">
+      <div className="flex items-center gap-4 rounded-[22px] border hairline bg-white p-5">
+        <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-berry text-xl font-bold text-white">
+          {user.name.charAt(0)}
+        </span>
+        <div className="min-w-0">
+          <p className="truncate font-display text-lg font-bold">{user.name}</p>
+          <p className="truncate text-sm text-ink-soft">{user.email}</p>
+        </div>
+      </div>
 
-      <div className="space-y-2 rounded-[22px] border hairline bg-white p-5">
-        <p className="font-display text-base font-bold">Sessão</p>
-        <button onClick={onBack} className="flex w-full items-center justify-between rounded-xl px-1 py-3 text-sm transition-colors hover:bg-paper">
-          <span className="flex items-center gap-3"><ArrowLeft className="h-4 w-4 text-ink-soft" /> Voltar para o site</span>
-          <ChevronRight className="h-4 w-4 text-ink-soft" />
-        </button>
-        <button onClick={sair} className="flex w-full items-center justify-between rounded-xl px-1 py-3 text-sm text-berry transition-colors hover:bg-berry-soft">
-          <span className="flex items-center gap-3"><LogOut className="h-4 w-4" /> Sair da conta</span>
-          <ChevronRight className="h-4 w-4" />
-        </button>
+      <div className="mt-3 divide-y divide-ink/10 overflow-hidden rounded-[22px] border hairline bg-white">
+        {SECOES.map((sec) => {
+          const Icon = sec.icon;
+          return (
+            <button
+              key={sec.id}
+              onClick={() => setSecao(sec.id)}
+              className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-paper"
+            >
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-paper text-ink-soft">
+                <Icon className="h-4 w-4" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-semibold">{sec.label}</span>
+                <span className="block truncate text-xs text-ink-soft">{sec.hint}</span>
+              </span>
+              <ChevronRight className="h-4 w-4 shrink-0 text-ink-soft" />
+            </button>
+          );
+        })}
       </div>
     </div>
   );

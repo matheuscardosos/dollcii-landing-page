@@ -164,9 +164,9 @@ export const COUPONS = { GELIZ10: 0.1 };
 export const FREE_DELIVERY_FROM = 50;
 export const DELIVERY_FEE = 7.9;
 
-export const calcTotals = (items, coupon, mode = "entrega") => {
+// O desconto vem de fora porque os cupons agora sao criados no painel da loja.
+export const calcTotals = (items, coupon, mode = "entrega", rate = 0) => {
   const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
-  const rate = COUPONS[(coupon || "").trim().toUpperCase()] || 0;
   const discount = subtotal * rate;
   const after = subtotal - discount;
   const delivery = mode === "entrega" && after > 0 && after < FREE_DELIVERY_FROM ? DELIVERY_FEE : 0;

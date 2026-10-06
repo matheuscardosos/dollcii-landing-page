@@ -101,8 +101,9 @@ const CartItem = ({ item }) => {
 
 const Coupon = () => {
   const { coupon, setCoupon } = useBag();
+  const { couponRate } = useStore();
   const [val, setVal] = useState(coupon);
-  const { rate } = calcTotals([], coupon);
+  const rate = couponRate(coupon);
   return (
     <div className="mt-4">
       <div className="flex gap-2">
@@ -111,7 +112,7 @@ const Coupon = () => {
       </div>
       {coupon && (
         <p className={`mt-2 text-xs ${rate ? "text-[#6F9A4F]" : "text-berry"}`}>
-          {rate ? `Cupom ${coupon} aplicado: ${rate * 100}% de desconto` : "Cupom inválido. Experimente GELIZ10"}
+          {rate ? `Cupom ${coupon} aplicado: ${Math.round(rate * 100)}% de desconto` : "Cupom inválido ou expirado"}
         </p>
       )}
     </div>
@@ -353,7 +354,7 @@ const Success = ({ onClose }) => (
 export const CheckoutPage = () => {
   const { items, coupon, checkout, setCheckout, clear, setCoupon, count } = useBag();
   const { user, addOrder } = useAuth();
-  const { addSale } = useStore();
+  const { addSale, couponRate, useCoupon } = useStore();
   const [mode, setMode] = useState("entrega");
   const [method, setMethod] = useState("cartao");
   const [address, setAddress] = useState(() => user?.address || EMPTY_ADDRESS);
@@ -364,7 +365,7 @@ export const CheckoutPage = () => {
     if (checkout && user?.address?.cep) setAddress(user.address);
   }, [checkout, user]);
 
-  const t = calcTotals(items, coupon, mode);
+  const t = calcTotals(items, coupon, mode, couponRate(coupon));
 
   const left = Math.max(0, FREE_DELIVERY_FROM - (t.subtotal - t.discount));
   const pct = Math.min(100, ((t.subtotal - t.discount) / FREE_DELIVERY_FROM) * 100);
@@ -388,6 +389,7 @@ export const CheckoutPage = () => {
   const concluir = useCallback(() => {
     const pedido = items.map(({ id, name, price, qty }) => ({ id, name, price, qty }));
     addSale({ items: pedido, total: t.total, payment: method, source: "site", step: 0 });
+    if (t.rate > 0) useCoupon(coupon);
     addOrder({
       code: Math.random().toString(36).slice(2, 8).toUpperCase(),
       date: new Date().toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }),
@@ -401,7 +403,7 @@ export const CheckoutPage = () => {
     clear();
     setCoupon("");
     setStage("success");
-  }, [addOrder, addSale, items, t.total, method, mode, address, clear, setCoupon]);
+  }, [addOrder, addSale, useCoupon, coupon, items, t.total, t.rate, method, mode, address, clear, setCoupon]);
 
   const handleFinalize = () => {
     if (validate() !== true) return;
