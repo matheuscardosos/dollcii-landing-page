@@ -14,7 +14,7 @@ const Item = ({ i }) => {
   const { setQty, remove } = useBag();
   return (
     <motion.li layout initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 40 }} className="flex gap-3 sm:gap-4 border-b border-app-border py-4 sm:py-5" data-testid={`cart-item-${i.id}`}>
-      <div className="grid h-20 w-16 sm:h-24 sm:w-20 shrink-0 place-items-center overflow-hidden rounded-xl sm:rounded-2xl bg-app-hover p-2"><img src={i.img} alt={i.name} className="h-full w-auto object-contain" /></div>
+      <div className="grid h-20 w-16 sm:h-24 sm:w-20 shrink-0 place-items-center overflow-hidden rounded-xl sm:rounded-2xl bg-app-hover p-2">{i.img ? <img src={i.img} alt={i.name} className="h-full w-auto object-contain" /> : <span className="text-center text-[10px] font-semibold leading-tight text-app-muted">{i.name}</span>}</div>
       <div className="flex flex-1 min-w-0 flex-col gap-1">
         <div className="flex justify-between gap-2">
           <p className="font-display text-base sm:text-lg font-bold leading-tight truncate">{i.name}</p>

@@ -77,7 +77,7 @@ const CartItem = ({ item }) => {
   return (
     <div className="flex gap-3 border-b border-app-border py-4">
       <div className="grid h-16 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-app-hover p-1.5">
-        <img src={item.img} alt={item.name} className="h-full w-auto object-contain" />
+        {item.img ? <img src={item.img} alt={item.name} className="h-full w-auto object-contain" /> : <span className="text-center text-[10px] font-semibold leading-tight text-app-muted">{item.name}</span>}
       </div>
       <div className="flex flex-1 min-w-0 flex-col gap-1">
         <div className="flex justify-between gap-2">

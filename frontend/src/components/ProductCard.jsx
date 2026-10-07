@@ -22,7 +22,11 @@ export const ProductCard = ({ p, onOpen }) => {
       <div className="relative overflow-hidden rounded-[28px] bg-paper transition-colors duration-500" style={{ "--tint": p.tint }}>
         <span className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: p.tint }} />
         <button onClick={() => onOpen(p)} data-testid={`product-open-${p.id}`} className="relative flex aspect-[4/5] w-full items-center justify-center p-4 sm:p-8" aria-label={`Ver detalhes de ${p.name}`}>
-          <img src={p.img} alt={p.name} loading="lazy" className={`max-h-full w-auto max-w-full object-contain drop-shadow-[0_24px_28px_rgba(17,17,17,0.14)] transition-transform duration-700 ease-out group-hover:-translate-y-3 group-hover:rotate-[-4deg] group-hover:scale-[1.06] ${esgotado ? "opacity-40 saturate-0" : ""}`} />
+          {p.img ? (
+            <img src={p.img} alt={p.name} loading="lazy" className={`max-h-full w-auto max-w-full object-contain drop-shadow-[0_24px_28px_rgba(17,17,17,0.14)] transition-transform duration-700 ease-out group-hover:-translate-y-3 group-hover:rotate-[-4deg] group-hover:scale-[1.06] ${esgotado ? "opacity-40 saturate-0" : ""}`} />
+          ) : (
+            <span className="font-display text-2xl font-bold tracking-[-0.03em] text-ink/25 sm:text-4xl">{p.name}</span>
+          )}
         </button>
         <div className="pointer-events-none absolute left-2 top-2 sm:left-4 sm:top-4 flex flex-wrap gap-1">
           {esgotado ? (

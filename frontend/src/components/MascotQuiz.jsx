@@ -1,161 +1,168 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { Send, X } from "lucide-react";
 import { brl } from "../data/menu";
 import { useBag } from "../context/BagContext";
 import { useStore } from "../context/StoreContext";
+import { analisarQuiz, PERGUNTAS } from "../lib/quiz";
 
 const P = process.env.PUBLIC_URL;
 
-const QUESTIONS = [
-  {
-    msg: "E aí! Eu sou o Geliz, seu guia de sabores. Bora descobrir o gelado perfeito pra você?",
-    question: "Qual tipo de doce você mais curte?",
-    options: [
-      { label: "Frutas frescas", value: "fruta" },
-      { label: "Chocolate intenso", value: "chocolate" },
-      { label: "Doces cremosos", value: "cremoso" },
-    ],
-  },
-  {
-    question: "Como você prefere a intensidade do sabor?",
-    options: [
-      { label: "Leve e refrescante", value: "leve" },
-      { label: "Equilibrado", value: "equilibrado" },
-      { label: "Forte e marcante", value: "forte" },
-    ],
-  },
-  {
-    question: "Pra qual ocasião?",
-    options: [
-      { label: "Pra mim, agora", value: "individual" },
-      { label: "Dividir com alguém", value: "dividir" },
-      { label: "Presentear", value: "presente" },
-    ],
-  },
-];
+const ABERTURA = "E aí! Eu sou o Dollcii, seu guia de sabores. Bora descobrir o seu Geliz ideal?";
 
-function pickProduct(answers, catalog) {
-  const [taste, intensity, occasion] = answers;
-  const byId = (id) => catalog.find((p) => p.id === id);
-
-  if (taste === "chocolate") return byId("geliz-nutella");
-
-  if (taste === "fruta") {
-    if (intensity === "leve") return byId("geliz-limao");
-    return byId("geliz-amor-cravejado");
-  }
-
-  // cremoso
-  if (intensity === "forte") return byId("geliz-nutella");
-  if (occasion === "presente") return byId("geliz-amor-cravejado");
-  return byId("geliz-pudim");
-}
-
-const Bubble = ({ children, delay = 0 }) => (
+const Bolha = ({ children, delay = 0 }) => (
   <motion.div
     initial={{ opacity: 0, y: 10, scale: 0.95 }}
     animate={{ opacity: 1, y: 0, scale: 1 }}
     transition={{ duration: 0.3, delay }}
-    className="flex gap-2.5 items-end"
+    className="flex items-end gap-2.5"
   >
     <img src={P + "/img/mascote.webp"} alt="" className="h-8 w-8 shrink-0 object-contain" />
-    <div className="rounded-2xl rounded-bl-md bg-paper px-4 py-3 text-sm leading-relaxed">
-      {children}
-    </div>
+    <div className="rounded-2xl rounded-bl-md bg-paper px-4 py-3 text-sm leading-relaxed">{children}</div>
   </motion.div>
 );
 
-const Options = ({ options, onPick }) => (
+const Minha = ({ children }) => (
+  <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex justify-end">
+    <span className="max-w-[80%] rounded-2xl rounded-br-md bg-ink px-4 py-2.5 text-sm text-white">{children}</span>
+  </motion.div>
+);
+
+const Opcoes = ({ opcoes, onPick }) => (
   <motion.div
     initial={{ opacity: 0, y: 8 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.3, delay: 0.2 }}
-    className="flex flex-col gap-2 pl-10"
+    className="grid grid-cols-2 gap-2 pl-10"
   >
-    {options.map((o) => (
+    {opcoes.map((o, i) => (
       <button
-        key={o.value}
-        onClick={() => onPick(o.value)}
-        className="rounded-full border hairline px-4 py-2.5 text-left text-sm font-medium transition-colors hover:bg-ink hover:text-white"
+        key={o.label}
+        onClick={() => onPick(i, o.label)}
+        className="flex items-center gap-1.5 rounded-full border hairline px-3 py-2 text-left text-xs font-medium transition-colors hover:bg-ink hover:text-white"
       >
-        {o.label}
+        <span aria-hidden="true">{o.emoji}</span>
+        <span className="min-w-0 truncate">{o.label}</span>
       </button>
     ))}
   </motion.div>
 );
 
-const Reveal = ({ product, onScrollDown }) => {
-  const [revealed, setRevealed] = useState(false);
+/* ── revelacao ── */
+
+const Revelacao = ({ resultado, onScrollDown }) => {
+  const [aberto, setAberto] = useState(false);
   const { add } = useBag();
+  const { principal, segunda, frase } = resultado;
+  const produto = principal.produto;
+
+  const revelar = () => {
+    setAberto(true);
+    setTimeout(() => onScrollDown?.(), 400);
+  };
 
   return (
     <div className="flex flex-col items-center gap-3 pt-2">
-      <Bubble>Seu sabor ideal é...</Bubble>
+      <Bolha>Seu Geliz ideal é...</Bolha>
+
       <motion.div
-        className="relative mt-2 flex h-44 w-32 items-center justify-center rounded-2xl"
-        style={{ background: revealed ? product.tint : "#111" }}
-        animate={{ background: revealed ? product.tint : "#111" }}
+        className="relative mt-2 flex h-44 w-32 items-center justify-center overflow-hidden rounded-2xl"
+        animate={{ background: aberto ? produto?.tint || "#FFECED" : "#111" }}
         transition={{ duration: 0.6 }}
       >
         <AnimatePresence>
-          {!revealed && (
-            <motion.span
-              key="question"
-              exit={{ opacity: 0, scale: 1.5 }}
-              className="text-5xl font-bold text-white/30 select-none"
-            >
+          {!aberto && (
+            <motion.span key="?" exit={{ opacity: 0, scale: 1.5 }} className="select-none text-5xl font-bold text-white/30">
               ?
             </motion.span>
           )}
         </AnimatePresence>
-        {revealed && (
-          <motion.img
-            initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ type: "spring", stiffness: 200, damping: 15 }}
-            src={product.img}
-            alt={product.name}
-            className="h-36 w-auto object-contain drop-shadow-lg"
-          />
-        )}
+
+        {aberto &&
+          (produto?.img ? (
+            <motion.img
+              initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 200, damping: 15 }}
+              src={produto.img}
+              alt={principal.nome}
+              className="h-36 w-auto object-contain drop-shadow-lg"
+            />
+          ) : (
+            <motion.span
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: "spring", stiffness: 200, damping: 15 }}
+              className="select-none text-6xl"
+              aria-hidden="true"
+            >
+              {principal.emoji}
+            </motion.span>
+          ))}
       </motion.div>
-      {!revealed ? (
+
+      {!aberto ? (
         <motion.button
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          onClick={() => { setRevealed(true); setTimeout(() => onScrollDown?.(), 400); }}
+          onClick={revelar}
           className="mt-1 rounded-full bg-berry px-5 py-2.5 text-sm font-semibold text-white transition-transform hover:scale-105"
         >
           Revelar!
         </motion.button>
       ) : (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="text-center"
-        >
-          <p className="font-display text-lg font-bold">{product.name}</p>
-          <p className="text-xs text-ink-soft">{product.desc}</p>
-          <p className="mt-1 font-semibold">{brl(product.price)}</p>
-          <button
-            onClick={() => add(product)}
-            className="mt-3 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-berry"
-          >
-            Adicionar na sacola
-          </button>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="w-full text-center">
+          <p className="font-display text-lg font-bold">{principal.nome}</p>
+          <p className="mt-0.5 text-xs leading-relaxed text-ink-soft">{principal.desc}</p>
+          <p className="mt-2 text-sm font-semibold text-berry">{frase}</p>
+
+          {produto ? (
+            <>
+              <p className="mt-1 font-semibold">{brl(produto.price)}</p>
+              <button
+                onClick={() => add(produto)}
+                className="mt-3 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-berry"
+              >
+                Adicionar na sacola
+              </button>
+            </>
+          ) : (
+            <p className="mt-3 text-xs text-ink-soft">Esse sabor sai direto com a gente, chama no WhatsApp.</p>
+          )}
+
+          <div className="mt-4 rounded-2xl bg-paper p-3 text-left">
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft">Você também vai gostar</p>
+            <div className="mt-1.5 flex items-center justify-between gap-2">
+              <span className="min-w-0">
+                <span className="block truncate text-sm font-semibold">
+                  <span aria-hidden="true">{segunda.emoji}</span> {segunda.nome}
+                </span>
+              </span>
+              {segunda.produto && (
+                <button
+                  onClick={() => add(segunda.produto)}
+                  className="shrink-0 rounded-full border hairline px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-ink hover:text-white"
+                >
+                  Somar
+                </button>
+              )}
+            </div>
+          </div>
         </motion.div>
       )}
     </div>
   );
 };
 
+/* ── chat ── */
+
 export const MascotQuiz = () => {
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState([]);
+  const [passo, setPasso] = useState(0);
+  const [respostas, setRespostas] = useState([]);
+  const [rotulos, setRotulos] = useState([]);
+  const [texto, setTexto] = useState("");
   const bodyRef = useRef(null);
   const { catalog } = useStore();
 
@@ -164,43 +171,49 @@ export const MascotQuiz = () => {
     if (params.has("quiz")) setOpen(true);
   }, []);
 
-  const scrollDown = () => {
+  const rolar = () => {
     setTimeout(() => {
       bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight, behavior: "smooth" });
     }, 350);
   };
 
   useEffect(() => {
-    if (!bodyRef.current) return;
-    scrollDown();
-  }, [step]);
-
-  const openQuiz = () => {
-    setOpen(true);
-    if (step === 0 && answers.length === 0) reset();
-  };
-
-  const closeQuiz = () => setOpen(false);
+    if (bodyRef.current) rolar();
+  }, [passo]);
 
   const reset = () => {
-    setStep(0);
-    setAnswers([]);
+    setPasso(0);
+    setRespostas([]);
+    setRotulos([]);
+    setTexto("");
   };
 
-  const answer = (val) => {
-    const next = [...answers, val];
-    setAnswers(next);
-    setStep(step + 1);
+  const responder = (valor, rotulo) => {
+    setRespostas((r) => [...r, valor]);
+    setRotulos((r) => [...r, rotulo]);
+    setPasso((p) => p + 1);
   };
 
-  const product = answers.length === 3 ? pickProduct(answers, catalog) : null;
+  const enviarTexto = (e) => {
+    e.preventDefault();
+    const t = texto.trim();
+    if (t.length < 2) return;
+    setTexto("");
+    responder(t, t);
+  };
+
+  const resultado = respostas.length === 3 ? analisarQuiz(respostas, catalog) : null;
+  const perguntaAtual = PERGUNTAS[passo];
+  const esperandoTexto = perguntaAtual?.tipo === "texto";
 
   return (
     <>
-      {/* Botao flutuante */}
       <motion.button
-        onClick={openQuiz}
-        className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-white shadow-xl border hairline overflow-hidden transition-transform hover:scale-110"
+        onClick={() => {
+          setOpen(true);
+          if (passo === 0 && respostas.length === 0) reset();
+        }}
+        className="fixed bottom-5 right-5 z-50 h-16 w-16 overflow-hidden rounded-full border hairline bg-white shadow-xl transition-transform hover:scale-110 sm:bottom-6 sm:right-6 sm:h-20 sm:w-20"
         whileHover={{ rotate: [0, -5, 5, 0] }}
         transition={{ duration: 0.5 }}
         aria-label="Abrir quiz de sabores"
@@ -208,7 +221,6 @@ export const MascotQuiz = () => {
         <img src={P + "/img/mascote.webp"} alt="Mascote Geliz" className="h-full w-full object-contain p-1" />
       </motion.button>
 
-      {/* Chat panel */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -216,77 +228,75 @@ export const MascotQuiz = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="fixed bottom-[5.5rem] right-5 sm:bottom-[6.5rem] sm:right-6 z-50 flex w-[min(340px,calc(100vw-2.5rem))] max-h-[calc(100dvh-7rem)] sm:max-h-[calc(100dvh-8rem)] flex-col rounded-[24px] border hairline bg-white shadow-2xl"
+            className="fixed bottom-[5.5rem] right-5 z-50 flex max-h-[calc(100dvh-7rem)] w-[min(360px,calc(100vw-2.5rem))] flex-col rounded-[24px] border hairline bg-white shadow-2xl sm:bottom-[6.5rem] sm:right-6 sm:max-h-[calc(100dvh-8rem)]"
           >
-            {/* Header */}
             <div className="flex items-center justify-between border-b hairline px-5 py-4">
               <div className="flex items-center gap-3">
                 <img src={P + "/img/mascote.webp"} alt="" className="h-9 w-9 object-contain" />
                 <div>
                   <p className="font-display text-sm font-bold">Geliz</p>
-                  <p className="text-[11px] text-ink-soft">Descubra seu sabor</p>
+                  <p className="text-[11px] text-ink-soft">
+                    {resultado ? "Achei o seu!" : `Pergunta ${Math.min(passo + 1, 3)} de 3`}
+                  </p>
                 </div>
               </div>
-              <button onClick={closeQuiz} className="grid h-8 w-8 place-items-center rounded-full transition-colors hover:bg-paper" aria-label="Fechar">
+              <button onClick={() => setOpen(false)} className="grid h-8 w-8 place-items-center rounded-full transition-colors hover:bg-paper" aria-label="Fechar">
                 <X className="h-4 w-4" />
               </button>
             </div>
 
-            {/* Body */}
-            <div ref={bodyRef} className="flex flex-col gap-4 p-4" data-lenis-prevent style={{ maxHeight: "60vh", overflowY: "auto", overscrollBehavior: "contain", scrollbarWidth: "none" }}>
-              {/* Pergunta 1 sempre visivel */}
-              {step >= 0 && (
-                <>
-                  <Bubble>{QUESTIONS[0].msg}</Bubble>
-                  <Bubble delay={0.15}>{QUESTIONS[0].question}</Bubble>
-                  {step === 0 && <Options options={QUESTIONS[0].options} onPick={answer} />}
-                </>
-              )}
+            <div
+              ref={bodyRef}
+              className="flex flex-col gap-4 p-4"
+              data-lenis-prevent
+              style={{ overflowY: "auto", overscrollBehavior: "contain", scrollbarWidth: "none" }}
+            >
+              <Bolha>{ABERTURA}</Bolha>
 
-              {/* Resposta 1 + Pergunta 2 */}
-              {step >= 1 && (
-                <>
-                  <div className="flex justify-end">
-                    <span className="rounded-2xl rounded-br-md bg-ink px-4 py-2.5 text-sm text-white">
-                      {QUESTIONS[0].options.find((o) => o.value === answers[0])?.label}
-                    </span>
+              {PERGUNTAS.map((q, i) => {
+                if (passo < i) return null;
+                return (
+                  <div key={q.id} className="flex flex-col gap-4">
+                    <Bolha delay={i === 0 ? 0.15 : 0}>{q.titulo}</Bolha>
+                    {passo === i && q.tipo === "escolha" && <Opcoes opcoes={q.opcoes} onPick={responder} />}
+                    {rotulos[i] && <Minha>{rotulos[i]}</Minha>}
                   </div>
-                  <Bubble>{QUESTIONS[1].question}</Bubble>
-                  {step === 1 && <Options options={QUESTIONS[1].options} onPick={answer} />}
-                </>
-              )}
+                );
+              })}
 
-              {/* Resposta 2 + Pergunta 3 */}
-              {step >= 2 && (
+              {resultado && (
                 <>
-                  <div className="flex justify-end">
-                    <span className="rounded-2xl rounded-br-md bg-ink px-4 py-2.5 text-sm text-white">
-                      {QUESTIONS[1].options.find((o) => o.value === answers[1])?.label}
-                    </span>
-                  </div>
-                  <Bubble>{QUESTIONS[2].question}</Bubble>
-                  {step === 2 && <Options options={QUESTIONS[2].options} onPick={answer} />}
-                </>
-              )}
-
-              {/* Resposta 3 + Revelacao */}
-              {step >= 3 && product && (
-                <>
-                  <div className="flex justify-end">
-                    <span className="rounded-2xl rounded-br-md bg-ink px-4 py-2.5 text-sm text-white">
-                      {QUESTIONS[2].options.find((o) => o.value === answers[2])?.label}
-                    </span>
-                  </div>
-                  <Reveal product={product} onScrollDown={scrollDown} />
+                  <Revelacao resultado={resultado} onScrollDown={rolar} />
                   <button
                     onClick={reset}
                     className="mx-auto mt-2 text-xs font-medium text-ink-soft underline transition-colors hover:text-ink"
                   >
-                    Tentar de novo
+                    Fazer de novo
                   </button>
                 </>
               )}
             </div>
+
+            {esperandoTexto && (
+              <form onSubmit={enviarTexto} className="flex items-center gap-2 border-t hairline p-3">
+                <input
+                  value={texto}
+                  onChange={(e) => setTexto(e.target.value)}
+                  placeholder={perguntaAtual.placeholder}
+                  maxLength={100}
+                  autoFocus
+                  className="h-10 flex-1 rounded-full border hairline px-4 text-sm outline-none focus:border-ink"
+                />
+                <button
+                  type="submit"
+                  disabled={texto.trim().length < 2}
+                  aria-label="Enviar resposta"
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-berry text-white transition-colors hover:bg-berry-dark disabled:opacity-40"
+                >
+                  <Send className="h-4 w-4" />
+                </button>
+              </form>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

@@ -41,7 +41,13 @@ const ProductTile = ({ p }) => {
   return (
     <motion.article layout className="overflow-hidden rounded-[22px] border border-app-border bg-app-surface">
       <div className="relative aspect-square" style={{ background: p.tint }}>
-        <img src={p.img} alt={p.name} loading="lazy" className={`absolute inset-0 h-full w-full object-contain p-4 ${esgotado ? "opacity-40 saturate-0" : ""}`} />
+        {p.img ? (
+          <img src={p.img} alt={p.name} loading="lazy" className={`absolute inset-0 h-full w-full object-contain p-4 ${esgotado ? "opacity-40 saturate-0" : ""}`} />
+        ) : (
+          <span className="absolute inset-0 grid place-items-center p-4 text-center font-display text-lg font-bold leading-tight tracking-[-0.03em] text-ink/25">
+            {p.name}
+          </span>
+        )}
         {esgotado ? (
           <span className="absolute left-2 top-2 rounded-full bg-ink px-2.5 py-1 text-[10px] font-semibold text-white">Esgotado</span>
         ) : (

@@ -428,7 +428,7 @@ const CardapioAdmin = () => {
           <div key={p.id} className={`rounded-[22px] border bg-app-surface p-4 ${pausado ? "border-app-border opacity-70" : "border-app-border"}`}>
             <div className="flex items-start gap-3">
               <div className="grid h-16 w-14 shrink-0 place-items-center overflow-hidden rounded-xl p-1.5" style={{ background: p.tint }}>
-                <img src={p.img} alt="" loading="lazy" className="h-full w-auto object-contain" />
+                {p.img ? <img src={p.img} alt="" loading="lazy" className="h-full w-auto object-contain" /> : <span className="text-center text-[9px] font-semibold leading-tight text-app-muted">{p.name}</span>}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold">{p.name}</p>
@@ -503,7 +503,7 @@ const Estoque = () => {
           <div key={p.id} className={`rounded-[22px] border bg-app-surface p-3 ${esgotado ? "border-berry/40" : "border-app-border"}`}>
             <div className="flex items-center gap-3">
               <div className="grid h-16 w-14 shrink-0 place-items-center overflow-hidden rounded-xl p-1.5" style={{ background: p.tint }}>
-                <img src={p.img} alt="" loading="lazy" className="h-full w-auto object-contain" />
+                {p.img ? <img src={p.img} alt="" loading="lazy" className="h-full w-auto object-contain" /> : <span className="text-center text-[9px] font-semibold leading-tight text-app-muted">{p.name}</span>}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold">{p.name}</p>
@@ -780,7 +780,7 @@ const NovaVenda = ({ onClose }) => {
           {catalog.map((p) => (
             <div key={p.id} className="flex items-center gap-3 rounded-[22px] border border-app-border p-3">
               <div className="grid h-16 w-14 shrink-0 place-items-center overflow-hidden rounded-xl p-1.5" style={{ background: p.tint }}>
-                <img src={p.img} alt="" className="h-full w-auto object-contain" />
+                {p.img ? <img src={p.img} alt="" className="h-full w-auto object-contain" /> : <span className="text-center text-[9px] font-semibold leading-tight text-app-muted">{p.name}</span>}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold">{p.name}</p>

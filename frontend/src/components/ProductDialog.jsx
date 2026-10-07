@@ -19,7 +19,11 @@ export const ProductDialog = ({ product, onClose }) => {
         {product && (
           <div className="grid md:grid-cols-2">
             <div className="flex aspect-square items-center justify-center p-10 md:aspect-auto" style={{ background: product.tint }}>
-              <img src={product.img} alt={product.name} className="max-h-[360px] w-auto max-w-full object-contain drop-shadow-[0_30px_30px_rgba(17,17,17,0.16)]" />
+              {product.img ? (
+                <img src={product.img} alt={product.name} className="max-h-[360px] w-auto max-w-full object-contain drop-shadow-[0_30px_30px_rgba(17,17,17,0.16)]" />
+              ) : (
+                <span className="font-display text-3xl font-bold tracking-[-0.03em] text-ink/25">{product.name}</span>
+              )}
             </div>
             <div className="flex flex-col p-7 sm:p-9">
               <div className="flex flex-wrap gap-1.5">
