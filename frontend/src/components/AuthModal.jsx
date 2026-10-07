@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
+import { Check } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "./ui/dialog";
+import { LegalModal } from "./LegalModal";
 import { useAuth } from "../context/AuthContext";
 
 const P = process.env.PUBLIC_URL;
@@ -141,6 +143,8 @@ const LoginView = ({ goTo, onDone }) => {
 const RegisterView = ({ goTo, onDone }) => {
   const { login } = useAuth();
   const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
+  const [aceitou, setAceitou] = useState(false);
+  const [legal, setLegal] = useState(null);
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const submit = (e) => {
@@ -148,6 +152,7 @@ const RegisterView = ({ goTo, onDone }) => {
     if (!form.name.trim() || !form.email.trim() || !form.password || !form.confirm)
       return toast.error("Preencha todos os campos");
     if (form.password !== form.confirm) return toast.error("As senhas não coincidem");
+    if (!aceitou) return toast.error("Você precisa aceitar os Termos de Uso para criar a conta");
     const u = login(form.email, form.password, form.name.trim());
     toast.success("Conta criada. Bem-vindo, " + u.name.split(" ")[0] + "!");
     onDone(u);
@@ -165,9 +170,32 @@ const RegisterView = ({ goTo, onDone }) => {
       <Field label="E-mail" type="email" value={form.email} onChange={set("email")} placeholder="seu@email.com" />
       <Field label="Senha" type="password" value={form.password} onChange={set("password")} placeholder="Mínimo 8 caracteres" />
       <Field label="Confirmar senha" type="password" value={form.confirm} onChange={set("confirm")} placeholder="Repita a senha" />
+
+      <label className="flex cursor-pointer items-start gap-2.5 pt-1">
+        <input type="checkbox" checked={aceitou} onChange={(e) => setAceitou(e.target.checked)} className="sr-only" />
+        <span
+          aria-hidden="true"
+          className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-md border transition-colors ${aceitou ? "border-berry bg-berry text-white" : "hairline"}`}
+        >
+          {aceitou && <Check className="h-3 w-3" strokeWidth={3} />}
+        </span>
+        <span className="text-xs leading-relaxed text-ink-soft">
+          Li e aceito os{" "}
+          <button type="button" onClick={() => setLegal("termos")} className="font-semibold text-berry hover:underline">
+            Termos de Uso
+          </button>{" "}
+          e a{" "}
+          <button type="button" onClick={() => setLegal("privacidade")} className="font-semibold text-berry hover:underline">
+            Política de Privacidade
+          </button>
+          .
+        </span>
+      </label>
+
       <button type="submit" className="mt-1 h-12 w-full rounded-full bg-berry text-sm font-semibold text-white transition-colors hover:bg-berry-dark">
         Criar conta
       </button>
+      <LegalModal type={legal} open={!!legal} onOpenChange={(o) => { if (!o) setLegal(null); }} />
       <p className="text-center text-sm text-ink-soft">
         Já tem conta?{" "}
         <button type="button" onClick={() => goTo("login")} className="font-semibold text-ink hover:underline">

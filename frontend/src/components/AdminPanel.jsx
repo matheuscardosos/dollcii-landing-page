@@ -418,9 +418,7 @@ const CardapioAdmin = () => {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-app-muted">
-        O preço alterado vale no site na hora. Pausar tira o sabor de venda sem mexer no estoque.
-      </p>
+      <p className="text-sm text-app-muted">Alterações no cardápio e status do produto.</p>
       {catalog.map((p) => {
         const m = metricas(p.id);
         const pausado = isPaused(p.id);

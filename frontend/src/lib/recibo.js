@@ -40,8 +40,12 @@ const fmtData = (iso) =>
     minute: "2-digit",
   });
 
-const enderecoEmLinhas = (a) => {
-  if (!a) return ["Retirada combinada pelo WhatsApp"];
+// Retirada nao tem endereco de entrega: o bloco muda de conteudo, nao so de titulo.
+const linhasDoLocal = (venda) => {
+  if (venda.mode === "retirada" || !venda.address) {
+    return ["Retirada no local", "Combine o horário pelo WhatsApp"];
+  }
+  const a = venda.address;
   const linha1 = [a.street, a.number].filter(Boolean).join(", ");
   const linha2 = [a.complement, a.neighborhood].filter(Boolean).join(" · ");
   const linha3 = [a.city, a.state].filter(Boolean).join(" / ");
@@ -53,9 +57,9 @@ export async function desenharRecibo(venda) {
   const logo = await carregarLogo();
 
   // Primeiro medimos a altura, que depende da quantidade de itens.
-  const linhasEndereco = enderecoEmLinhas(venda.address);
+  const linhasEndereco = linhasDoLocal(venda);
   const altura =
-    290 + venda.items.length * 34 + linhasEndereco.length * 22 + (venda.canceled ? 70 : 0) + 250;
+    290 + venda.items.length * 34 + linhasEndereco.length * 22 + (venda.canceled ? 70 : 0) + 270;
 
   const canvas = document.createElement("canvas");
   canvas.width = LARGURA * ESCALA;
@@ -120,7 +124,8 @@ export async function desenharRecibo(venda) {
   }
 
   y += 34;
-  texto(venda.mode === "retirada" ? "RETIRADA" : "ENTREGA", MARGEM, y, { tam: 10, peso: "700", cor: COR.suave });
+  const ehRetirada = venda.mode === "retirada" || !venda.address;
+  texto(ehRetirada ? "RETIRADA" : "ENTREGA EM", MARGEM, y, { tam: 10, peso: "700", cor: COR.suave });
   texto("PAGAMENTO", meio, y, { tam: 10, peso: "700", cor: COR.suave });
   y += 20;
   texto(PAGAMENTO[venda.payment] || "A combinar", meio, y, { tam: 15, peso: "600" });
@@ -168,7 +173,7 @@ export async function desenharRecibo(venda) {
   }
 
   // Rodape
-  y = altura - 92;
+  y = altura - 112;
   linha(y);
   y += 28;
   texto("Obrigado por fazer parte da nossa história.", MARGEM, y, { tam: 14, peso: "600" });
@@ -179,6 +184,8 @@ export async function desenharRecibo(venda) {
   });
   y += 18;
   texto("@gelizgeladinhos · (38) 9985-9473", MARGEM, y, { tam: 12, cor: COR.suave });
+  y += 22;
+  texto("Este recibo não possui validade fiscal.", MARGEM, y, { tam: 11, cor: COR.suave });
 
   return canvas;
 }
