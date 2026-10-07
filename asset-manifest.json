@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/geliz-landing-page/static/css/main.e16d80ef.css",
-    "main.js": "/geliz-landing-page/static/js/main.3d68ff59.js",
+    "main.js": "/geliz-landing-page/static/js/main.dab2e4d9.js",
     "static/js/389.4cd3e834.chunk.js": "/geliz-landing-page/static/js/389.4cd3e834.chunk.js",
     "static/js/239.b02d44ad.chunk.js": "/geliz-landing-page/static/js/239.b02d44ad.chunk.js",
     "static/js/977.25613ff5.chunk.js": "/geliz-landing-page/static/js/977.25613ff5.chunk.js",
     "static/js/732.8c88a72b.chunk.js": "/geliz-landing-page/static/js/732.8c88a72b.chunk.js",
     "index.html": "/geliz-landing-page/index.html",
     "main.e16d80ef.css.map": "/geliz-landing-page/static/css/main.e16d80ef.css.map",
-    "main.3d68ff59.js.map": "/geliz-landing-page/static/js/main.3d68ff59.js.map",
+    "main.dab2e4d9.js.map": "/geliz-landing-page/static/js/main.dab2e4d9.js.map",
     "389.4cd3e834.chunk.js.map": "/geliz-landing-page/static/js/389.4cd3e834.chunk.js.map",
     "239.b02d44ad.chunk.js.map": "/geliz-landing-page/static/js/239.b02d44ad.chunk.js.map",
     "977.25613ff5.chunk.js.map": "/geliz-landing-page/static/js/977.25613ff5.chunk.js.map",
@@ -16,6 +16,6 @@
   },
   "entrypoints": [
     "static/css/main.e16d80ef.css",
-    "static/js/main.3d68ff59.js"
+    "static/js/main.dab2e4d9.js"
   ]
 }
