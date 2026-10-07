@@ -124,7 +124,7 @@ const Track = ({ step }) => (
           <span className={`relative grid h-8 w-8 place-items-center rounded-full ${done ? "bg-berry text-white" : "bg-app-border text-app-muted"}`}>
             <Icon className="h-4 w-4" />
           </span>
-          <span className={`text-center text-[10px] leading-tight ${done ? "font-semibold text-ink" : "text-app-muted"}`}>
+          <span className={`text-center text-[10px] leading-tight ${done ? "font-semibold text-app-text" : "text-app-muted"}`}>
             {s.label}
           </span>
         </li>
