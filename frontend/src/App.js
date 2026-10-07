@@ -82,7 +82,18 @@ function App() {
           <Routes />
           <BagDrawer />
           <CheckoutPage />
-          <Toaster position="bottom-center" richColors={false} toastOptions={{ className: "!rounded-full !bg-ink !text-white !border-none" }} />
+          {/* No topo porque o rodape e disputado: barra de abas, mascote,
+              nova venda e banner de cookies vivem todos la embaixo.
+              As cores seguem os tokens pra nao sumir no modo escuro. */}
+          <Toaster
+            position="top-center"
+            offset={84}
+            richColors={false}
+            toastOptions={{
+              className:
+                "!rounded-full !border !border-app-border !bg-app-invert !text-app-invert-text !shadow-lg",
+            }}
+          />
         </BagProvider>
       </StoreProvider>
     </AuthProvider>
