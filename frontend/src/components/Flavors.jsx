@@ -55,7 +55,7 @@ export const Flavors = () => {
       <div className="grid gap-10 lg:grid-cols-12">
         <div className="lg:col-span-12">
           <Eyebrow>Os sabores assinatura</Eyebrow>
-          <H2 className="mt-5 max-w-4xl" lines={["Quatro receitas,", <span key="b">uma obsessão: <span className="text-berry">a fruta.</span></span>]} />
+          <H2 className="mt-5 max-w-4xl" lines={["Quatro receitas,", <span key="b">uma obsessão: <span className="text-berry">a cremosidade.</span></span>]} />
         </div>
         <div className="hidden lg:col-span-6 lg:block">
           <div className="sticky top-28 h-[76vh]">

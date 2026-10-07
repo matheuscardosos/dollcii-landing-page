@@ -99,7 +99,7 @@ export const Hero = () => {
             <Line i={2}>de verdade.</Line>
           </h1>
           <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 1, ease }} className="mt-5 sm:mt-7 max-w-md text-sm sm:text-base leading-relaxed text-ink-soft lg:text-lg">
-            Fruta inteira, leite fresco e nenhum atalho. Gelados feitos à mão, em pequenos lotes, todos os dias.
+            Receita de chef, ingrediente escolhido a dedo e a cremosidade no ponto. Geladinho gourmet feito à mão em Montes Claros.
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, duration: 1, ease }} className="mt-7 sm:mt-9 flex flex-col gap-5 lg:gap-6">
             <FlavorSwitch active={flavor} onPick={pick} />
