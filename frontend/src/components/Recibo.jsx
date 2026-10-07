@@ -44,13 +44,13 @@ export const Recibo = ({ venda, onClose }) => {
     <button
       onClick={onClick}
       disabled={!pronto || !!ocupado}
-      className={`flex h-12 flex-1 items-center justify-center gap-2 rounded-full text-sm font-semibold transition-colors disabled:opacity-50 ${
+      className={`flex h-14 w-full shrink-0 items-center justify-center gap-2.5 rounded-full text-[15px] font-semibold transition-colors disabled:opacity-50 sm:h-12 sm:w-auto sm:flex-1 sm:text-sm ${
         primario
           ? "bg-berry text-white hover:bg-berry-dark"
           : "border border-app-border hover:bg-app-hover"
       }`}
     >
-      {ocupado === nome ? <Loader2 className="h-4 w-4 animate-spin" /> : <Icon className="h-4 w-4" />}
+      {ocupado === nome ? <Loader2 className="h-[18px] w-[18px] animate-spin" /> : <Icon className="h-[18px] w-[18px]" />}
       {label}
     </button>
   );

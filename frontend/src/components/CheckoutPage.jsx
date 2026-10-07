@@ -217,7 +217,7 @@ const Option = ({ on, onClick, icon, title, children }) => (
   </>
 );
 
-const PaymentSection = ({ method, setMethod }) => (
+const PaymentSection = ({ method, setMethod, troco, setTroco, total }) => (
   <div className="space-y-4">
     <Label>Forma de pagamento</Label>
     <p className="-mt-2 text-sm text-app-muted">Escolha o método que prefere para finalizar sua compra.</p>
@@ -250,11 +250,41 @@ const PaymentSection = ({ method, setMethod }) => (
       icon={<img src={P + "/img/dinheiro.svg"} alt="" className="h-5" />}
       title="Dinheiro na entrega"
     >
-      <div className="rounded-2xl border border-app-border p-4">
-        <p className="text-sm font-semibold">Você paga em espécie</p>
-        <p className="mt-1 text-xs leading-relaxed text-app-muted">
-          Combine o troco com a gente pelo WhatsApp depois de confirmar o pedido.
-        </p>
+      <div className="space-y-3 rounded-2xl border border-app-border p-4">
+        <p className="text-sm font-semibold">Você paga em espécie na entrega</p>
+        <div>
+          <Label>Precisa de troco?</Label>
+          <div className="mt-2 flex gap-2">
+            {[[true, "Sim, preciso"], [false, "Não, valor exato"]].map(([v, rotulo]) => (
+              <button
+                key={rotulo}
+                type="button"
+                onClick={() => setTroco((t) => ({ ...t, precisa: v, para: v ? t.para : "" }))}
+                className={`h-10 rounded-full border px-4 text-sm font-medium transition-colors ${troco.precisa === v ? "border-app-text bg-app-invert text-app-invert-text" : "border-app-border"}`}
+              >
+                {rotulo}
+              </button>
+            ))}
+          </div>
+        </div>
+        {troco.precisa && (
+          <label className="block">
+            <Label>Troco para quanto?</Label>
+            <span className="relative mt-1.5 block">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-app-muted">R$</span>
+              <input
+                value={troco.para}
+                onChange={(e) => setTroco((t) => ({ ...t, para: e.target.value.replace(/[^\d,.]/g, "") }))}
+                inputMode="decimal"
+                placeholder="50,00"
+                className="h-12 w-full rounded-2xl border border-app-border bg-app-surface pl-11 pr-4 text-sm outline-none focus:border-app-text"
+              />
+            </span>
+            <span className="mt-1.5 block text-xs text-app-muted">
+              O pedido deu {brl(total)}. Diga com quanto você vai pagar, pra gente já sair com o troco.
+            </span>
+          </label>
+        )}
       </div>
     </Option>
 
@@ -384,6 +414,7 @@ export const CheckoutPage = () => {
   const [method, setMethod] = useState("cartao");
   const [address, setAddress] = useState(() => user?.address || EMPTY_ADDRESS);
   const [stage, setStage] = useState("form"); // form | pix | success
+  const [troco, setTroco] = useState({ precisa: false, para: "" });
   const [concluida, setConcluida] = useState(null);
   const [verRecibo, setVerRecibo] = useState(false);
 
@@ -403,6 +434,7 @@ export const CheckoutPage = () => {
       setStage("form");
       setConcluida(null);
       setVerRecibo(false);
+      setTroco({ precisa: false, para: "" });
     }, 300);
   };
 
@@ -413,6 +445,11 @@ export const CheckoutPage = () => {
       if (!address.number.trim()) return toast.error("Informe o número");
       if (!address.neighborhood.trim()) return toast.error("Informe o bairro");
       if (!address.city.trim()) return toast.error("Informe a cidade");
+    }
+    if (method === "dinheiro" && troco.precisa) {
+      const valor = parseFloat(troco.para.replace(/\./g, "").replace(",", "."));
+      if (!valor) return toast.error("Informe com quanto você vai pagar");
+      if (valor < t.total) return toast.error("O valor precisa cobrir os " + brl(t.total) + " do pedido");
     }
     return true;
   };
@@ -430,6 +467,10 @@ export const CheckoutPage = () => {
       customer: { name: user.name, email: user.email },
       mode,
       address: mode === "entrega" ? address : null,
+      troco:
+        method === "dinheiro" && troco.precisa
+          ? { para: parseFloat(troco.para.replace(/\./g, "").replace(",", ".")) }
+          : null,
     };
     addSale(venda);
     setConcluida(venda);
@@ -511,7 +552,7 @@ export const CheckoutPage = () => {
           {/* Right column: address + payment */}
           <div className="space-y-8 lg:col-span-7">
             <AddressSection address={address} setAddress={setAddress} mode={mode} setMode={setMode} />
-            <PaymentSection method={method} setMethod={setMethod} />
+            <PaymentSection method={method} setMethod={setMethod} troco={troco} setTroco={setTroco} total={t.total} />
 
             <button
               onClick={handleFinalize}

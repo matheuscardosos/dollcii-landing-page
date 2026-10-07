@@ -59,7 +59,7 @@ export async function desenharRecibo(venda) {
   // Primeiro medimos a altura, que depende da quantidade de itens.
   const linhasEndereco = linhasDoLocal(venda);
   const altura =
-    290 + venda.items.length * 34 + linhasEndereco.length * 22 + (venda.canceled ? 70 : 0) + 270;
+    290 + venda.items.length * 34 + linhasEndereco.length * 22 + (venda.canceled ? 70 : 0) + (venda.troco ? 20 : 0) + 270;
 
   const canvas = document.createElement("canvas");
   canvas.width = LARGURA * ESCALA;
@@ -129,6 +129,9 @@ export async function desenharRecibo(venda) {
   texto("PAGAMENTO", meio, y, { tam: 10, peso: "700", cor: COR.suave });
   y += 20;
   texto(PAGAMENTO[venda.payment] || "A combinar", meio, y, { tam: 15, peso: "600" });
+  if (venda.troco) {
+    texto("Troco para " + brl(venda.troco.para), meio, y + 19, { tam: 12, cor: COR.suave });
+  }
 
   linhasEndereco.forEach((l, i) => {
     texto(l, MARGEM, y + i * 20, { tam: 13, cor: i === 0 ? COR.tinta : COR.suave });

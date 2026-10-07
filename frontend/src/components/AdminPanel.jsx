@@ -340,6 +340,17 @@ const Pedidos = () => {
               </div>
             </div>
 
+            {s.troco && (
+              <div className="mt-3 rounded-xl bg-app-accent-soft px-3 py-2">
+                <p className="text-xs font-semibold text-berry">
+                  Levar troco para {brl(s.troco.para)}
+                </p>
+                <p className="text-[11px] text-app-muted">
+                  O cliente paga com {brl(s.troco.para)} e recebe {brl(s.troco.para - s.total)} de volta.
+                </p>
+              </div>
+            )}
+
             <div className="mt-3 flex items-center gap-2 rounded-xl bg-app-hover px-3 py-2">
               <User className="h-3.5 w-3.5 shrink-0 text-app-muted" />
               {s.customer ? (
