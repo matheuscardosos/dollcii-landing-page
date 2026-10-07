@@ -1,4 +1,4 @@
-const CACHE = "geliz-v1";
+const CACHE = "geliz-v2";
 const CORE = ["./", "./index.html", "./favicon.ico", "./icons/icon-192.png"];
 
 self.addEventListener("install", (e) => {
