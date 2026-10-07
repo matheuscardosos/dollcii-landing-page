@@ -76,17 +76,17 @@ export const Footer = () => {
         <img src={P + "/img/logo.webp"} alt="Geliz" className="mx-auto w-full max-w-[560px]" />
       </div>
       <div className="flex flex-col justify-between gap-4 py-8 font-mono text-[11px] uppercase tracking-[0.18em] text-white/55 sm:flex-row sm:items-center">
-        <span>© 2026 Geliz</span>
+        <span>
+          © 2026 Geliz · site por{" "}
+          <a href="https://www.instagram.com/math.scs" target="_blank" rel="noreferrer" className="text-white/80 transition-colors hover:text-berry">
+            math.scs
+          </a>
+        </span>
         <div className="flex gap-4">
           <button onClick={() => setLegal("termos")} className="transition-colors hover:text-white">Termos de Uso</button>
           <button onClick={() => setLegal("privacidade")} className="transition-colors hover:text-white">Privacidade</button>
         </div>
-        <span>
-          Feito à mão em Montes Claros, MG · site por{" "}
-          <a href="https://github.com/matheuscardosos" target="_blank" rel="noreferrer" className="text-white/80 transition-colors hover:text-berry">
-            math.scs
-          </a>
-        </span>
+        <span>Feito à mão em Montes Claros, MG</span>
       </div>
     </div>
     <LegalModal type={legal} open={!!legal} onOpenChange={(o) => { if (!o) setLegal(null); }} />

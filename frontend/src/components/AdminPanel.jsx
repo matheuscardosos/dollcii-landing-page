@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft, Boxes, Check, ChevronRight, Clock, Heart, LogOut, Minus, Package,
-  Pause, Play, Plus, Receipt, Ticket, Trash2, TrendingUp, Truck, User, UtensilsCrossed, Wallet, X,
+  MoreHorizontal, Pause, Play, Plus, Receipt, Ticket, Trash2, TrendingUp, Truck, User, UtensilsCrossed, Wallet, X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "./Logo";
@@ -27,6 +27,9 @@ const STEPS = [
 ];
 
 const ESTOQUE_BAIXO = 10;
+
+// A barra do celular comporta 4 abas mais o botao "Mais"; o resto vai pra folha.
+const NA_BARRA = 4;
 
 const fmtHora = (iso) =>
   new Date(iso).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
@@ -832,12 +835,61 @@ const NovaVenda = ({ onClose }) => {
   );
 };
 
+/* ── folha com as abas que nao couberam ── */
+
+const MaisOpcoes = ({ atual, onPick, onClose }) => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    onClick={onClose}
+    className="fixed inset-0 z-50 flex items-end bg-black/50 lg:hidden"
+  >
+    <motion.div
+      initial={{ y: 60 }}
+      animate={{ y: 0 }}
+      exit={{ y: 60 }}
+      onClick={(e) => e.stopPropagation()}
+      className="w-full rounded-t-[28px] bg-app-bg p-5"
+      style={{ paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" }}
+    >
+      <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-app-border" />
+      <div className="divide-y divide-app-border overflow-hidden rounded-[22px] border border-app-border bg-app-surface">
+        {TABS.slice(NA_BARRA).map((t) => {
+          const Icon = t.icon;
+          const on = atual === t.id;
+          return (
+            <button
+              key={t.id}
+              onClick={() => onPick(t.id)}
+              className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-app-hover"
+            >
+              <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${on ? "bg-app-accent-soft text-berry" : "bg-app-hover text-app-muted"}`}>
+                <Icon className="h-4 w-4" />
+              </span>
+              <span className={`flex-1 text-sm ${on ? "font-semibold text-berry" : "font-medium"}`}>{t.label}</span>
+              <ChevronRight className="h-4 w-4 shrink-0 text-app-muted" />
+            </button>
+          );
+        })}
+      </div>
+      <button
+        onClick={onClose}
+        className="mt-3 h-12 w-full rounded-full border border-app-border text-sm font-semibold transition-colors hover:bg-app-hover"
+      >
+        Fechar
+      </button>
+    </motion.div>
+  </motion.div>
+);
+
 /* ── casca ── */
 
 export const AdminPanel = () => {
   const { user, logout } = useAuth();
   const [tab, setTab] = useState("resumo");
   const [venda, setVenda] = useState(false);
+  const [mais, setMais] = useState(false);
 
   if (!user) return null;
 
@@ -929,11 +981,31 @@ export const AdminPanel = () => {
 
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-app-border bg-app-surface/95 backdrop-blur-xl lg:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
         <div className="mx-auto grid h-16 max-w-md grid-cols-5 items-center px-2">
-          {TABS.map((t) => <TabButton key={t.id} t={t} on={tab === t.id} onClick={() => setTab(t.id)} />)}
+          {TABS.slice(0, NA_BARRA).map((t) => (
+            <TabButton key={t.id} t={t} on={tab === t.id} onClick={() => setTab(t.id)} />
+          ))}
+          <TabButton
+            t={{ label: "Mais", icon: MoreHorizontal }}
+            on={TABS.slice(NA_BARRA).some((t) => t.id === tab)}
+            onClick={() => setMais(true)}
+          />
         </div>
       </nav>
 
       <AnimatePresence>{venda && <NovaVenda onClose={() => setVenda(false)} />}</AnimatePresence>
+
+      <AnimatePresence>
+        {mais && (
+          <MaisOpcoes
+            atual={tab}
+            onPick={(id) => {
+              setTab(id);
+              setMais(false);
+            }}
+            onClose={() => setMais(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
