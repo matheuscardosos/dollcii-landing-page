@@ -1,18 +1,19 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  ArrowLeft, Boxes, Check, ChevronRight, Clock, LogOut, Minus, Package,
-  Plus, Receipt, Ticket, Trash2, TrendingUp, Truck, User, Wallet, X,
+  ArrowLeft, Boxes, Check, ChevronRight, Clock, Heart, LogOut, Minus, Package,
+  Pause, Play, Plus, Receipt, Ticket, Trash2, TrendingUp, Truck, User, UtensilsCrossed, Wallet, X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "./Logo";
 import { useAuth } from "../context/AuthContext";
 import { useStore } from "../context/StoreContext";
-import { brl, PRODUCTS } from "../data/menu";
+import { brl } from "../data/menu";
 
 const TABS = [
   { id: "resumo", label: "Resumo", icon: TrendingUp },
   { id: "pedidos", label: "Pedidos", icon: Receipt },
+  { id: "cardapio", label: "Cardápio", icon: UtensilsCrossed },
   { id: "estoque", label: "Estoque", icon: Boxes },
   { id: "despesas", label: "Despesas", icon: Wallet },
   { id: "cupons", label: "Cupons", icon: Ticket },
@@ -58,11 +59,11 @@ const Metric = ({ label, value, hint, accent }) => (
 );
 
 const Resumo = ({ onNovaVenda, onVerPendentes }) => {
-  const { resumo, pendentes, stock, isLow, isAvailable } = useStore();
+  const { resumo, pendentes, stock, isLow, isAvailable, catalog } = useStore();
   const [periodo, setPeriodo] = useState("hoje");
   const r = resumo(periodo);
 
-  const repor = PRODUCTS.filter((p) => !isAvailable(p.id) || isLow(p.id));
+  const repor = catalog.filter((p) => !isAvailable(p.id) || isLow(p.id));
   const margem = r.faturamento > 0 ? Math.round((r.lucro / r.faturamento) * 100) : 0;
 
   return (
@@ -407,16 +408,92 @@ const Pedidos = () => {
   );
 };
 
-/* ── aba estoque ── */
+/* ── aba cardapio ── */
 
-const Estoque = () => {
-  const { stock, costs, adjustStock, setStock, setCost, isAvailable, isLow } = useStore();
+const CardapioAdmin = () => {
+  const { catalog, costs, stock, metricas, setPrice, togglePaused, isPaused } = useStore();
+
   return (
     <div className="space-y-3">
       <p className="text-sm text-app-muted">
-        O custo por unidade entra no cálculo do lucro. O cliente nunca vê essas quantidades.
+        O preço alterado vale no site na hora. Pausar tira o sabor de venda sem mexer no estoque.
       </p>
-      {PRODUCTS.map((p) => {
+      {catalog.map((p) => {
+        const m = metricas(p.id);
+        const pausado = isPaused(p.id);
+        const custo = costs[p.id] ?? 0;
+        const margem = p.price > 0 ? Math.round(((p.price - custo) / p.price) * 100) : 0;
+        return (
+          <div key={p.id} className={`rounded-[22px] border bg-app-surface p-4 ${pausado ? "border-app-border opacity-70" : "border-app-border"}`}>
+            <div className="flex items-start gap-3">
+              <div className="grid h-16 w-14 shrink-0 place-items-center overflow-hidden rounded-xl p-1.5" style={{ background: p.tint }}>
+                <img src={p.img} alt="" loading="lazy" className="h-full w-auto object-contain" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold">{p.name}</p>
+                <p className="mt-0.5 line-clamp-2 text-xs leading-snug text-app-muted">{p.desc}</p>
+              </div>
+              <button
+                onClick={() => togglePaused(p.id)}
+                aria-label={pausado ? "Voltar a vender" : "Pausar venda"}
+                className={`flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold transition-colors ${pausado ? "border-berry text-berry" : "border-app-border text-app-muted hover:text-app-text"}`}
+              >
+                {pausado ? <Play className="h-3.5 w-3.5" /> : <Pause className="h-3.5 w-3.5" />}
+                {pausado ? "Pausado" : "À venda"}
+              </button>
+            </div>
+
+            <div className="mt-3 grid grid-cols-2 gap-3 border-t border-app-border pt-3 sm:grid-cols-4">
+              <label className="block">
+                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-app-muted">Preço</span>
+                <span className="relative mt-1 block">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-app-muted">R$</span>
+                  <input
+                    value={String(p.price).replace(".", ",")}
+                    onChange={(e) => setPrice(p.id, parseFloat(e.target.value.replace(",", ".").replace(/[^\d.]/g, "")) || 0)}
+                    inputMode="decimal"
+                    aria-label={"Preço de " + p.name}
+                    className="h-9 w-full rounded-lg border border-app-border bg-app-surface pl-9 pr-2 font-mono text-sm outline-none focus:border-app-text"
+                  />
+                </span>
+              </label>
+              <div>
+                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-app-muted">Margem</span>
+                <p className="mt-1 flex h-9 items-center font-mono text-sm">
+                  {margem}% <span className="ml-1.5 text-xs text-app-muted">({brl(custo)} de custo)</span>
+                </p>
+              </div>
+              <div>
+                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-app-muted">Estoque</span>
+                <p className="mt-1 flex h-9 items-center font-mono text-sm">{stock[p.id] ?? 0} un</p>
+              </div>
+              <div>
+                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-app-muted">Favoritado</span>
+                <p className="mt-1 flex h-9 items-center gap-1.5 font-mono text-sm">
+                  <Heart className="h-3.5 w-3.5 fill-berry text-berry" /> {m.favoritos}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-3 flex items-center justify-between gap-3 rounded-xl bg-app-hover px-3 py-2">
+              <span className="text-xs text-app-muted">Vendeu {m.qty} un no total</span>
+              <span className="font-mono text-xs font-semibold">{brl(m.receita)}</span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+/* ── aba estoque ── */
+
+const Estoque = () => {
+  const { stock, costs, adjustStock, setStock, setCost, isAvailable, isLow, catalog } = useStore();
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-app-muted">Defina o custo e o estoque de cada produto.</p>
+      {catalog.map((p) => {
         const qty = stock[p.id] ?? 0;
         const esgotado = !isAvailable(p.id);
         const baixo = isLow(p.id);
@@ -667,12 +744,12 @@ const Cupons = () => {
 /* ── nova venda ── */
 
 const NovaVenda = ({ onClose }) => {
-  const { addSale } = useStore();
+  const { addSale, catalog } = useStore();
   const [qtys, setQtys] = useState({});
   const [payment, setPayment] = useState("dinheiro");
 
   const set = (id, d) => setQtys((q) => ({ ...q, [id]: Math.max(0, (q[id] || 0) + d) }));
-  const itens = PRODUCTS.filter((p) => qtys[p.id] > 0).map((p) => ({ id: p.id, name: p.name, price: p.price, qty: qtys[p.id] }));
+  const itens = catalog.filter((p) => qtys[p.id] > 0).map((p) => ({ id: p.id, name: p.name, price: p.price, qty: qtys[p.id] }));
   const total = itens.reduce((s, i) => s + i.price * i.qty, 0);
 
   const registrar = () => {
@@ -699,7 +776,7 @@ const NovaVenda = ({ onClose }) => {
 
       <div className="flex-1 overflow-y-auto px-5 py-5">
         <div className="mx-auto max-w-lg space-y-3">
-          {PRODUCTS.map((p) => (
+          {catalog.map((p) => (
             <div key={p.id} className="flex items-center gap-3 rounded-[22px] border border-app-border p-3">
               <div className="grid h-16 w-14 shrink-0 place-items-center overflow-hidden rounded-xl p-1.5" style={{ background: p.tint }}>
                 <img src={p.img} alt="" className="h-full w-auto object-contain" />
@@ -832,6 +909,7 @@ export const AdminPanel = () => {
           >
             {tab === "resumo" && <Resumo onNovaVenda={() => setVenda(true)} onVerPendentes={() => setTab("pedidos")} />}
             {tab === "pedidos" && <Pedidos />}
+            {tab === "cardapio" && <CardapioAdmin />}
             {tab === "estoque" && <Estoque />}
             {tab === "despesas" && <Despesas />}
             {tab === "cupons" && <Cupons />}

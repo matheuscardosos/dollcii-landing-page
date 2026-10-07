@@ -81,7 +81,12 @@ export const Footer = () => {
           <button onClick={() => setLegal("termos")} className="transition-colors hover:text-white">Termos de Uso</button>
           <button onClick={() => setLegal("privacidade")} className="transition-colors hover:text-white">Privacidade</button>
         </div>
-        <span>Feito à mão em Montes Claros, MG</span>
+        <span>
+          Feito à mão em Montes Claros, MG · site por{" "}
+          <a href="https://github.com/matheuscardosos" target="_blank" rel="noreferrer" className="text-white/80 transition-colors hover:text-berry">
+            math.scs
+          </a>
+        </span>
       </div>
     </div>
     <LegalModal type={legal} open={!!legal} onOpenChange={(o) => { if (!o) setLegal(null); }} />

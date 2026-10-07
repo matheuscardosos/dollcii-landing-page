@@ -244,6 +244,20 @@ const PaymentSection = ({ method, setMethod }) => (
     </Option>
 
     <Option
+      on={method === "dinheiro"}
+      onClick={() => setMethod("dinheiro")}
+      icon={<img src={P + "/img/dinheiro.svg"} alt="" className="h-5" />}
+      title="Dinheiro na entrega"
+    >
+      <div className="rounded-2xl border border-app-border p-4">
+        <p className="text-sm font-semibold">Você paga em espécie</p>
+        <p className="mt-1 text-xs leading-relaxed text-app-muted">
+          Combine o troco com a gente pelo WhatsApp depois de confirmar o pedido.
+        </p>
+      </div>
+    </Option>
+
+    <Option
       on={method === "pix"}
       onClick={() => setMethod("pix")}
       icon={<img src={P + "/img/pix.svg"} alt="" className="h-5" />}

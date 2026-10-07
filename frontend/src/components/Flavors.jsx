@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useInView } from "framer-motion";
 import { Plus } from "lucide-react";
-import { FLAVORS, PRODUCTS, brl } from "../data/menu";
+import { FLAVORS, brl } from "../data/menu";
+import { useStore } from "../context/StoreContext";
 import { useBag } from "../context/BagContext";
 import { FlavorStage } from "./FlavorStage";
 import { Eyebrow, H2, Reveal, Section } from "./Reveal";
@@ -10,7 +11,8 @@ const Block = ({ f, onActive }) => {
   const ref = useRef(null);
   const inView = useInView(ref, { amount: 0.5 });
   const { add } = useBag();
-  const product = PRODUCTS.find((p) => p.id === f.productId);
+  const { catalog } = useStore();
+  const product = catalog.find((p) => p.id === f.productId);
 
   useEffect(() => {
     if (inView) onActive(f.id);

@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
-import { PRODUCTS, brl } from "../data/menu";
+import { brl } from "../data/menu";
 import { useBag } from "../context/BagContext";
+import { useStore } from "../context/StoreContext";
 
 const P = process.env.PUBLIC_URL;
 
@@ -34,9 +35,9 @@ const QUESTIONS = [
   },
 ];
 
-function pickProduct(answers) {
+function pickProduct(answers, catalog) {
   const [taste, intensity, occasion] = answers;
-  const byId = (id) => PRODUCTS.find((p) => p.id === id);
+  const byId = (id) => catalog.find((p) => p.id === id);
 
   if (taste === "chocolate") return byId("geliz-nutella");
 
@@ -156,6 +157,7 @@ export const MascotQuiz = () => {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState([]);
   const bodyRef = useRef(null);
+  const { catalog } = useStore();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -191,7 +193,7 @@ export const MascotQuiz = () => {
     setStep(step + 1);
   };
 
-  const product = answers.length === 3 ? pickProduct(answers) : null;
+  const product = answers.length === 3 ? pickProduct(answers, catalog) : null;
 
   return (
     <>

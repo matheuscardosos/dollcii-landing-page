@@ -13,6 +13,9 @@ const vazio = () => ({
   expenses: [],
   stock: Object.fromEntries(PRODUCTS.map((p) => [p.id, STOCK_INICIAL])),
   costs: Object.fromEntries(PRODUCTS.map((p) => [p.id, CUSTO_INICIAL])),
+  // So o que a loja mudou em cima do cardapio base.
+  overrides: {},
+  favorites: {},
   // O cupom antigo vira o primeiro da lista, agora editavel pelo painel.
   coupons: Object.entries(COUPONS).map(([code, rate]) => ({
     code,
@@ -35,6 +38,8 @@ const load = () => {
       // Produto novo no cardapio entra com estoque cheio em vez de indefinido.
       stock: { ...base.stock, ...(v.stock || {}) },
       costs: { ...base.costs, ...(v.costs || {}) },
+      overrides: v.overrides || {},
+      favorites: v.favorites || {},
     };
   } catch {
     return vazio();
@@ -95,6 +100,19 @@ export const StoreProvider = ({ children }) => {
 
   const adjustStock = useCallback((id, delta) => {
     setData((d) => ({ ...d, stock: { ...d.stock, [id]: Math.max(0, (d.stock[id] ?? 0) + delta) } }));
+  }, []);
+
+  const setPrice = useCallback((id, price) => {
+    setData((d) => ({ ...d, overrides: { ...d.overrides, [id]: { ...d.overrides[id], price: Math.max(0, price) } } }));
+  }, []);
+
+  const togglePaused = useCallback((id) => {
+    setData((d) => ({ ...d, overrides: { ...d.overrides, [id]: { ...d.overrides[id], paused: !d.overrides[id]?.paused } } }));
+  }, []);
+
+  // Contagem global de favoritos: o perfil guarda os do usuario, isso guarda o total.
+  const bumpFavorite = useCallback((id, delta) => {
+    setData((d) => ({ ...d, favorites: { ...d.favorites, [id]: Math.max(0, (d.favorites[id] || 0) + delta) } }));
   }, []);
 
   const setCost = useCallback((id, value) => {
@@ -188,8 +206,30 @@ export const StoreProvider = ({ children }) => {
       };
     };
 
+    // O cardapio que o resto do app enxerga ja vem com o que a loja editou.
+    const catalog = PRODUCTS.map((p) => ({ ...p, ...(data.overrides[p.id] || {}) }));
+
+    const metricas = (id) => {
+      let qty = 0;
+      let receita = 0;
+      data.sales.forEach((v) => {
+        if (v.canceled) return;
+        v.items.forEach((i) => {
+          if (i.id !== id) return;
+          qty += i.qty;
+          receita += i.price * i.qty;
+        });
+      });
+      return { qty, receita, favoritos: data.favorites[id] || 0 };
+    };
+
     return {
       ...data,
+      catalog,
+      metricas,
+      setPrice,
+      togglePaused,
+      bumpFavorite,
       addSale,
       advanceSale,
       cancelSale,
@@ -213,7 +253,8 @@ export const StoreProvider = ({ children }) => {
       isExpired: (c) => !!c.expiresAt && c.expiresAt < hoje(),
 
       // Quem vende so pergunta se tem ou nao tem. A quantidade fica no painel.
-      isAvailable: (id) => (data.stock[id] ?? 0) > 0,
+      isAvailable: (id) => !data.overrides[id]?.paused && (data.stock[id] ?? 0) > 0,
+      isPaused: (id) => !!data.overrides[id]?.paused,
       isLow: (id) => {
         const q = data.stock[id] ?? 0;
         return q > 0 && q <= ULTIMAS_UNIDADES;
@@ -223,7 +264,7 @@ export const StoreProvider = ({ children }) => {
       resumo,
       pendentes: data.sales.filter((s) => !s.canceled && s.step < 3),
     };
-  }, [data, addSale, advanceSale, cancelSale, adjustStock, setStock, setCost, addExpense, removeExpense, addCoupon, toggleCoupon, removeCoupon, useCoupon]);
+  }, [data, addSale, advanceSale, cancelSale, adjustStock, setStock, setCost, setPrice, togglePaused, bumpFavorite, addExpense, removeExpense, addCoupon, toggleCoupon, removeCoupon, useCoupon]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 };

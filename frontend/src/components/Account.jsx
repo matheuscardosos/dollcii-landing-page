@@ -9,7 +9,7 @@ import { Logo } from "./Logo";
 import { useAuth } from "../context/AuthContext";
 import { useBag } from "../context/BagContext";
 import { useStore } from "../context/StoreContext";
-import { brl, CATEGORIES, PRODUCTS } from "../data/menu";
+import { brl, CATEGORIES } from "../data/menu";
 
 const TABS = [
   { id: "cardapio", label: "Cardápio", icon: UtensilsCrossed },
@@ -30,8 +30,12 @@ const ORDER_STEPS = [
 const ProductTile = ({ p }) => {
   const { add } = useBag();
   const { isFavorite, toggleFavorite } = useAuth();
-  const { isAvailable, isLow } = useStore();
+  const { isAvailable, isLow, bumpFavorite } = useStore();
   const fav = isFavorite(p.id);
+  const favoritar = () => {
+    toggleFavorite(p.id);
+    bumpFavorite(p.id, fav ? -1 : 1);
+  };
   const esgotado = !isAvailable(p.id);
   return (
     <motion.article layout className="overflow-hidden rounded-[22px] border border-app-border bg-app-surface">
@@ -45,7 +49,7 @@ const ProductTile = ({ p }) => {
           )
         )}
         <button
-          onClick={() => toggleFavorite(p.id)}
+          onClick={favoritar}
           aria-label={fav ? "Remover dos favoritos" : "Salvar nos favoritos"}
           className="absolute bottom-2 right-2 grid h-9 w-9 place-items-center rounded-full bg-app-surface shadow-md transition-transform active:scale-90"
         >
@@ -82,8 +86,9 @@ const Empty = ({ icon: Icon, title, text }) => (
 /* ── aba cardapio ── */
 
 const Cardapio = () => {
+  const { catalog } = useStore();
   const [cat, setCat] = useState("todos");
-  const list = useMemo(() => (cat === "todos" ? PRODUCTS : PRODUCTS.filter((p) => p.cat === cat)), [cat]);
+  const list = useMemo(() => (cat === "todos" ? catalog : catalog.filter((p) => p.cat === cat)), [cat, catalog]);
   return (
     <>
       <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 sm:mx-0 sm:px-0" style={{ scrollbarWidth: "none" }}>
@@ -108,7 +113,8 @@ const Cardapio = () => {
 
 const Favoritos = () => {
   const { favorites } = useAuth();
-  const list = PRODUCTS.filter((p) => favorites.includes(p.id));
+  const { catalog } = useStore();
+  const list = catalog.filter((p) => favorites.includes(p.id));
   if (!list.length) {
     return <Empty icon={Heart} title="Nenhum favorito ainda" text="Toque no coração de um sabor no cardápio para salvar aqui." />;
   }
@@ -166,7 +172,7 @@ const Pedidos = () => {
             </div>
             <div className="shrink-0 text-right">
               <p className={`font-display text-lg font-bold ${o.canceled ? "text-app-muted line-through" : ""}`}>{brl(o.total)}</p>
-              <p className="text-[11px] text-app-muted">{o.payment === "pix" ? "Pix" : "Maquininha"}</p>
+              <p className="text-[11px] text-app-muted">{o.payment === "pix" ? "Pix" : o.payment === "dinheiro" ? "Dinheiro" : "Maquininha"}</p>
             </div>
           </div>
           <ul className="mt-3 space-y-1 border-t border-app-border pt-3">

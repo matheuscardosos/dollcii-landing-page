@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowDown, ArrowRight, Plus } from "lucide-react";
-import { FLAVORS, PRODUCTS, brl } from "../data/menu";
+import { FLAVORS, brl } from "../data/menu";
+import { useStore } from "../context/StoreContext";
 import { FlavorStage } from "./FlavorStage";
 import { useBag } from "../context/BagContext";
 import { scrollToId } from "./SmoothScroll";
@@ -55,7 +56,8 @@ const FlavorSwitch = ({ active, onPick }) => (
 
 const FlavorCard = ({ flavor }) => {
   const { add } = useBag();
-  const product = PRODUCTS.find((p) => p.id === flavor.productId);
+  const { catalog } = useStore();
+  const product = catalog.find((p) => p.id === flavor.productId);
   return (
     <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease, delay: 1 }} className="flex w-full min-w-0 items-center gap-4 sm:gap-6 rounded-[22px] sm:rounded-[26px] border hairline bg-white p-2.5 pl-5 sm:p-3 sm:pl-6 sm:w-fit" data-testid="hero-flavor-card">
       <div className="min-w-0 flex-1 py-0.5">

@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search } from "lucide-react";
-import { CATEGORIES, PRODUCTS } from "../data/menu";
+import { CATEGORIES } from "../data/menu";
+import { useStore } from "../context/StoreContext";
 import { ProductCard } from "./ProductCard";
 import { ProductDialog } from "./ProductDialog";
 import { Eyebrow, H2 } from "./Reveal";
@@ -10,13 +11,14 @@ const normalize = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLo
 
 export const Menu = () => {
   const [cat, setCat] = useState("todos");
+  const { catalog } = useStore();
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(null);
 
   const list = useMemo(() => {
     const term = normalize(q.trim());
-    return PRODUCTS.filter((p) => (cat === "todos" || p.cat === cat) && (!term || normalize(`${p.name} ${p.desc}`).includes(term)));
-  }, [cat, q]);
+    return catalog.filter((p) => (cat === "todos" || p.cat === cat) && (!term || normalize(`${p.name} ${p.desc}`).includes(term)));
+  }, [cat, q, catalog]);
 
   return (
     <section id="cardapio" data-testid="menu-section" className="border-t hairline bg-white py-24 lg:py-36">
