@@ -214,6 +214,13 @@ const SECOES = [
   { id: "sessao", label: "Sessão", hint: "Voltar ao site ou sair", icon: LogOut },
 ];
 
+// custom no AnimatePresence faz a direcao chegar tambem em quem esta saindo.
+const DESLIZA = {
+  entra: (d) => ({ opacity: 0, x: d * 26 }),
+  centro: { opacity: 1, x: 0 },
+  sai: (d) => ({ opacity: 0, x: d * -26 }),
+};
+
 const SectionHeader = ({ title, onBack }) => (
   <div className="mb-4 flex items-center gap-3">
     <button onClick={onBack} aria-label="Voltar" className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-app-border bg-app-surface transition-colors hover:bg-app-hover">
@@ -278,110 +285,142 @@ const Conta = () => {
     toast.success("Você saiu da conta");
   };
 
-  const voltar = () => setSecao(null);
+  // O lado pra onde desliza depende de estar entrando ou voltando.
+  const [dir, setDir] = useState(1);
 
-  if (secao === "pessoais") {
-    return (
-      <div className="mx-auto max-w-lg">
-        <SectionHeader title="Dados pessoais" onBack={voltar} />
-        <Card onSubmit={salvarDados} cta="Salvar dados">
-          <Field label="Nome" value={form.name} onChange={setF("name")} />
-          <Field label="E-mail" value={user.email} disabled />
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="CPF" value={form.cpf} onChange={setF("cpf")} placeholder="000.000.000-00" inputMode="numeric" />
-            <Field label="Telefone" value={form.phone} onChange={setF("phone")} placeholder="(38) 90000-0000" inputMode="tel" />
-          </div>
-        </Card>
-      </div>
-    );
-  }
+  const abrir = (id) => {
+    setDir(1);
+    setSecao(id);
+  };
 
-  if (secao === "endereco") {
-    return (
-      <div className="mx-auto max-w-lg">
-        <SectionHeader title="Endereço padrão" onBack={voltar} />
-        <Card onSubmit={salvarEndereco} cta="Salvar endereço">
-          <div className="relative">
-            <Field label="CEP" value={addr.cep} onChange={setA("cep")} placeholder="00000-000" inputMode="numeric" maxLength={9} />
-            {busyCep && <span className="absolute right-4 top-9 text-xs text-app-muted">Buscando...</span>}
-          </div>
-          <Field label="Rua" value={addr.street} onChange={setA("street")} placeholder="Nome da rua" />
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Número" value={addr.number} onChange={setA("number")} placeholder="Nº" />
-            <Field label="Complemento" value={addr.complement} onChange={setA("complement")} placeholder="Apto, bloco" />
-          </div>
-          <Field label="Bairro" value={addr.neighborhood} onChange={setA("neighborhood")} placeholder="Bairro" />
-          <div className="grid grid-cols-3 gap-3">
-            <div className="col-span-2">
-              <Field label="Cidade" value={addr.city} onChange={setA("city")} placeholder="Cidade" />
+  const voltar = () => {
+    setDir(-1);
+    setSecao(null);
+  };
+
+  const conteudo = () => {
+
+    if (secao === "pessoais") {
+      return (
+        <>
+          <SectionHeader title="Dados pessoais" onBack={voltar} />
+          <Card onSubmit={salvarDados} cta="Salvar dados">
+            <Field label="Nome" value={form.name} onChange={setF("name")} />
+            <Field label="E-mail" value={user.email} disabled />
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="CPF" value={form.cpf} onChange={setF("cpf")} placeholder="000.000.000-00" inputMode="numeric" />
+              <Field label="Telefone" value={form.phone} onChange={setF("phone")} placeholder="(38) 90000-0000" inputMode="tel" />
             </div>
-            <Field label="UF" value={addr.state} onChange={setA("state")} placeholder="MG" maxLength={2} />
+          </Card>
+        </>
+      );
+    }
+
+    if (secao === "endereco") {
+      return (
+        <>
+          <SectionHeader title="Endereço padrão" onBack={voltar} />
+          <Card onSubmit={salvarEndereco} cta="Salvar endereço">
+            <div className="relative">
+              <Field label="CEP" value={addr.cep} onChange={setA("cep")} placeholder="00000-000" inputMode="numeric" maxLength={9} />
+              {busyCep && <span className="absolute right-4 top-9 text-xs text-app-muted">Buscando...</span>}
+            </div>
+            <Field label="Rua" value={addr.street} onChange={setA("street")} placeholder="Nome da rua" />
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Número" value={addr.number} onChange={setA("number")} placeholder="Nº" />
+              <Field label="Complemento" value={addr.complement} onChange={setA("complement")} placeholder="Apto, bloco" />
+            </div>
+            <Field label="Bairro" value={addr.neighborhood} onChange={setA("neighborhood")} placeholder="Bairro" />
+            <div className="grid grid-cols-3 gap-3">
+              <div className="col-span-2">
+                <Field label="Cidade" value={addr.city} onChange={setA("city")} placeholder="Cidade" />
+              </div>
+              <Field label="UF" value={addr.state} onChange={setA("state")} placeholder="MG" maxLength={2} />
+            </div>
+          </Card>
+        </>
+      );
+    }
+
+    if (secao === "seguranca") {
+      return (
+        <>
+          <SectionHeader title="Segurança" onBack={voltar} />
+          <Card onSubmit={trocarSenha} cta="Alterar senha">
+            <Field label="Senha atual" type="password" value={pass.atual} onChange={(e) => setPass((p) => ({ ...p, atual: e.target.value }))} />
+            <Field label="Nova senha" type="password" value={pass.nova} onChange={(e) => setPass((p) => ({ ...p, nova: e.target.value }))} />
+            <Field label="Confirmar nova senha" type="password" value={pass.confirma} onChange={(e) => setPass((p) => ({ ...p, confirma: e.target.value }))} />
+          </Card>
+        </>
+      );
+    }
+
+    if (secao === "sessao") {
+      return (
+        <>
+          <SectionHeader title="Sessão" onBack={voltar} />
+          <div className="space-y-1 rounded-[22px] border border-app-border bg-app-surface p-3">
+            <button onClick={sair} className="flex w-full items-center justify-between rounded-xl px-2 py-3.5 text-sm text-berry transition-colors hover:bg-app-accent-soft">
+              <span className="flex items-center gap-3"><LogOut className="h-4 w-4" /> Sair da conta</span>
+              <ChevronRight className="h-4 w-4" />
+            </button>
           </div>
-        </Card>
-      </div>
-    );
-  }
+        </>
+      );
+    }
 
-  if (secao === "seguranca") {
     return (
-      <div className="mx-auto max-w-lg">
-        <SectionHeader title="Segurança" onBack={voltar} />
-        <Card onSubmit={trocarSenha} cta="Alterar senha">
-          <Field label="Senha atual" type="password" value={pass.atual} onChange={(e) => setPass((p) => ({ ...p, atual: e.target.value }))} />
-          <Field label="Nova senha" type="password" value={pass.nova} onChange={(e) => setPass((p) => ({ ...p, nova: e.target.value }))} />
-          <Field label="Confirmar nova senha" type="password" value={pass.confirma} onChange={(e) => setPass((p) => ({ ...p, confirma: e.target.value }))} />
-        </Card>
-      </div>
-    );
-  }
-
-  if (secao === "sessao") {
-    return (
-      <div className="mx-auto max-w-lg">
-        <SectionHeader title="Sessão" onBack={voltar} />
-        <div className="space-y-1 rounded-[22px] border border-app-border bg-app-surface p-3">
-          <button onClick={sair} className="flex w-full items-center justify-between rounded-xl px-2 py-3.5 text-sm text-berry transition-colors hover:bg-app-accent-soft">
-            <span className="flex items-center gap-3"><LogOut className="h-4 w-4" /> Sair da conta</span>
-            <ChevronRight className="h-4 w-4" />
-          </button>
+      <>
+        <div className="flex items-center gap-4 rounded-[22px] border border-app-border bg-app-surface p-5">
+          <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-berry text-xl font-bold text-white">
+            {user.name.charAt(0)}
+          </span>
+          <div className="min-w-0">
+            <p className="truncate font-display text-lg font-bold">{user.name}</p>
+            <p className="truncate text-sm text-app-muted">{user.email}</p>
+          </div>
         </div>
-      </div>
+
+        <div className="mt-3 divide-y divide-app-border overflow-hidden rounded-[22px] border border-app-border bg-app-surface">
+          {SECOES.map((sec) => {
+            const Icon = sec.icon;
+            return (
+              <button
+                key={sec.id}
+                onClick={() => abrir(sec.id)}
+                className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-app-hover"
+              >
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-app-hover text-app-muted">
+                  <Icon className="h-4 w-4" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-semibold">{sec.label}</span>
+                  <span className="block truncate text-xs text-app-muted">{sec.hint}</span>
+                </span>
+                <ChevronRight className="h-4 w-4 shrink-0 text-app-muted" />
+              </button>
+            );
+          })}
+        </div>
+      </>
     );
-  }
+  };
 
   return (
-    <div className="mx-auto max-w-lg">
-      <div className="flex items-center gap-4 rounded-[22px] border border-app-border bg-app-surface p-5">
-        <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-berry text-xl font-bold text-white">
-          {user.name.charAt(0)}
-        </span>
-        <div className="min-w-0">
-          <p className="truncate font-display text-lg font-bold">{user.name}</p>
-          <p className="truncate text-sm text-app-muted">{user.email}</p>
-        </div>
-      </div>
-
-      <div className="mt-3 divide-y divide-app-border overflow-hidden rounded-[22px] border border-app-border bg-app-surface">
-        {SECOES.map((sec) => {
-          const Icon = sec.icon;
-          return (
-            <button
-              key={sec.id}
-              onClick={() => setSecao(sec.id)}
-              className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-app-hover"
-            >
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-app-hover text-app-muted">
-                <Icon className="h-4 w-4" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-semibold">{sec.label}</span>
-                <span className="block truncate text-xs text-app-muted">{sec.hint}</span>
-              </span>
-              <ChevronRight className="h-4 w-4 shrink-0 text-app-muted" />
-            </button>
-          );
-        })}
-      </div>
+    <div className="mx-auto max-w-lg overflow-x-clip">
+      <AnimatePresence mode="wait" initial={false} custom={dir}>
+        <motion.div
+          key={secao || "menu"}
+          custom={dir}
+          variants={DESLIZA}
+          initial="entra"
+          animate="centro"
+          exit="sai"
+          transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {conteudo()}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 };
