@@ -30,11 +30,20 @@ const ORDER_STEPS = [
 const ProductTile = ({ p }) => {
   const { add } = useBag();
   const { isFavorite, toggleFavorite } = useAuth();
+  const { isAvailable, isLow } = useStore();
   const fav = isFavorite(p.id);
+  const esgotado = !isAvailable(p.id);
   return (
     <motion.article layout className="overflow-hidden rounded-[22px] border border-app-border bg-app-surface">
       <div className="relative aspect-square" style={{ background: p.tint }}>
-        <img src={p.img} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-contain p-4" />
+        <img src={p.img} alt={p.name} loading="lazy" className={`absolute inset-0 h-full w-full object-contain p-4 ${esgotado ? "opacity-40 saturate-0" : ""}`} />
+        {esgotado ? (
+          <span className="absolute left-2 top-2 rounded-full bg-ink px-2.5 py-1 text-[10px] font-semibold text-white">Esgotado</span>
+        ) : (
+          isLow(p.id) && (
+            <span className="absolute left-2 top-2 rounded-full bg-berry px-2.5 py-1 text-[10px] font-semibold text-white">Últimas</span>
+          )
+        )}
         <button
           onClick={() => toggleFavorite(p.id)}
           aria-label={fav ? "Remover dos favoritos" : "Salvar nos favoritos"}
@@ -50,8 +59,9 @@ const ProductTile = ({ p }) => {
           <span className="font-display text-lg font-bold">{brl(p.price)}</span>
           <button
             onClick={() => add(p)}
-            aria-label={"Adicionar " + p.name}
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-app-invert text-app-invert-text transition-colors hover:bg-berry active:scale-90"
+            disabled={esgotado}
+            aria-label={esgotado ? p.name + " esgotado" : "Adicionar " + p.name}
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-app-invert text-app-invert-text transition-colors hover:bg-berry active:scale-90 disabled:pointer-events-none disabled:opacity-30"
           >
             <Plus className="h-4 w-4" />
           </button>

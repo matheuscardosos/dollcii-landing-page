@@ -2,9 +2,13 @@ import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { brl } from "../data/menu";
 import { useBag } from "../context/BagContext";
+import { useStore } from "../context/StoreContext";
 
 export const ProductCard = ({ p, onOpen }) => {
   const { add } = useBag();
+  // So perguntamos se tem ou nao tem. A quantidade e assunto do painel.
+  const { isAvailable, isLow } = useStore();
+  const esgotado = !isAvailable(p.id);
   return (
     <motion.article
       layout
@@ -18,18 +22,28 @@ export const ProductCard = ({ p, onOpen }) => {
       <div className="relative overflow-hidden rounded-[28px] bg-paper transition-colors duration-500" style={{ "--tint": p.tint }}>
         <span className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: p.tint }} />
         <button onClick={() => onOpen(p)} data-testid={`product-open-${p.id}`} className="relative flex aspect-[4/5] w-full items-center justify-center p-4 sm:p-8" aria-label={`Ver detalhes de ${p.name}`}>
-          <img src={p.img} alt={p.name} loading="lazy" className="max-h-full w-auto max-w-full object-contain drop-shadow-[0_24px_28px_rgba(17,17,17,0.14)] transition-transform duration-700 ease-out group-hover:-translate-y-3 group-hover:rotate-[-4deg] group-hover:scale-[1.06]" />
+          <img src={p.img} alt={p.name} loading="lazy" className={`max-h-full w-auto max-w-full object-contain drop-shadow-[0_24px_28px_rgba(17,17,17,0.14)] transition-transform duration-700 ease-out group-hover:-translate-y-3 group-hover:rotate-[-4deg] group-hover:scale-[1.06] ${esgotado ? "opacity-40 saturate-0" : ""}`} />
         </button>
         <div className="pointer-events-none absolute left-2 top-2 sm:left-4 sm:top-4 flex flex-wrap gap-1">
-          {p.tags.map((t) => (
-            <span key={t} className="rounded-full bg-white px-1.5 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-[11px] font-semibold text-ink">{t}</span>
-          ))}
+          {esgotado ? (
+            <span className="rounded-full bg-ink px-2.5 py-1 text-[9px] sm:text-[11px] font-semibold text-white">Esgotado</span>
+          ) : (
+            <>
+              {isLow(p.id) && (
+                <span className="rounded-full bg-berry px-2.5 py-1 text-[9px] sm:text-[11px] font-semibold text-white">Últimas unidades</span>
+              )}
+              {p.tags.map((t) => (
+                <span key={t} className="rounded-full bg-white px-1.5 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-[11px] font-semibold text-ink">{t}</span>
+              ))}
+            </>
+          )}
         </div>
         <button
           data-testid={`add-to-cart-button-${p.id}`}
           onClick={() => add(p)}
-          className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 grid h-9 w-9 sm:h-12 sm:w-12 place-items-center rounded-full bg-ink text-white shadow-lg transition-[transform,background-color] duration-300 hover:scale-110 hover:bg-berry"
-          aria-label={`Adicionar ${p.name} à sacola`}
+          disabled={esgotado}
+          className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 grid h-9 w-9 sm:h-12 sm:w-12 place-items-center rounded-full bg-ink text-white shadow-lg transition-[transform,background-color] duration-300 hover:scale-110 hover:bg-berry disabled:pointer-events-none disabled:opacity-30"
+          aria-label={esgotado ? `${p.name} esgotado` : `Adicionar ${p.name} à sacola`}
         >
           <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
         </button>

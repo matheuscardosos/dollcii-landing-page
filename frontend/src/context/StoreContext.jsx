@@ -3,6 +3,8 @@ import { COUPONS, PRODUCTS } from "../data/menu";
 
 const KEY = "geliz-loja";
 const STOCK_INICIAL = 40;
+const CUSTO_INICIAL = 2.5;
+const ULTIMAS_UNIDADES = 6;
 
 // Dados da operacao, compartilhados entre Nicolas e Allana.
 // Ficam fora do perfil de usuario porque a loja e uma so.
@@ -10,6 +12,7 @@ const vazio = () => ({
   sales: [],
   expenses: [],
   stock: Object.fromEntries(PRODUCTS.map((p) => [p.id, STOCK_INICIAL])),
+  costs: Object.fromEntries(PRODUCTS.map((p) => [p.id, CUSTO_INICIAL])),
   // O cupom antigo vira o primeiro da lista, agora editavel pelo painel.
   coupons: Object.entries(COUPONS).map(([code, rate]) => ({
     code,
@@ -31,6 +34,7 @@ const load = () => {
       coupons: Array.isArray(v.coupons) ? v.coupons : base.coupons,
       // Produto novo no cardapio entra com estoque cheio em vez de indefinido.
       stock: { ...base.stock, ...(v.stock || {}) },
+      costs: { ...base.costs, ...(v.costs || {}) },
     };
   } catch {
     return vazio();
@@ -93,6 +97,10 @@ export const StoreProvider = ({ children }) => {
     setData((d) => ({ ...d, stock: { ...d.stock, [id]: Math.max(0, (d.stock[id] ?? 0) + delta) } }));
   }, []);
 
+  const setCost = useCallback((id, value) => {
+    setData((d) => ({ ...d, costs: { ...d.costs, [id]: Math.max(0, value) } }));
+  }, []);
+
   const setStock = useCallback((id, qty) => {
     setData((d) => ({ ...d, stock: { ...d.stock, [id]: Math.max(0, qty) } }));
   }, []);
@@ -133,11 +141,53 @@ export const StoreProvider = ({ children }) => {
   }, []);
 
   const value = useMemo(() => {
-    const doDia = (arr) => arr.filter((x) => x.date.slice(0, 10) === hoje());
-    const vendasHoje = doDia(data.sales).filter((v) => !v.canceled);
-    const despesasHoje = doDia(data.expenses);
-    const faturamento = vendasHoje.reduce((s, v) => s + v.total, 0);
-    const gastos = despesasHoje.reduce((s, e) => s + e.value, 0);
+    const diasAtras = (n) => {
+      const d = new Date();
+      d.setDate(d.getDate() - n);
+      return d.toISOString().slice(0, 10);
+    };
+
+    // "tudo" nao filtra; os outros cortam pela data de corte.
+    const corte = { hoje: hoje(), "7d": diasAtras(6), "30d": diasAtras(29), tudo: null };
+
+    const resumo = (periodo = "hoje") => {
+      const desde = corte[periodo];
+      const dentro = (x) => !desde || x.date.slice(0, 10) >= desde;
+
+      const vendas = data.sales.filter((v) => dentro(v) && !v.canceled);
+      const despesas = data.expenses.filter(dentro);
+
+      const faturamento = vendas.reduce((acc, v) => acc + v.total, 0);
+      // Custo do que saiu, nao do que esta parado em estoque.
+      const custo = vendas.reduce(
+        (acc, v) => acc + v.items.reduce((a, i) => a + (data.costs[i.id] ?? 0) * i.qty, 0),
+        0
+      );
+      const gastos = despesas.reduce((acc, e) => acc + e.value, 0);
+
+      const porProduto = {};
+      vendas.forEach((v) =>
+        v.items.forEach((i) => {
+          const r = (porProduto[i.id] = porProduto[i.id] || { id: i.id, name: i.name, qty: 0, receita: 0, custo: 0 });
+          r.qty += i.qty;
+          r.receita += i.price * i.qty;
+          r.custo += (data.costs[i.id] ?? 0) * i.qty;
+        })
+      );
+
+      return {
+        vendas,
+        pedidos: vendas.length,
+        faturamento,
+        custo,
+        gastos,
+        lucro: faturamento - custo - gastos,
+        ticket: vendas.length ? faturamento / vendas.length : 0,
+        unidades: vendas.reduce((acc, v) => acc + v.items.reduce((a, i) => a + i.qty, 0), 0),
+        ranking: Object.values(porProduto).sort((a, b) => b.qty - a.qty),
+      };
+    };
+
     return {
       ...data,
       addSale,
@@ -146,6 +196,7 @@ export const StoreProvider = ({ children }) => {
       salesOf: (email) => data.sales.filter((s) => s.customer && s.customer.email === email),
       adjustStock,
       setStock,
+      setCost,
       addExpense,
       removeExpense,
       addCoupon,
@@ -160,16 +211,19 @@ export const StoreProvider = ({ children }) => {
         return c.discount / 100;
       },
       isExpired: (c) => !!c.expiresAt && c.expiresAt < hoje(),
-      hoje: {
-        vendas: vendasHoje,
-        pedidos: vendasHoje.length,
-        faturamento,
-        gastos,
-        lucro: faturamento - gastos,
-        ticket: vendasHoje.length ? faturamento / vendasHoje.length : 0,
+
+      // Quem vende so pergunta se tem ou nao tem. A quantidade fica no painel.
+      isAvailable: (id) => (data.stock[id] ?? 0) > 0,
+      isLow: (id) => {
+        const q = data.stock[id] ?? 0;
+        return q > 0 && q <= ULTIMAS_UNIDADES;
       },
+      stockLeft: (id) => data.stock[id] ?? 0,
+
+      resumo,
+      pendentes: data.sales.filter((s) => !s.canceled && s.step < 3),
     };
-  }, [data, addSale, advanceSale, cancelSale, adjustStock, setStock, addExpense, removeExpense, addCoupon, toggleCoupon, removeCoupon, useCoupon]);
+  }, [data, addSale, advanceSale, cancelSale, adjustStock, setStock, setCost, addExpense, removeExpense, addCoupon, toggleCoupon, removeCoupon, useCoupon]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 };

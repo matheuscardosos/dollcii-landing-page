@@ -480,7 +480,7 @@ export const CheckoutPage = () => {
 
             <button
               onClick={handleFinalize}
-              className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-berry text-sm font-semibold text-app-invert-text transition-colors hover:bg-berry-dark"
+              className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-berry text-sm font-semibold text-white transition-colors hover:bg-berry-dark"
             >
               Finalizar pedido
             </button>

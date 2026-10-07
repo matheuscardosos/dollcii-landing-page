@@ -3,6 +3,7 @@ import { Minus, Plus } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "./ui/dialog";
 import { brl } from "../data/menu";
 import { useBag } from "../context/BagContext";
+import { useStore } from "../context/StoreContext";
 
 export const ProductDialog = ({ product, onClose }) => {
   const { add } = useBag();

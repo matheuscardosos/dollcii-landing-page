@@ -11,7 +11,7 @@ import { useStore } from "../context/StoreContext";
 import { brl, PRODUCTS } from "../data/menu";
 
 const TABS = [
-  { id: "hoje", label: "Hoje", icon: TrendingUp },
+  { id: "resumo", label: "Resumo", icon: TrendingUp },
   { id: "pedidos", label: "Pedidos", icon: Receipt },
   { id: "estoque", label: "Estoque", icon: Boxes },
   { id: "despesas", label: "Despesas", icon: Wallet },
@@ -38,7 +38,14 @@ const Empty = ({ icon: Icon, title, text }) => (
   </div>
 );
 
-/* ── aba hoje ── */
+/* ── aba resumo ── */
+
+const PERIODOS = [
+  { id: "hoje", label: "Hoje" },
+  { id: "7d", label: "7 dias" },
+  { id: "30d", label: "30 dias" },
+  { id: "tudo", label: "Tudo" },
+];
 
 const Metric = ({ label, value, hint, accent }) => (
   <div className="rounded-[22px] border border-app-border bg-app-surface p-5">
@@ -50,33 +57,106 @@ const Metric = ({ label, value, hint, accent }) => (
   </div>
 );
 
-const Hoje = ({ onNovaVenda }) => {
-  const { hoje, stock } = useStore();
-  const baixos = PRODUCTS.filter((p) => (stock[p.id] ?? 0) <= ESTOQUE_BAIXO);
+const Resumo = ({ onNovaVenda, onVerPendentes }) => {
+  const { resumo, pendentes, stock, isLow, isAvailable } = useStore();
+  const [periodo, setPeriodo] = useState("hoje");
+  const r = resumo(periodo);
+
+  const repor = PRODUCTS.filter((p) => !isAvailable(p.id) || isLow(p.id));
+  const margem = r.faturamento > 0 ? Math.round((r.lucro / r.faturamento) * 100) : 0;
+
   return (
     <div className="space-y-4">
+      {pendentes.length > 0 && (
+        <button
+          onClick={onVerPendentes}
+          className="flex w-full items-center gap-3 rounded-[22px] bg-berry p-5 text-left text-white transition-transform active:scale-[0.99]"
+        >
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/20">
+            <Clock className="h-5 w-5" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-display text-lg font-bold">
+              {pendentes.length} {pendentes.length === 1 ? "pedido aguardando" : "pedidos aguardando"}
+            </span>
+            <span className="block text-xs text-white/80">Toque para ver a lista</span>
+          </span>
+          <ChevronRight className="h-5 w-5 shrink-0" />
+        </button>
+      )}
+
+      <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+        {PERIODOS.map((x) => (
+          <button
+            key={x.id}
+            onClick={() => setPeriodo(x.id)}
+            className={`h-9 shrink-0 rounded-full border px-4 text-sm font-medium transition-colors ${periodo === x.id ? "border-app-text bg-app-invert text-app-invert-text" : "border-app-border bg-app-surface"}`}
+          >
+            {x.label}
+          </button>
+        ))}
+      </div>
+
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Metric label="Vendido hoje" value={brl(hoje.faturamento)} hint={hoje.pedidos + (hoje.pedidos === 1 ? " pedido" : " pedidos")} />
-        <Metric label="Ticket médio" value={brl(hoje.ticket)} />
-        <Metric label="Despesas" value={brl(hoje.gastos)} />
-        <Metric label="Lucro" value={brl(hoje.lucro)} accent={hoje.lucro >= 0 ? "#6F9A4F" : "#FC030F"} />
+        <Metric
+          label="Faturamento"
+          value={brl(r.faturamento)}
+          hint={r.pedidos + (r.pedidos === 1 ? " pedido" : " pedidos") + " · " + r.unidades + " un"}
+        />
+        <Metric label="Ticket médio" value={brl(r.ticket)} />
+        <Metric label="Custo + despesas" value={brl(r.custo + r.gastos)} hint={"Produção " + brl(r.custo)} />
+        <Metric
+          label="Lucro"
+          value={brl(r.lucro)}
+          hint={r.faturamento > 0 ? "Margem de " + margem + "%" : undefined}
+          accent={r.lucro >= 0 ? "#6F9A4F" : "#FC030F"}
+        />
       </div>
 
       <button
         onClick={onNovaVenda}
-        className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-berry text-sm font-semibold text-app-invert-text transition-colors hover:bg-berry-dark"
+        className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-berry text-sm font-semibold text-white transition-colors hover:bg-berry-dark"
       >
         <Plus className="h-4 w-4" /> Registrar nova venda
       </button>
 
-      {baixos.length > 0 && (
+      {r.ranking.length > 0 && (
+        <div className="rounded-[22px] border border-app-border bg-app-surface p-5">
+          <p className="font-display text-base font-bold">Mais vendidos</p>
+          <ul className="mt-3 space-y-3">
+            {r.ranking.map((item, i) => {
+              const pct = Math.round((item.qty / r.ranking[0].qty) * 100);
+              const lucroItem = item.receita - item.custo;
+              return (
+                <li key={item.id}>
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="min-w-0 truncate text-sm font-medium">
+                      {i + 1}. {item.name}
+                    </span>
+                    <span className="shrink-0 font-mono text-xs text-app-muted">
+                      {item.qty} un · {brl(lucroItem)}
+                    </span>
+                  </div>
+                  <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-app-border">
+                    <div className="h-full rounded-full bg-berry" style={{ width: pct + "%" }} />
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      {repor.length > 0 && (
         <div className="rounded-[22px] border border-berry/30 bg-app-accent-soft p-5">
-          <p className="font-display text-base font-bold">Estoque baixo</p>
+          <p className="font-display text-base font-bold">Precisa repor</p>
           <ul className="mt-2 space-y-1 text-sm">
-            {baixos.map((p) => (
+            {repor.map((p) => (
               <li key={p.id} className="flex justify-between gap-3">
                 <span className="min-w-0 truncate">{p.name}</span>
-                <span className="shrink-0 font-mono text-xs font-semibold">{stock[p.id] ?? 0} un</span>
+                <span className={`shrink-0 font-mono text-xs font-semibold ${isAvailable(p.id) ? "" : "text-berry"}`}>
+                  {isAvailable(p.id) ? (stock[p.id] ?? 0) + " un" : "Esgotado"}
+                </span>
               </li>
             ))}
           </ul>
@@ -84,16 +164,16 @@ const Hoje = ({ onNovaVenda }) => {
       )}
 
       <div className="rounded-[22px] border border-app-border bg-app-surface p-5">
-        <p className="font-display text-base font-bold">Vendas de hoje</p>
-        {hoje.vendas.length === 0 ? (
-          <p className="mt-2 text-sm text-app-muted">Nenhuma venda registrada ainda hoje.</p>
+        <p className="font-display text-base font-bold">Vendas do período</p>
+        {r.vendas.length === 0 ? (
+          <p className="mt-2 text-sm text-app-muted">Nenhuma venda registrada.</p>
         ) : (
           <ul className="mt-3 divide-y divide-app-border">
-            {hoje.vendas.map((v) => (
+            {r.vendas.slice(0, 12).map((v) => (
               <li key={v.code} className="flex items-center justify-between gap-3 py-2.5">
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-medium">
-                    {v.items.reduce((s, i) => s + i.qty, 0)} un · {v.customer ? v.customer.name : "Balcão"}
+                    {v.items.reduce((a, i) => a + i.qty, 0)} un · {v.customer ? v.customer.name : "Balcão"}
                   </span>
                   <span className="block text-xs text-app-muted">{fmtHora(v.date)}</span>
                 </span>
@@ -101,6 +181,9 @@ const Hoje = ({ onNovaVenda }) => {
               </li>
             ))}
           </ul>
+        )}
+        {r.vendas.length > 12 && (
+          <p className="mt-3 text-xs text-app-muted">Mostrando as 12 mais recentes de {r.vendas.length}.</p>
         )}
       </div>
     </div>
@@ -172,7 +255,7 @@ const CancelDialog = ({ sale, onClose, onConfirm }) => {
           <button onClick={onClose} className="h-12 flex-1 rounded-full border border-app-border text-sm font-semibold transition-colors hover:bg-app-hover">
             Voltar
           </button>
-          <button onClick={confirmar} className="h-12 flex-1 rounded-full bg-berry text-sm font-semibold text-app-invert-text transition-colors hover:bg-berry-dark">
+          <button onClick={confirmar} className="h-12 flex-1 rounded-full bg-berry text-sm font-semibold text-white transition-colors hover:bg-berry-dark">
             Cancelar pedido
           </button>
         </div>
@@ -181,13 +264,18 @@ const CancelDialog = ({ sale, onClose, onConfirm }) => {
   );
 };
 
+const SITUACOES = [
+  { id: "pendentes", label: "Pendentes", test: (s) => !s.canceled && s.step < 3 },
+  { id: "entregues", label: "Entregues", test: (s) => !s.canceled && s.step === 3 },
+  { id: "cancelados", label: "Cancelados", test: (s) => s.canceled },
+  { id: "todos", label: "Todos", test: () => true },
+];
+
 const Pedidos = () => {
   const { sales, advanceSale, cancelSale } = useStore();
   const [cancelando, setCancelando] = useState(null);
-
-  if (!sales.length) {
-    return <Empty icon={Receipt} title="Nenhum pedido ainda" text="Vendas do site e do balcão aparecem aqui." />;
-  }
+  const [situacao, setSituacao] = useState("pendentes");
+  const [busca, setBusca] = useState("");
 
   const confirmar = (motivo) => {
     cancelSale(cancelando.code, motivo);
@@ -195,10 +283,47 @@ const Pedidos = () => {
     setCancelando(null);
   };
 
+  if (!sales.length) {
+    return <Empty icon={Receipt} title="Nenhum pedido ainda" text="Vendas do site e do balcão aparecem aqui." />;
+  }
+
+  const termo = busca.trim().toUpperCase();
+  const filtro = SITUACOES.find((x) => x.id === situacao).test;
+  const lista = sales.filter(
+    (s) => filtro(s) && (!termo || s.code.includes(termo) || (s.customer && s.customer.name.toUpperCase().includes(termo)))
+  );
+
   return (
     <>
+      <div className="mb-4 space-y-3">
+        <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+          {SITUACOES.map((x) => {
+            const n = sales.filter(x.test).length;
+            return (
+              <button
+                key={x.id}
+                onClick={() => setSituacao(x.id)}
+                className={`flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-4 text-sm font-medium transition-colors ${situacao === x.id ? "border-app-text bg-app-invert text-app-invert-text" : "border-app-border bg-app-surface"}`}
+              >
+                {x.label}
+                <span className={`font-mono text-[11px] ${situacao === x.id ? "opacity-70" : "text-app-muted"}`}>{n}</span>
+              </button>
+            );
+          })}
+        </div>
+        <input
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          placeholder="Buscar por código ou cliente"
+          className="h-11 w-full rounded-full border border-app-border bg-app-surface px-4 text-sm outline-none focus:border-app-text"
+        />
+      </div>
+
+      {lista.length === 0 ? (
+        <Empty icon={Receipt} title="Nada por aqui" text="Nenhum pedido bate com o filtro escolhido." />
+      ) : (
       <div className="space-y-3">
-        {sales.map((s) => (
+        {lista.map((s) => (
           <article key={s.code} className={`rounded-[22px] border bg-app-surface p-4 sm:p-5 ${s.canceled ? "border-berry/30 opacity-80" : "border-app-border"}`}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
@@ -271,6 +396,7 @@ const Pedidos = () => {
           </article>
         ))}
       </div>
+      )}
 
       <AnimatePresence>
         {cancelando && (
@@ -284,37 +410,63 @@ const Pedidos = () => {
 /* ── aba estoque ── */
 
 const Estoque = () => {
-  const { stock, adjustStock, setStock } = useStore();
+  const { stock, costs, adjustStock, setStock, setCost, isAvailable, isLow } = useStore();
   return (
     <div className="space-y-3">
+      <p className="text-sm text-app-muted">
+        O custo por unidade entra no cálculo do lucro. O cliente nunca vê essas quantidades.
+      </p>
       {PRODUCTS.map((p) => {
         const qty = stock[p.id] ?? 0;
-        const baixo = qty <= ESTOQUE_BAIXO;
+        const esgotado = !isAvailable(p.id);
+        const baixo = isLow(p.id);
+        const margem = p.price > 0 ? Math.round(((p.price - (costs[p.id] ?? 0)) / p.price) * 100) : 0;
         return (
-          <div key={p.id} className="flex items-center gap-3 rounded-[22px] border border-app-border bg-app-surface p-3">
-            <div className="grid h-16 w-14 shrink-0 place-items-center overflow-hidden rounded-xl p-1.5" style={{ background: p.tint }}>
-              <img src={p.img} alt="" loading="lazy" className="h-full w-auto object-contain" />
+          <div key={p.id} className={`rounded-[22px] border bg-app-surface p-3 ${esgotado ? "border-berry/40" : "border-app-border"}`}>
+            <div className="flex items-center gap-3">
+              <div className="grid h-16 w-14 shrink-0 place-items-center overflow-hidden rounded-xl p-1.5" style={{ background: p.tint }}>
+                <img src={p.img} alt="" loading="lazy" className="h-full w-auto object-contain" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold">{p.name}</p>
+                <p className={`mt-0.5 text-xs ${esgotado || baixo ? "font-semibold text-berry" : "text-app-muted"}`}>
+                  {esgotado ? "Esgotado no site" : qty + " unidades" + (baixo ? " · repor" : "")}
+                </p>
+              </div>
+              <div className="flex shrink-0 items-center gap-1">
+                <button onClick={() => adjustStock(p.id, -1)} aria-label="Tirar uma" className="grid h-9 w-9 place-items-center rounded-full border border-app-border transition-colors hover:bg-app-hover">
+                  <Minus className="h-3.5 w-3.5" />
+                </button>
+                <input
+                  value={qty}
+                  onChange={(e) => setStock(p.id, parseInt(e.target.value.replace(/\D/g, "") || "0", 10))}
+                  inputMode="numeric"
+                  aria-label={"Estoque de " + p.name}
+                  className="h-9 w-12 rounded-lg border border-app-border bg-app-surface text-center font-mono text-sm outline-none focus:border-app-text"
+                />
+                <button onClick={() => adjustStock(p.id, 1)} aria-label="Somar uma" className="grid h-9 w-9 place-items-center rounded-full border border-app-border transition-colors hover:bg-app-hover">
+                  <Plus className="h-3.5 w-3.5" />
+                </button>
+              </div>
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold">{p.name}</p>
-              <p className={`mt-0.5 text-xs ${baixo ? "font-semibold text-berry" : "text-app-muted"}`}>
-                {qty} unidades{baixo ? " · repor" : ""}
+
+            <div className="mt-3 flex items-center gap-3 border-t border-app-border pt-3">
+              <label className="flex items-center gap-2">
+                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-app-muted">Custo</span>
+                <span className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-app-muted">R$</span>
+                  <input
+                    value={String(costs[p.id] ?? 0).replace(".", ",")}
+                    onChange={(e) => setCost(p.id, parseFloat(e.target.value.replace(",", ".").replace(/[^\d.]/g, "")) || 0)}
+                    inputMode="decimal"
+                    aria-label={"Custo de " + p.name}
+                    className="h-9 w-24 rounded-lg border border-app-border bg-app-surface pl-9 pr-2 font-mono text-sm outline-none focus:border-app-text"
+                  />
+                </span>
+              </label>
+              <p className="ml-auto text-xs text-app-muted">
+                Vende a {brl(p.price)} · margem de <span className="font-semibold text-app-text">{margem}%</span>
               </p>
-            </div>
-            <div className="flex shrink-0 items-center gap-1">
-              <button onClick={() => adjustStock(p.id, -1)} aria-label="Tirar uma" className="grid h-9 w-9 place-items-center rounded-full border border-app-border transition-colors hover:bg-app-hover">
-                <Minus className="h-3.5 w-3.5" />
-              </button>
-              <input
-                value={qty}
-                onChange={(e) => setStock(p.id, parseInt(e.target.value.replace(/\D/g, "") || "0", 10))}
-                inputMode="numeric"
-                aria-label={"Estoque de " + p.name}
-                className="h-9 w-12 rounded-lg border border-app-border text-center font-mono text-sm outline-none focus:border-app-text"
-              />
-              <button onClick={() => adjustStock(p.id, 1)} aria-label="Somar uma" className="grid h-9 w-9 place-items-center rounded-full border border-app-border transition-colors hover:bg-app-hover">
-                <Plus className="h-3.5 w-3.5" />
-              </button>
             </div>
           </div>
         );
@@ -593,7 +745,7 @@ const NovaVenda = ({ onClose }) => {
           </div>
           <button
             onClick={registrar}
-            className="h-14 shrink-0 rounded-full bg-berry px-8 text-sm font-semibold text-app-invert-text transition-colors hover:bg-berry-dark"
+            className="h-14 shrink-0 rounded-full bg-berry px-8 text-sm font-semibold text-white transition-colors hover:bg-berry-dark"
           >
             Registrar venda
           </button>
@@ -607,7 +759,7 @@ const NovaVenda = ({ onClose }) => {
 
 export const AdminPanel = () => {
   const { user, logout } = useAuth();
-  const [tab, setTab] = useState("hoje");
+  const [tab, setTab] = useState("resumo");
   const [venda, setVenda] = useState(false);
 
   if (!user) return null;
@@ -641,7 +793,7 @@ export const AdminPanel = () => {
         </nav>
         <button
           onClick={() => setVenda(true)}
-          className="mt-4 flex h-12 items-center justify-center gap-2 rounded-full bg-berry text-sm font-semibold text-app-invert-text transition-colors hover:bg-berry-dark"
+          className="mt-4 flex h-12 items-center justify-center gap-2 rounded-full bg-berry text-sm font-semibold text-white transition-colors hover:bg-berry-dark"
         >
           <Plus className="h-4 w-4" /> Nova venda
         </button>
@@ -678,7 +830,7 @@ export const AdminPanel = () => {
             transition={{ duration: 0.22 }}
             className="mt-5 lg:mt-0"
           >
-            {tab === "hoje" && <Hoje onNovaVenda={() => setVenda(true)} />}
+            {tab === "resumo" && <Resumo onNovaVenda={() => setVenda(true)} onVerPendentes={() => setTab("pedidos")} />}
             {tab === "pedidos" && <Pedidos />}
             {tab === "estoque" && <Estoque />}
             {tab === "despesas" && <Despesas />}

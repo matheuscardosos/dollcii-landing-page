@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { toast } from "sonner";
 import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "./ui/sheet";
 import { useBag } from "../context/BagContext";
@@ -56,7 +57,8 @@ const Coupon = () => {
 const Summary = () => {
   const { items, coupon, setOpen, setCheckout } = useBag();
   const { signed } = useAuth();
-  const { couponRate } = useStore();
+  const { couponRate, isAvailable } = useStore();
+  const esgotados = items.filter((i) => !isAvailable(i.id));
   const [authOpen, setAuthOpen] = useState(false);
 
   const irParaCheckout = () => {
@@ -66,6 +68,9 @@ const Summary = () => {
 
   // Sem conta nao da pra fechar pedido: abre o login e segue depois.
   const finalizar = () => {
+    if (esgotados.length) {
+      return toast.error("Tire da sacola: " + esgotados.map((i) => i.name).join(", "));
+    }
     if (signed) return irParaCheckout();
     setAuthOpen(true);
   };
@@ -85,9 +90,14 @@ const Summary = () => {
         <div className="flex justify-between"><dt className="text-app-muted">Entrega</dt><dd data-testid="cart-delivery" className="font-mono">{t.delivery ? brl(t.delivery) : "Grátis"}</dd></div>
         <div className="flex justify-between pt-2 font-display text-2xl font-bold"><dt>Total</dt><dd data-testid="cart-total">{brl(t.total)}</dd></div>
       </dl>
-      <button data-testid="checkout-button" onClick={finalizar} className="mt-5 h-14 w-full rounded-full bg-berry text-sm font-semibold text-app-invert-text transition-colors hover:bg-berry-dark">
+      <button data-testid="checkout-button" onClick={finalizar} className="mt-5 h-14 w-full rounded-full bg-berry text-sm font-semibold text-white transition-colors hover:bg-berry-dark">
         Finalizar pedido
       </button>
+      {esgotados.length > 0 && (
+        <p className="mt-2 text-center text-xs text-berry">
+          {esgotados.length === 1 ? "Um item esgotou" : "Alguns itens esgotaram"} enquanto você escolhia.
+        </p>
+      )}
       {!signed && <p className="mt-2 text-center text-xs text-app-muted">Entre na sua conta para finalizar</p>}
       <AuthModal open={authOpen} onOpenChange={setAuthOpen} onSuccess={irParaCheckout} />
     </div>
