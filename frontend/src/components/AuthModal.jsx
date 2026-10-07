@@ -93,7 +93,7 @@ const GoogleView = ({ goTo, onDone }) => {
         ))}
       </div>
       <p className="text-center text-[11px] leading-relaxed text-ink-soft">
-        Demonstração. Nenhuma conta real do Google é acessada.
+        Ambiente de homologação. Nenhuma conta real do Google é acessada.
       </p>
     </div>
   );

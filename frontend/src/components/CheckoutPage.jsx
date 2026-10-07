@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, Check, Copy, CreditCard, Lock, Minus, Plus, Trash2, X } from "lucide-react";
+import { ArrowLeft, Check, Copy, CreditCard, Lock, Minus, Plus, Receipt, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { useBag } from "../context/BagContext";
 import { useAuth } from "../context/AuthContext";
 import { useStore } from "../context/StoreContext";
+import { Recibo } from "./Recibo";
 import { brl, calcTotals, FREE_DELIVERY_FROM } from "../data/menu";
 
 const P = process.env.PUBLIC_URL;
@@ -345,7 +346,7 @@ const PixWaiting = ({ total, onConfirm }) => {
 
 /* ── success screen ── */
 
-const Success = ({ onClose }) => (
+const Success = ({ onClose, venda, onRecibo }) => (
   <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
     <motion.div
       initial={{ scale: 0 }}
@@ -357,9 +358,19 @@ const Success = ({ onClose }) => (
     </motion.div>
     <p className="font-display text-3xl font-bold">Pedido confirmado!</p>
     <p className="max-w-xs text-sm text-app-muted">Seu pedido foi recebido e está sendo preparado. Acompanhe pelo app ou aguarde a entrega.</p>
-    <button onClick={onClose} className="mt-4 h-12 rounded-full bg-app-invert px-8 text-sm font-semibold text-app-invert-text transition-colors hover:bg-berry">
-      Voltar para a loja
-    </button>
+    {venda && (
+      <p className="font-mono text-sm font-semibold tracking-wider">#{venda.code}</p>
+    )}
+    <div className="mt-4 flex w-full max-w-xs flex-col gap-2">
+      {venda && (
+        <button onClick={onRecibo} className="flex h-12 items-center justify-center gap-2 rounded-full bg-berry text-sm font-semibold text-white transition-colors hover:bg-berry-dark">
+          <Receipt className="h-4 w-4" /> Ver recibo
+        </button>
+      )}
+      <button onClick={onClose} className="h-12 rounded-full bg-app-invert text-sm font-semibold text-app-invert-text transition-colors hover:bg-berry">
+        Voltar para a loja
+      </button>
+    </div>
   </div>
 );
 
@@ -373,6 +384,8 @@ export const CheckoutPage = () => {
   const [method, setMethod] = useState("cartao");
   const [address, setAddress] = useState(() => user?.address || EMPTY_ADDRESS);
   const [stage, setStage] = useState("form"); // form | pix | success
+  const [concluida, setConcluida] = useState(null);
+  const [verRecibo, setVerRecibo] = useState(false);
 
   // Endereco padrao do perfil preenche o formulario quando o checkout abre.
   useEffect(() => {
@@ -386,7 +399,11 @@ export const CheckoutPage = () => {
 
   const close = () => {
     setCheckout(false);
-    setTimeout(() => setStage("form"), 300);
+    setTimeout(() => {
+      setStage("form");
+      setConcluida(null);
+      setVerRecibo(false);
+    }, 300);
   };
 
   const validate = () => {
@@ -402,7 +419,9 @@ export const CheckoutPage = () => {
 
   const concluir = useCallback(() => {
     const pedido = items.map(({ id, name, price, qty }) => ({ id, name, price, qty }));
-    addSale({
+    const venda = {
+      code: "GLZ" + Math.random().toString(36).slice(2, 7).toUpperCase(),
+      date: new Date().toISOString(),
       items: pedido,
       total: t.total,
       payment: method,
@@ -411,7 +430,9 @@ export const CheckoutPage = () => {
       customer: { name: user.name, email: user.email },
       mode,
       address: mode === "entrega" ? address : null,
-    });
+    };
+    addSale(venda);
+    setConcluida(venda);
     if (t.rate > 0) useCoupon(coupon);
     clear();
     setCoupon("");
@@ -446,7 +467,7 @@ export const CheckoutPage = () => {
       </div>
 
       {stage === "success" ? (
-        <Success onClose={close} />
+        <Success onClose={close} venda={concluida} onRecibo={() => setVerRecibo(true)} />
       ) : stage === "pix" ? (
         <div className="mx-auto max-w-lg px-5 sm:px-8">
           <PixWaiting total={t.total} onConfirm={concluir} />
@@ -504,6 +525,10 @@ export const CheckoutPage = () => {
           </div>
         </div>
       )}
+
+      <AnimatePresence>
+        {verRecibo && concluida && <Recibo venda={concluida} onClose={() => setVerRecibo(false)} />}
+      </AnimatePresence>
     </motion.div>
   );
 };

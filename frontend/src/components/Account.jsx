@@ -9,6 +9,7 @@ import { Logo } from "./Logo";
 import { useAuth } from "../context/AuthContext";
 import { useBag } from "../context/BagContext";
 import { useStore } from "../context/StoreContext";
+import { Recibo } from "./Recibo";
 import { brl, CATEGORIES } from "../data/menu";
 
 const TABS = [
@@ -152,6 +153,7 @@ const Track = ({ step }) => (
 const Pedidos = () => {
   const { user } = useAuth();
   const { salesOf } = useStore();
+  const [recibo, setRecibo] = useState(null);
   // Le direto das vendas da loja: assim um cancelamento no painel chega aqui.
   const orders = salesOf(user.email);
 
@@ -193,8 +195,17 @@ const Pedidos = () => {
           ) : (
             <Track step={o.step} />
           )}
+          <button
+            onClick={() => setRecibo(o)}
+            className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-full border border-app-border text-xs font-semibold transition-colors hover:bg-app-hover"
+          >
+            <Receipt className="h-3.5 w-3.5" /> Ver recibo
+          </button>
         </article>
       ))}
+      <AnimatePresence>
+        {recibo && <Recibo venda={recibo} onClose={() => setRecibo(null)} />}
+      </AnimatePresence>
     </div>
   );
 };
