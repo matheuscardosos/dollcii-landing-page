@@ -16,7 +16,7 @@ module.exports = {
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
-        paper: { DEFAULT: "#FFF8F0", 2: "#FDEFE2" },
+        paper: { DEFAULT: "#F4F4F4", 2: "#EAEAEA" },
         ink: { DEFAULT: "#1A1110", soft: "#7B6A63" },
         berry: { DEFAULT: "#FC030F", dark: "#CD0202", soft: "#FFECED" },
         sun: { DEFAULT: "#FCC303", dark: "#FEA203", soft: "#FFF6DB" },
