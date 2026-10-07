@@ -22,7 +22,7 @@ const Field = ({ label, type = "text", ...props }) => {
         <input
           {...props}
           type={isPassword && show ? "text" : type}
-          className="h-12 w-full rounded-2xl border hairline bg-white px-4 pr-11 text-sm outline-none focus:border-ink"
+          className="h-11 w-full rounded-2xl border hairline bg-white px-4 pr-11 text-sm outline-none focus:border-ink"
         />
         {isPassword && (
           <button type="button" tabIndex={-1} onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-soft hover:text-ink">
@@ -38,7 +38,7 @@ const GoogleButton = ({ label, onClick }) => (
   <button
     type="button"
     onClick={onClick}
-    className="flex h-12 w-full items-center justify-center gap-3 rounded-2xl border hairline bg-white text-sm font-medium transition-colors hover:bg-paper"
+    className="flex h-11 w-full items-center justify-center gap-3 rounded-2xl border hairline bg-white text-sm font-medium transition-colors hover:bg-paper"
   >
     <img src={P + "/img/google.svg"} alt="" className="h-5 w-5" />
     {label}
@@ -154,7 +154,7 @@ const RegisterView = ({ goTo, onDone }) => {
   };
 
   return (
-    <form onSubmit={submit} className="space-y-4">
+    <form onSubmit={submit} className="space-y-3">
       <div>
         <DialogTitle className="font-display text-2xl font-bold tracking-[-0.03em]">Criar conta</DialogTitle>
         <DialogDescription className="mt-1 text-sm text-ink-soft">Cadastre-se para fazer pedidos</DialogDescription>
@@ -165,7 +165,7 @@ const RegisterView = ({ goTo, onDone }) => {
       <Field label="E-mail" type="email" value={form.email} onChange={set("email")} placeholder="seu@email.com" />
       <Field label="Senha" type="password" value={form.password} onChange={set("password")} placeholder="Mínimo 8 caracteres" />
       <Field label="Confirmar senha" type="password" value={form.confirm} onChange={set("confirm")} placeholder="Repita a senha" />
-      <button type="submit" className="h-12 w-full rounded-full bg-berry text-sm font-semibold text-white transition-colors hover:bg-berry-dark">
+      <button type="submit" className="mt-1 h-12 w-full rounded-full bg-berry text-sm font-semibold text-white transition-colors hover:bg-berry-dark">
         Criar conta
       </button>
       <p className="text-center text-sm text-ink-soft">
@@ -223,11 +223,13 @@ export const AuthModal = ({ open, onOpenChange, onSuccess }) => {
 
   return (
     <Dialog open={open} onOpenChange={close}>
-      <DialogContent className="max-h-[94svh] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-[20px] border-none bg-white p-6 sm:rounded-[28px] sm:p-8">
-        {view === "login" && <LoginView goTo={setView} onDone={done} />}
-        {view === "register" && <RegisterView goTo={setView} onDone={done} />}
-        {view === "forgot" && <ForgotView goTo={setView} />}
-        {view === "google" && <GoogleView goTo={setView} onDone={done} />}
+      <DialogContent className="flex max-h-[90svh] w-[calc(100%-2rem)] max-w-md flex-col gap-0 overflow-hidden rounded-[20px] border-none bg-white p-0 sm:rounded-[28px]">
+        <div className="overflow-y-auto p-6 sm:p-8" data-lenis-prevent>
+          {view === "login" && <LoginView goTo={setView} onDone={done} />}
+          {view === "register" && <RegisterView goTo={setView} onDone={done} />}
+          {view === "forgot" && <ForgotView goTo={setView} />}
+          {view === "google" && <GoogleView goTo={setView} onDone={done} />}
+        </div>
       </DialogContent>
     </Dialog>
   );

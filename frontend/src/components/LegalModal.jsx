@@ -110,8 +110,10 @@ const Privacy = () => (
 
 export const LegalModal = ({ type, open, onOpenChange }) => (
   <Dialog open={open} onOpenChange={onOpenChange}>
-    <DialogContent className="max-h-[90svh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto rounded-[20px] sm:rounded-[28px] border-none bg-white p-6 sm:p-8 lg:p-10">
-      {type === "termos" ? <Terms /> : <Privacy />}
+    <DialogContent className="flex max-h-[90svh] w-[calc(100%-2rem)] max-w-2xl flex-col gap-0 overflow-hidden rounded-[20px] border-none bg-white p-0 sm:rounded-[28px]">
+      <div className="overflow-y-auto p-6 sm:p-8 lg:p-10" data-lenis-prevent>
+        {type === "termos" ? <Terms /> : <Privacy />}
+      </div>
     </DialogContent>
   </Dialog>
 );
