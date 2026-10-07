@@ -17,8 +17,9 @@ export const Recibo = ({ venda, onClose }) => {
       canvas.style.width = "100%";
       canvas.style.height = "auto";
       canvas.style.display = "block";
-      holder.current.innerHTML = "";
-      holder.current.appendChild(canvas);
+      // replaceChildren em vez de innerHTML: o React nunca renderiza aqui dentro,
+      // entao este no e so meu e nao ha nada do React pra atropelar.
+      holder.current.replaceChildren(canvas);
       canvasRef.current = canvas;
       setPronto(true);
     });
@@ -77,11 +78,7 @@ export const Recibo = ({ venda, onClose }) => {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-5" data-lenis-prevent>
-          <div
-            ref={holder}
-            className="overflow-hidden rounded-2xl border border-app-border shadow-sm"
-            style={{ minHeight: pronto ? undefined : 320 }}
-          >
+          <div className="overflow-hidden rounded-2xl border border-app-border shadow-sm">
             {!pronto && (
               <div className="grid h-80 place-items-center text-sm text-app-muted">
                 <span className="flex items-center gap-2">
@@ -89,6 +86,7 @@ export const Recibo = ({ venda, onClose }) => {
                 </span>
               </div>
             )}
+            <div ref={holder} />
           </div>
         </div>
 
