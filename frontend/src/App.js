@@ -50,6 +50,13 @@ const PROTEGIDAS = ["/conta", "/painel"];
 const Routes = () => {
   const [route, go] = useHashRoute();
   const { signed, isAdmin } = useAuth();
+  const noApp = signed && ((route === "/painel" && isAdmin) || route === "/conta");
+
+  // Marca a raiz pra que o tema escuro alcance tambem o que vai pra portal.
+  useEffect(() => {
+    document.documentElement.classList.toggle("app-mode", noApp);
+    return () => document.documentElement.classList.remove("app-mode");
+  }, [noApp]);
 
   useEffect(() => {
     // Sessao encerrada, ou cliente tentando o painel da loja: volta pro site.
@@ -61,8 +68,9 @@ const Routes = () => {
     window.scrollTo(0, 0);
   }, [route]);
 
-  if (route === "/painel" && signed && isAdmin) return <AdminPanel onBack={() => go("/")} />;
-  if (route === "/conta" && signed) return <Account onBack={() => go("/")} />;
+  // O app de pedidos e um modulo a parte: so se sai dele deslogando.
+  if (route === "/painel" && signed && isAdmin) return <AdminPanel />;
+  if (route === "/conta" && signed) return <Account />;
   return <Landing />;
 };
 

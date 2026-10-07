@@ -57,6 +57,43 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
 .lenis.lenis-stopped { overflow: hidden; }
 
+/* Tokens do app de pedidos.
+   O claro vale em qualquer lugar, inclusive na landing. O escuro so entra
+   quando a raiz esta em modo app, o que tambem alcanca sacola e checkout,
+   que o Radix monta em portal fora da arvore do app. */
+:root {
+    --app-bg: #ffffff;
+    --app-surface: #ffffff;
+    --app-border: rgba(17, 17, 17, 0.11);
+    --app-text: #1a1110;
+    --app-muted: #7b6a63;
+    --app-hover: #f4f4f4;
+    --app-invert: #1a1110;
+    --app-invert-text: #ffffff;
+    --app-accent: #fc030f;
+    --app-accent-soft: #ffeced;
+}
+
+@media (prefers-color-scheme: dark) {
+    html.app-mode {
+        /* Preto puro, sem desvio pro azul nem pro cinza. */
+        --app-bg: #000000;
+        --app-surface: #000000;
+        --app-border: rgba(255, 255, 255, 0.16);
+        --app-text: #ffffff;
+        --app-muted: rgba(255, 255, 255, 0.58);
+        --app-hover: rgba(255, 255, 255, 0.07);
+        --app-invert: #ffffff;
+        --app-invert-text: #000000;
+        --app-accent-soft: rgba(252, 3, 15, 0.2);
+
+        color-scheme: dark;
+    }
+
+    /* Sem isso o overscroll mostra uma faixa branca. */
+    html.app-mode, html.app-mode body { background: #000000; }
+}
+
 .hairline { border-color: rgba(17, 17, 17, 0.1); }
 
 .text-outline {
