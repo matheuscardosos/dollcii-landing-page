@@ -86,6 +86,17 @@ export const Hero = () => {
     setFlavor(f);
   };
 
+  // Sem isso a troca automatica so comeca a baixar a foto do proximo sabor
+  // na hora de mostrar, e a primeira volta engasga.
+  useEffect(() => {
+    const proximo = FLAVORS[(FLAVORS.indexOf(flavor) + 1) % FLAVORS.length];
+    [proximo.pop, ...proximo.pieces.map((p) => p.src)].forEach((src) => {
+      const img = new Image();
+      img.decoding = "async";
+      img.src = src;
+    });
+  }, [flavor]);
+
   return (
     <section id="topo" data-testid="hero-section" className="relative overflow-hidden bg-white pt-[76px]">
       <div className="mx-auto grid w-full max-w-[1440px] gap-6 px-5 pb-10 sm:px-8 lg:grid-cols-12 lg:items-center lg:gap-10 lg:px-14 lg:pb-6 xl:min-h-[calc(100svh-76px)] xl:pb-0">

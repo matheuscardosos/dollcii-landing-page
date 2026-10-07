@@ -14,7 +14,7 @@ const Piece = ({ p, sx, sy, i }) => {
       exit={{ opacity: 0, scale: 0.5, rotate: p.rot + 30 }}
       transition={{ duration: 0.9, ease, delay: 0.12 + i * 0.08 }}
     >
-      <img src={p.src} alt="" className="fruit-shadow animate-float w-full" style={{ animationDelay: `${p.delay}s`, animationDuration: `${5 + p.depth * 1.5}s` }} draggable={false} />
+      <img src={p.src} alt="" decoding="async" className="fruit-shadow animate-float w-full" style={{ animationDelay: `${p.delay}s`, animationDuration: `${5 + p.depth * 1.5}s` }} draggable={false} />
     </motion.div>
   );
 };
@@ -59,6 +59,8 @@ export const FlavorStage = ({ flavor, className = "", pieces = true }) => {
             className="pop-shadow h-[92%] w-auto select-none object-contain"
             style={{ x: popX, y: popY }}
             draggable={false}
+            fetchPriority="high"
+            decoding="async"
             data-testid="hero-popsicle-image"
           />
         </motion.div>
