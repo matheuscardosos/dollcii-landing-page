@@ -6,7 +6,7 @@ import { useStore } from "../context/StoreContext";
 import { FlavorStage } from "./FlavorStage";
 import { useBag } from "../context/BagContext";
 import { scrollToId } from "./SmoothScroll";
-import { ease, Eyebrow } from "./Reveal";
+import { ease } from "./Reveal";
 
 const SwapWord = ({ flavor }) => (
   <span className="relative inline-grid overflow-hidden pb-[0.12em] -mb-[0.12em] align-bottom">
@@ -101,10 +101,7 @@ export const Hero = () => {
     <section id="topo" data-testid="hero-section" className="relative overflow-hidden bg-white pt-[76px]">
       <div className="mx-auto grid w-full max-w-[1440px] gap-6 px-5 pb-10 sm:px-8 lg:grid-cols-12 lg:items-center lg:gap-10 lg:px-14 lg:pb-6 xl:min-h-[calc(100svh-76px)] xl:pb-0">
         <div className="relative z-10 min-w-0 pt-10 lg:col-span-6 lg:pt-4 xl:pt-0">
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2, duration: 1 }}>
-            <Eyebrow>Geladinhos gourmet · Montes Claros, MG</Eyebrow>
-          </motion.div>
-          <h1 data-testid="hero-title" className="mt-5 sm:mt-6 font-display text-[2.6rem] font-bold leading-[0.95] tracking-[-0.04em] sm:text-7xl lg:text-[4rem] xl:text-[5.4rem] 2xl:text-[6.2rem]">
+          <h1 data-testid="hero-title" className="font-display text-[2.6rem] font-bold leading-[0.95] tracking-[-0.04em] sm:text-7xl lg:text-[4rem] xl:text-[5.4rem] 2xl:text-[6.2rem]">
             <Line i={0}>Feito de</Line>
             <Line i={1}><SwapWord flavor={flavor} /></Line>
             <Line i={2}>de verdade.</Line>

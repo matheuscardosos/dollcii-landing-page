@@ -1,5 +1,5 @@
 import { ChefHat, Heart, Smile, Snowflake } from "lucide-react";
-import { Eyebrow, H2, Reveal, Section } from "./Reveal";
+import { H2, Reveal, Section } from "./Reveal";
 import { WhatsAppIcon, WHATSAPP_URL } from "./WhatsAppIcon";
 
 const P = process.env.PUBLIC_URL;
@@ -20,8 +20,7 @@ export const Historia = () => (
   <Section id="historia" data-testid="historia-section" className="py-24 lg:py-36">
     <div className="grid gap-14 lg:grid-cols-12 lg:gap-16">
       <div className="lg:col-span-6">
-        <Eyebrow>Quem somos</Eyebrow>
-        <H2 className="mt-5" lines={["Nicolas", <span key="a">e <span className="text-berry">Allana.</span></span>]} />
+        <H2 lines={["Nicolas", <span key="a">e <span className="text-berry">Allana.</span></span>]} />
         <Reveal className="mt-8 space-y-5 text-lg leading-relaxed text-ink-soft" delay={0.1}>
           <p>Olá! Somos um casal de jovens empreendedores que decidiu transformar um sonho em sabor.</p>
           <p>
@@ -63,8 +62,7 @@ export const Historia = () => (
 
     <div className="mt-24 grid gap-14 lg:grid-cols-12 lg:gap-16">
       <div className="lg:col-span-5">
-        <Eyebrow>O que oferecemos</Eyebrow>
-        <Reveal className="mt-5" delay={0.05}>
+        <Reveal delay={0.05}>
           <p className="font-display text-[2rem] font-bold leading-[1.05] tracking-[-0.03em] sm:text-4xl">
             Não vendemos apenas geladinhos. Vendemos experiência, afeto e <span className="text-berry">Gelicidade.</span>
           </p>
@@ -86,8 +84,7 @@ export const Historia = () => (
       </div>
 
       <div className="lg:col-span-7">
-        <Eyebrow>Por que comprar com a Geliz</Eyebrow>
-        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           {REASONS.map(([Icon, title, text], i) => (
             <Reveal key={title} delay={i * 0.06} className="rounded-[24px] border hairline p-6 transition-colors hover:bg-paper">
               <span className="grid h-11 w-11 place-items-center rounded-full bg-berry-soft text-berry">

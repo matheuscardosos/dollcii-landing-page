@@ -5,7 +5,7 @@ import { CATEGORIES } from "../data/menu";
 import { useStore } from "../context/StoreContext";
 import { ProductCard } from "./ProductCard";
 import { ProductDialog } from "./ProductDialog";
-import { Eyebrow, H2 } from "./Reveal";
+import { H2 } from "./Reveal";
 
 const normalize = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
@@ -25,8 +25,7 @@ export const Menu = () => {
       <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-14">
         <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
           <div>
-            <Eyebrow>Cardápio</Eyebrow>
-            <H2 className="mt-5" lines={["Escolha o seu", <span key="e" className="text-berry">favorito.</span>]} />
+            <H2 lines={["Escolha o seu", <span key="e" className="text-berry">favorito.</span>]} />
           </div>
           <label className="flex h-12 w-full items-center gap-3 rounded-full bg-paper px-5 lg:w-80">
             <Search className="h-4 w-4 text-ink-soft" />

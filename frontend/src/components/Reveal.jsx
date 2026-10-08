@@ -39,13 +39,6 @@ export const Lines = ({ lines, className = "", delay = 0, onLoad = false, testId
   );
 };
 
-export const Eyebrow = ({ children, className = "" }) => (
-  <p className={`flex items-start gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft ${className}`}>
-    <span className="mt-[0.35em] h-1.5 w-1.5 shrink-0 rounded-full bg-berry" />
-    {children}
-  </p>
-);
-
 export const Section = forwardRef(({ children, className = "", ...rest }, ref) => (
   <section ref={ref} className={`mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-14 ${className}`} {...rest}>
     {children}
